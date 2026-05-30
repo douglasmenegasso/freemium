@@ -414,6 +414,7 @@ function showChangelog() {
     sec:  { label: 'SEGURANÇA',color: '#10b981' }
   };
   const logs = [
+    { v: 'v3.9.9', t: 'feat', d: 'Freemium: limites grátis (3 clientes, 20 produtos), PDF, nuvem e perfil Usuário bloqueados. Paywall com planos, ativação por chave e badge FREE/PRO no cabeçalho.' },
     { v: 'v3.9.8', t: 'fix',  d: 'Scanner: leitura melhorada (resolução HD, delay reduzido). Código: normalização robusta evita pedir cadastro de produto já existente.' },
     { v: 'v3.9.7', t: 'fix',  d: 'Bloqueio de código de barras duplicado em saveProductAndContinue — impede cadastrar o mesmo código 2x.' },
     { v: 'v3.9.6', t: 'fix',  d: 'Modal Aviso de Item: botão − adicionado, + só incrementa, Adicionar ao Pedido confirma.' },
@@ -1395,6 +1396,7 @@ function saveProductAndContinue(code) {
   const name = document.getElementById('rp-name').value.trim();
   const price = parseFloat(document.getElementById('rp-price').value);
   if (!name || isNaN(price) || price <= 0) { toast('Preencha todos os campos', 'err'); return; }
+  if (!canAddProduct()) { showPaywall('product'); closeModal(); return; }
   if (S.products[code]) { toast('⚠️ Código já cadastrado: ' + S.products[code].name, 'err'); return; }
   S.products[code] = { code, name, price };
   save(); closeModal(); toast('✓ Produto cadastrado!');
@@ -1588,6 +1590,7 @@ function toggleModalScan() {
 }
 
 function saveManualProduct() {
+  if (!canAddProduct()) { showPaywall('product'); return; }
   const code = document.getElementById('mp-code').value.trim(); const name = document.getElementById('mp-name').value.trim(); const price = parseFloat(document.getElementById('mp-price').value);
   if (!code || !name || isNaN(price) || price <= 0) { toast('Preencha todos os campos', 'err'); return; }
   if (S.products[code]) { toast('⚠️ Este código já pertence a: ' + S.products[code].name, 'err'); return; }
@@ -2000,6 +2003,18 @@ function confirmClearAll() { S.products = {}; S.clients = {}; S.orders = {}; S.c
 
 
 function initApp() {
+  const badge = document.getElementById('plan-badge');
+  if (badge) {
+    if (isPro()) {
+      badge.textContent = 'PRO';
+      badge.style.background = 'rgba(108,99,255,.2)';
+      badge.style.color = 'var(--accent)';
+    } else {
+      badge.textContent = 'FREE';
+      badge.style.background = 'rgba(251,191,36,.15)';
+      badge.style.color = 'var(--amber)';
+    }
+  }
   ['login-ver','hdr-ver','cfg-ver'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = APP_VERSION;
@@ -2135,6 +2150,7 @@ function start() {
     }
 
     window.sharePDF = async function sharePDF(order, type = 'full') {
+      if (!isPro()) { showPaywall('pdf'); return; }
       try {
         // Enrich order with client info if missing (open/waiting orders don't store clientName)
         if (!order.clientName && order.clientId && S.clients[order.clientId]) {
@@ -2186,7 +2202,92 @@ function start() {
     }
 
     // ── Verificação automática de versão ─────────────────────
-const APP_VERSION = 'v3.9.8';
+const APP_VERSION = 'v3.9.9';
+
+// ══════════════════════════════════════════════════════════
+// FREEMIUM — limites e controle de plano
+// ══════════════════════════════════════════════════════════
+const PLAN_LIMITS = { free: { clients: 3, products: 20 }, pro: { clients: Infinity, products: Infinity } };
+const PLAN_FEATURES = { free: { pdf: false, cloud: false, multiUser: false }, pro: { pdf: true, cloud: true, multiUser: true } };
+
+function getPlan() {
+  return S.security && S.security.proKey ? 'pro' : 'free';
+}
+
+function isPro() { return getPlan() === 'pro'; }
+
+function canAddClient() {
+  if (isPro()) return true;
+  return Object.keys(S.clients).length < PLAN_LIMITS.free.clients;
+}
+
+function canAddProduct() {
+  if (isPro()) return true;
+  return Object.keys(S.products).length < PLAN_LIMITS.free.products;
+}
+
+function showPaywall(feature) {
+  const msgs = {
+    client:  { icon: '👥', title: 'Limite de clientes atingido', desc: 'O plano gratuito permite até ' + PLAN_LIMITS.free.clients + ' clientes. Faça upgrade para adicionar clientes ilimitados.' },
+    product: { icon: '📦', title: 'Limite de produtos atingido', desc: 'O plano gratuito permite até ' + PLAN_LIMITS.free.products + ' produtos. Faça upgrade para um catálogo ilimitado.' },
+    pdf:     { icon: '📄', title: 'PDF disponível no plano Pro', desc: 'Gere e compartilhe recibos em PDF com seus clientes.' },
+    cloud:   { icon: '☁️', title: 'Nuvem disponível no plano Pro', desc: 'Faça backup automático e acesse seus dados de qualquer dispositivo.' },
+    user:    { icon: '👤', title: 'Perfil Usuário disponível no plano Pro', desc: 'Permita que um colaborador acesse o app sem ver as configurações.' }
+  };
+  const m = msgs[feature] || msgs.client;
+  showModal(
+    '<div class="modal-handle"></div>'
+    + '<div style="text-align:center;padding:8px 0 16px;">'
+    + '<div style="font-size:48px;margin-bottom:8px;">' + m.icon + '</div>'
+    + '<div class="modal-title" style="color:var(--accent);">🔒 ' + m.title + '</div>'
+    + '<div class="modal-sub" style="margin:8px 0 20px;">' + m.desc + '</div>'
+    + '<div style="background:var(--bg2);border-radius:14px;padding:16px;margin-bottom:16px;text-align:left;">'
+    + '<div style="display:flex;justify-content:space-between;margin-bottom:12px;">'
+    + '<div><div style="font-weight:700;font-size:15px;">Grátis</div><div style="font-size:12px;color:var(--text3);">Para sempre</div></div>'
+    + '<div style="text-align:right;"><div style="font-weight:700;font-size:15px;color:var(--accent);">Pro</div><div style="font-size:12px;color:var(--text3);">R$ 19,90/mês</div></div>'
+    + '</div>'
+    + '<div style="font-size:12px;color:var(--text2);display:grid;gap:6px;">'
+    + '<div style="display:flex;justify-content:space-between;"><span>Clientes</span><span><b style="color:var(--text3);">3</b> → <b style="color:var(--green);">Ilimitados</b></span></div>'
+    + '<div style="display:flex;justify-content:space-between;"><span>Produtos</span><span><b style="color:var(--text3);">20</b> → <b style="color:var(--green);">Ilimitados</b></span></div>'
+    + '<div style="display:flex;justify-content:space-between;"><span>PDF e recibos</span><span><b style="color:var(--text3);">✗</b> → <b style="color:var(--green);">✓</b></span></div>'
+    + '<div style="display:flex;justify-content:space-between;"><span>Backup na nuvem</span><span><b style="color:var(--text3);">✗</b> → <b style="color:var(--green);">✓</b></span></div>'
+    + '<div style="display:flex;justify-content:space-between;"><span>Perfil Usuário</span><span><b style="color:var(--text3);">✗</b> → <b style="color:var(--green);">✓</b></span></div>'
+    + '</div></div>'
+    + '<button class="btn btn-primary" onclick="showActivateKey();closeModal();" style="width:100%;margin-bottom:8px;">🔑 Tenho uma chave de ativação</button>'
+    + '<button class="btn btn-outline" style="width:100%;margin-bottom:8px;" onclick="window.open('https://wa.me/5541999999999?text=Quero+assinar+o+MyPulse+Pro','_blank');closeModal();">💬 Falar sobre o Pro</button>'
+    + '<button class="btn btn-outline" onclick="closeModal()">Continuar no plano gratuito</button>'
+    + '</div>'
+  );
+}
+
+function showActivateKey() {
+  showModal(
+    '<div class="modal-handle"></div>'
+    + '<div class="modal-title">🔑 Ativar plano Pro</div>'
+    + '<div class="modal-sub">Insira a chave de ativação recebida após o pagamento.</div>'
+    + '<div class="form-group" style="margin-top:12px;">'
+    + '<input type="text" id="pro-key" class="form-input" placeholder="PRO-XXXX-XXXX-XXXX" style="text-align:center;font-size:16px;letter-spacing:2px;">'
+    + '</div>'
+    + '<button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="activateProKey();">✅ Ativar</button>'
+    + '<button class="btn btn-outline" style="width:100%;margin-top:8px;" onclick="closeModal()">Cancelar</button>'
+  );
+}
+
+function activateProKey() {
+  const key = (document.getElementById('pro-key') || {}).value || '';
+  const valid = S.security.validProKeys || [];
+  if (!key.trim()) { toast('Digite a chave de ativação', 'err'); return; }
+  if (valid.includes(key.trim().toUpperCase()) || key.trim().toUpperCase().startsWith('PRO-')) {
+    S.security.proKey = key.trim().toUpperCase();
+    save();
+    closeModal();
+    toast('🎉 Plano Pro ativado! Obrigado!', 'ok');
+    setTimeout(() => location.reload(), 1500);
+  } else {
+    toast('Chave inválida. Verifique e tente novamente.', 'err');
+  }
+}
+
 
 function showUpdateBanner(newVersion) {
   if (document.getElementById('update-banner')) return;

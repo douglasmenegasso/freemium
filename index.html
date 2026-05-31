@@ -349,13 +349,17 @@ function save() {
 // LOGIN & RECOVERY LOGIC
 // ══════════════════════════════════════════════════════════
 function loginAsUser() {
-  console.log('Login direto como Usuário');
-  // Usuário pode entrar em qualquer plano — restrições aplicadas ao usar funções Pro
+  console.log('Iniciando fluxo de Usuário');
+  if (!isPro()) {
+    showPaywall('user');
+    return;
+  }
   doLogin('user');
 }
 
 function loginAsAdmin() {
   console.log('Iniciando fluxo de Admin');
+  // Admin pode entrar, mas funções Pro serão bloqueadas dentro do app se não for Pro
   if (!S.adminPass) {
     showModal(`
       <div class="modal-handle"></div>
@@ -2258,7 +2262,7 @@ function showPaywall(feature) {
     + '<div style="display:flex;justify-content:space-between;"><span>Perfil Usuário</span><span><b style="color:var(--text3);">✗</b> → <b style="color:var(--green);">✓</b></span></div>'
     + '</div></div>'
     + '<button class="btn btn-primary" onclick="showActivateKey();closeModal();" style="width:100%;margin-bottom:8px;">🔑 Tenho uma chave de ativação</button>'
-    + '<button class="btn btn-outline" style="width:100%;margin-bottom:8px;" onclick="window.open('https://wa.me/5541999999999?text=Quero+assinar+o+MyPulse+Pro','_blank');closeModal();">💬 Falar sobre o Pro</button>'
+    + '<button class="btn btn-outline" style="width:100%;margin-bottom:8px;" onclick="window.open(\'https://wa.me/5541999999999?text=Quero+assinar+o+MyPulse+Pro\',\'_blank\');closeModal();">💬 Falar sobre o Pro</button>'
     + '<button class="btn btn-outline" onclick="closeModal()">Continuar no plano gratuito</button>'
     + '</div>'
   );

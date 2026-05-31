@@ -636,6 +636,7 @@ async function ghLoad() {
       if (!S.recoveryKey) { S.recoveryKey = d.security.recoveryKey; DB.save('csn_recoverykey', S.recoveryKey); }
       if (!S.recoveryEmail) { S.recoveryEmail = d.security.recoveryEmail; DB.save('csn_recoveryemail', S.recoveryEmail); }
       if (d.security.validProKeys) { S.security.validProKeys = d.security.validProKeys; }
+      if (d.security.proKeysMap) { S.security.proKeysMap = d.security.proKeysMap; }
     }
     S.lastSaved = d.savedAt ? new Date(d.savedAt).getTime() : 0;
     saveLocal();
@@ -671,7 +672,13 @@ async function _ghDoSave() {
     orders:   JSON.parse(JSON.stringify(S.orders)),
     closed:   JSON.parse(JSON.stringify(S.closed)),
     returned: JSON.parse(JSON.stringify(S.returned || {})),
-    security: { adminPass: S.adminPass, recoveryKey: S.recoveryKey, recoveryEmail: S.recoveryEmail, validProKeys: S.security.validProKeys || [] },
+    security: { 
+      adminPass: S.adminPass, 
+      recoveryKey: S.recoveryKey, 
+      recoveryEmail: S.recoveryEmail, 
+      validProKeys: S.security.validProKeys || [],
+      proKeysMap: S.security.proKeysMap || {}
+    },
     savedAt
   };
   const content = utf8_to_b64(JSON.stringify(d, null, 2));
@@ -1934,7 +1941,8 @@ function renderSettings() {
       <div class="card">
         <div class="card-title">🔑 Segurança</div>
         <button class="btn btn-outline" style="margin-bottom:10px;" onclick="changeAdminPass()">Alterar senha de Admin</button>
-        <button class="btn btn-outline" onclick="showRecoveryInfo()">Ver chave de recuperação</button>
+        <button class="btn btn-outline" style="margin-bottom:10px;" onclick="showRecoveryInfo()">Ver chave de recuperação</button>
+        <button class="btn btn-amber" onclick="showKeyManager()">🔑 Gestão de Chaves Pro</button>
       </div>
       <div class="card">
         <div class="card-title" style="color:var(--red);">⚠️ Zona de perigo</div>
@@ -2268,16 +2276,17 @@ function showPaywall(feature) {
     + '<div class="modal-title" style="color:var(--accent);">🔒 ' + m.title + '</div>'
     + '<div class="modal-sub" style="margin:8px 0 20px;">' + m.desc + '</div>'
     + '<div style="background:var(--bg2);border-radius:14px;padding:16px;margin-bottom:16px;text-align:left;">'
-    + '<div style="display:flex;justify-content:space-between;margin-bottom:12px;">'
-    + '<div><div style="font-weight:700;font-size:15px;">Grátis</div><div style="font-size:12px;color:var(--text3);">Para sempre</div></div>'
-    + '<div style="text-align:right;"><div style="font-weight:700;font-size:15px;color:var(--accent);">Pro</div><div style="font-size:12px;color:var(--text3);">R$ 19,90/mês</div></div>'
+    + '<div style="display:grid;grid-template-columns:1fr 60px 80px;gap:8px;margin-bottom:12px;font-size:13px;border-bottom:1px solid var(--border);padding-bottom:8px;">'
+    + '<div style="font-weight:700;color:var(--text3);">Recurso</div>'
+    + '<div style="font-weight:700;text-align:center;">Grátis</div>'
+    + '<div style="font-weight:700;text-align:right;color:var(--accent);">Pro</div>'
     + '</div>'
-    + '<div style="font-size:12px;color:var(--text2);display:grid;gap:6px;">'
-    + '<div style="display:flex;justify-content:space-between;"><span>Clientes</span><span><b style="color:var(--text3);">3</b> → <b style="color:var(--green);">Ilimitados</b></span></div>'
-    + '<div style="display:flex;justify-content:space-between;"><span>Produtos</span><span><b style="color:var(--text3);">20</b> → <b style="color:var(--green);">Ilimitados</b></span></div>'
-    + '<div style="display:flex;justify-content:space-between;"><span>PDF e recibos</span><span><b style="color:var(--text3);">✗</b> → <b style="color:var(--green);">✓</b></span></div>'
-    + '<div style="display:flex;justify-content:space-between;"><span>Backup na nuvem</span><span><b style="color:var(--text3);">✗</b> → <b style="color:var(--green);">✓</b></span></div>'
-    + '<div style="display:flex;justify-content:space-between;"><span>Perfil Usuário</span><span><b style="color:var(--text3);">✗</b> → <b style="color:var(--green);">✓</b></span></div>'
+    + '<div style="font-size:12px;color:var(--text2);display:grid;gap:10px;">'
+    + '<div style="display:grid;grid-template-columns:1fr 60px 80px;gap:8px;align-items:center;"><span>👥 Clientes</span><span style="text-align:center;font-weight:700;">3</span><span style="text-align:right;color:var(--green);font-weight:700;">Ilimitados</span></div>'
+    + '<div style="display:grid;grid-template-columns:1fr 60px 80px;gap:8px;align-items:center;"><span>📦 Produtos</span><span style="text-align:center;font-weight:700;">20</span><span style="text-align:right;color:var(--green);font-weight:700;">Ilimitados</span></div>'
+    + '<div style="display:grid;grid-template-columns:1fr 60px 80px;gap:8px;align-items:center;"><span>📄 PDF e Recibos</span><span style="text-align:center;color:var(--red);">✗</span><span style="text-align:right;color:var(--green);">✓</span></div>'
+    + '<div style="display:grid;grid-template-columns:1fr 60px 80px;gap:8px;align-items:center;"><span>☁️ Backup Nuvem</span><span style="text-align:center;color:var(--red);">✗</span><span style="text-align:right;color:var(--green);">✓</span></div>'
+    + '<div style="grid-template-columns:1fr 60px 80px;gap:8px;align-items:center;display:grid;"><span>👤 Perfil Usuário</span><span style="text-align:center;color:var(--red);">✗</span><span style="text-align:right;color:var(--green);">✓</span></div>'
     + '</div></div>'
     + '<button class="btn btn-primary" onclick="showActivateKey();closeModal();" style="width:100%;margin-bottom:8px;">🔑 Tenho uma chave de ativação</button>'
     + '<button class="btn btn-outline" style="width:100%;margin-bottom:8px;" onclick="window.open(\'https://wa.me/5541996427444?text=Quero+assinar+o+MyPulse+Pro\',\'_blank\');closeModal();">💬 Falar sobre o Pro</button>'
@@ -2300,39 +2309,297 @@ function showActivateKey() {
 }
 
 function activateProKey() {
-  const key = ((document.getElementById('pro-key') || {}).value || '').trim().toUpperCase();
-  const valid = S.security.validProKeys || [];
+  const keyInput = document.getElementById('pro-key');
+  const key = (keyInput ? keyInput.value : '').trim().toUpperCase();
   if (!key) { toast('Digite a chave de ativação', 'err'); return; }
   
-  // Validação: deve estar na lista vinda da nuvem (dados.json)
-  if (valid.includes(key)) {
+  const keysMap = S.security.proKeysMap || {};
+  const keyData = keysMap[key];
+
+  if (keyData) {
+    const used = keyData.usedCount || 0;
+    const limit = keyData.maxUses || 1;
+
+    if (used >= limit) {
+      toast('Esta chave já atingiu o limite de ativações.', 'err');
+      return;
+    }
+
+    // Ativar
     S.security.proKey = key;
+    keyData.usedCount = used + 1;
+    keyData.lastUsedAt = new Date().toISOString();
+    
     save();
-    closeModal();
-    toast('🎉 Plano Pro ativado! Obrigado!', 'ok');
-    setTimeout(() => location.reload(), 1500);
+    toast('🎉 Plano Pro ativado! Sincronizando...', 'ok');
+    
+    // Tenta sincronizar o uso da chave imediatamente
+    if (S.ghToken && S.ghRepo) {
+      _ghDoSave().then(() => {
+        closeModal();
+        setTimeout(() => location.reload(), 1000);
+      }).catch(() => {
+        closeModal();
+        setTimeout(() => location.reload(), 1000);
+      });
+    } else {
+      closeModal();
+      setTimeout(() => location.reload(), 1000);
+    }
   } else {
-    toast('Chave inválida ou não encontrada na nuvem.', 'err');
+    // Fallback para chaves antigas se houver
+    const validLegacy = S.security.validProKeys || [];
+    if (validLegacy.includes(key)) {
+      S.security.proKey = key;
+      save();
+      closeModal();
+      toast('🎉 Plano Pro ativado!', 'ok');
+      setTimeout(() => location.reload(), 1000);
+    } else {
+      toast('Chave inválida ou não encontrada.', 'err');
+    }
   }
 }
 
-// Função administrativa para gerar chaves (usar via console pelo Douglas)
-window.adminGenerateProKey = function() {
-  if (S.userRole !== 'admin') { 
-    console.error('Acesso negado: você precisa estar logado como Administrador para gerar chaves.'); 
-    toast('Acesso negado: Logue como Admin', 'err');
-    return; 
-  }
-  const newKey = 'PRO-2026-' + Math.random().toString(36).substring(2, 6).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
-  if (!S.security.validProKeys) S.security.validProKeys = [];
-  S.security.validProKeys.push(newKey);
+// Interface de Gestão de Chaves
+function showKeyManager() {
+  if (S.userRole !== 'admin') { toast('Acesso restrito ao Admin', 'err'); return; }
+  
+  const keysMap = S.security.proKeysMap || {};
+  const keys = Object.keys(keysMap).sort((a,b) => (keysMap[b].createdAt || '').localeCompare(keysMap[a].createdAt || ''));
+
+  let html = `
+    <div class="modal-handle"></div>
+    <div class="modal-title">🔑 Gestão de Chaves Pro</div>
+    <div class="card" style="margin-bottom:16px;padding:12px;">
+      <div class="form-group">
+        <label class="form-label">Limite de Ativações (1 = uso único)</label>
+        <input type="number" id="key-limit" class="form-input" value="1" min="1">
+      </div>
+      <button class="btn btn-primary" onclick="generateNewProKey()">✨ Gerar Nova Chave</button>
+    </div>
+    <div style="max-height:300px;overflow-y:auto;margin-bottom:16px;">
+      ${keys.length === 0 ? '<div style="text-align:center;color:var(--text3);padding:20px;">Nenhuma chave gerada ainda.</div>' : ''}
+      ${keys.map(k => {
+        const d = keysMap[k];
+        const status = d.usedCount >= d.maxUses ? '<span style="color:var(--red);">Esgotada</span>' : '<span style="color:var(--green);">Ativa</span>';
+        return `
+          <div class="card" style="margin-bottom:8px;padding:10px;font-size:12px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+              <b style="font-family:monospace;font-size:14px;color:var(--accent2);">${k}</b>
+              <b>${status}</b>
+            </div>
+            <div style="display:flex;justify-content:space-between;color:var(--text2);">
+              <span>Usos: ${d.usedCount || 0} / ${d.maxUses}</span>
+              <span>${d.createdAt ? new Date(d.createdAt).toLocaleDateString('pt-BR') : ''}</span>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+    <button class="btn btn-outline" onclick="closeModal()">Fechar</button>
+  `;
+  showModal(html);
+}
+
+function generateNewProKey() {
+  const limit = parseInt(document.getElementById('key-limit').value) || 1;
+  const key = 'PRO-2026-' + Math.random().toString(36).substring(2, 6).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+  
+  if (!S.security.proKeysMap) S.security.proKeysMap = {};
+  S.security.proKeysMap[key] = {
+    key: key,
+    maxUses: limit,
+    usedCount: 0,
+    createdAt: new Date().toISOString(),
+    lastUsedAt: null
+  };
+  
   save();
-  console.log('%c NOVA CHAVE GERADA: ' + newKey, 'background: #222; color: #bada55; font-size: 20px; padding: 10px;');
-  toast('Chave gerada e salva na nuvem!', 'ok');
+  toast('Chave ' + key + ' gerada!', 'ok');
+  showKeyManager(); // Refresh
   if (S.ghToken && S.ghRepo) syncNow();
-  return "Chave gerada: " + newKey;
+}
+
+// Expor para o console também
+window.adminGenerateProKey = function() {
+  if (S.userRole !== 'admin') { toast('Logue como Admin', 'err'); return; }
+  generateNewProKey();
 };
 
+
+function showUpdateBanner(newVersion) {
+  if (document.getElementById('update-banner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'update-banner';
+  banner.style.cssText = 'position:fixed;bottom:80px;left:12px;right:12px;z-index:9999;' +
+    'background:linear-gradient(135deg,#1e1b4b,#312e81);border:1px solid var(--accent);' +
+    'border-radius:16px;padding:14px 16px;box-shadow:0 8px 32px rgba(108,99,255,.4);' +
+    'animation:slideUp .3s ease;';
+  banner.innerHTML =
+    '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">' +
+      '<div><div style="font-weight:700;font-size:14px;color:#fff;">Nova versao disponivel!</div>' +
+      '<div style="font-size:12px;color:rgba(255,255,255,.8);">' + newVersion + ' pronto para instalar</div></div>' +
+      '<button onclick="doAppUpdate()" style="background:var(--accent);color:#fff;border:none;' +
+        'border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">' +
+        'Atualizar agora' +
+      '</button>' +
+    '</div>';
+  document.body.appendChild(banner);
+}
+
+function doAppUpdate() {
+  const b = document.getElementById('update-banner');
+  if (b) b.innerHTML = '<div style="text-align:center;color:#fff;padding:4px 0;font-size:13px;">Limpando cache e reiniciando...</div>';
+  
+  if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage('SKIP_WAITING');
+  }
+
+  if ('caches' in window) {
+    caches.keys().then(keys => {
+      return Promise.all(keys.map(k => caches.delete(k)));
+    }).then(() => {
+      window.location.reload(true);
+      setTimeout(() => { window.location.href = window.location.origin + window.location.pathname + '?v=' + Date.now(); }, 500);
+    }).catch(() => {
+      window.location.reload(true);
+    });
+  } else {
+    window.location.reload(true);
+  }
+}
+
+async function checkAppUpdate() {
+  if (!navigator.onLine) return;
+  try {
+    const res = await fetch('version.json', { cache: 'no-store', signal: AbortSignal.timeout(5000) });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.version && data.version !== APP_VERSION) {
+      showUpdateBanner(data.version);
+      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage('SKIP_WAITING');
+      }
+    } else {
+      // Versão atual — remove banner caso tenha ficado de sessão anterior
+      const b = document.getElementById('update-banner');
+      if (b) b.remove();
+    }
+  } catch(e) {}
+}
+
+if (navigator.onLine) checkAppUpdate();
+setInterval(checkAppUpdate, 5 * 60 * 1000);
+window.addEventListener('online', checkAppUpdate);
+
+(function loadLibs() {
+  const zxing = document.createElement('script');
+  zxing.src = 'https://unpkg.com/@zxing/library@0.19.1/umd/index.min.js';
+  zxing.async = true;
+  zxing.onload = () => { console.log('ZXing loaded'); };
+  document.head.appendChild(zxing);
+  start();
+})();
+</script>
+</body>
+</html>
+    save();
+    toast('🎉 Plano Pro ativado! Sincronizando...', 'ok');
+    
+    // Tenta sincronizar o uso da chave imediatamente
+    if (S.ghToken && S.ghRepo) {
+      _ghDoSave().then(() => {
+        closeModal();
+        setTimeout(() => location.reload(), 1000);
+      }).catch(() => {
+        closeModal();
+        setTimeout(() => location.reload(), 1000);
+      });
+    } else {
+      closeModal();
+      setTimeout(() => location.reload(), 1000);
+    }
+  } else {
+    // Fallback para chaves antigas se houver
+    const validLegacy = S.security.validProKeys || [];
+    if (validLegacy.includes(key)) {
+      S.security.proKey = key;
+      save();
+      closeModal();
+      toast('🎉 Plano Pro ativado!', 'ok');
+      setTimeout(() => location.reload(), 1000);
+    } else {
+      toast('Chave inválida ou não encontrada.', 'err');
+    }
+  }
+}
+
+// Interface de Gestão de Chaves
+function showKeyManager() {
+  if (S.userRole !== 'admin') { toast('Acesso restrito ao Admin', 'err'); return; }
+  
+  const keysMap = S.security.proKeysMap || {};
+  const keys = Object.keys(keysMap).sort((a,b) => (keysMap[b].createdAt || '').localeCompare(keysMap[a].createdAt || ''));
+
+  let html = `
+    <div class="modal-handle"></div>
+    <div class="modal-title">🔑 Gestão de Chaves Pro</div>
+    <div class="card" style="margin-bottom:16px;padding:12px;">
+      <div class="form-group">
+        <label class="form-label">Limite de Ativações (1 = uso único)</label>
+        <input type="number" id="key-limit" class="form-input" value="1" min="1">
+      </div>
+      <button class="btn btn-primary" onclick="generateNewProKey()">✨ Gerar Nova Chave</button>
+    </div>
+    <div style="max-height:300px;overflow-y:auto;margin-bottom:16px;">
+      ${keys.length === 0 ? '<div style="text-align:center;color:var(--text3);padding:20px;">Nenhuma chave gerada ainda.</div>' : ''}
+      ${keys.map(k => {
+        const d = keysMap[k];
+        const status = d.usedCount >= d.maxUses ? '<span style="color:var(--red);">Esgotada</span>' : '<span style="color:var(--green);">Ativa</span>';
+        return `
+          <div class="card" style="margin-bottom:8px;padding:10px;font-size:12px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+              <b style="font-family:monospace;font-size:14px;color:var(--accent2);">${k}</b>
+              <b>${status}</b>
+            </div>
+            <div style="display:flex;justify-content:space-between;color:var(--text2);">
+              <span>Usos: ${d.usedCount || 0} / ${d.maxUses}</span>
+              <span>${d.createdAt ? new Date(d.createdAt).toLocaleDateString('pt-BR') : ''}</span>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+    <button class="btn btn-outline" onclick="closeModal()">Fechar</button>
+  `;
+  showModal(html);
+}
+
+function generateNewProKey() {
+  const limit = parseInt(document.getElementById('key-limit').value) || 1;
+  const key = 'PRO-2026-' + Math.random().toString(36).substring(2, 6).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+  
+  if (!S.security.proKeysMap) S.security.proKeysMap = {};
+  S.security.proKeysMap[key] = {
+    key: key,
+    maxUses: limit,
+    usedCount: 0,
+    createdAt: new Date().toISOString(),
+    lastUsedAt: null
+  };
+  
+  save();
+  toast('Chave ' + key + ' gerada!', 'ok');
+  showKeyManager(); // Refresh
+  if (S.ghToken && S.ghRepo) syncNow();
+}
+
+// Expor para o console também
+window.adminGenerateProKey = function() {
+  if (S.userRole !== 'admin') { toast('Logue como Admin', 'err'); return; }
+  generateNewProKey();
+};
 
 function showUpdateBanner(newVersion) {
   if (document.getElementById('update-banner')) return;

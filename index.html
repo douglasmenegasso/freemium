@@ -293,7 +293,7 @@ let S = {
   closed:   DB.load('csn_closed',   []),
   ghToken:  DB.load('csn_ghtoken',  ''),
   ghRepo:   DB.load('csn_ghrepo',   ''),
-  userRole: null, // Forçar login ao reiniciar (v3.8.0)
+  userRole: null, // Forçar login ao reiniciar
   adminPass: DB.load('csn_adminpass', ''), // Senha do admin
   company: DB.load('csn_company', { name: '', responsible: '', phone: '' }), // Dados da empresa
   recoveryKey: DB.load('csn_recoverykey', ''), // Chave de recuperação

@@ -635,6 +635,7 @@ async function ghLoad() {
       if (!S.adminPass) { S.adminPass = d.security.adminPass; DB.save('csn_adminpass', S.adminPass); }
       if (!S.recoveryKey) { S.recoveryKey = d.security.recoveryKey; DB.save('csn_recoverykey', S.recoveryKey); }
       if (!S.recoveryEmail) { S.recoveryEmail = d.security.recoveryEmail; DB.save('csn_recoveryemail', S.recoveryEmail); }
+      if (d.security.validProKeys) { S.security.validProKeys = d.security.validProKeys; }
     }
     S.lastSaved = d.savedAt ? new Date(d.savedAt).getTime() : 0;
     saveLocal();
@@ -670,7 +671,7 @@ async function _ghDoSave() {
     orders:   JSON.parse(JSON.stringify(S.orders)),
     closed:   JSON.parse(JSON.stringify(S.closed)),
     returned: JSON.parse(JSON.stringify(S.returned || {})),
-    security: { adminPass: S.adminPass, recoveryKey: S.recoveryKey, recoveryEmail: S.recoveryEmail },
+    security: { adminPass: S.adminPass, recoveryKey: S.recoveryKey, recoveryEmail: S.recoveryEmail, validProKeys: S.security.validProKeys || [] },
     savedAt
   };
   const content = utf8_to_b64(JSON.stringify(d, null, 2));
@@ -2279,7 +2280,7 @@ function showPaywall(feature) {
     + '<div style="display:flex;justify-content:space-between;"><span>Perfil Usuário</span><span><b style="color:var(--text3);">✗</b> → <b style="color:var(--green);">✓</b></span></div>'
     + '</div></div>'
     + '<button class="btn btn-primary" onclick="showActivateKey();closeModal();" style="width:100%;margin-bottom:8px;">🔑 Tenho uma chave de ativação</button>'
-    + '<button class="btn btn-outline" style="width:100%;margin-bottom:8px;" onclick="window.open(\'https://wa.me/5541999999999?text=Quero+assinar+o+MyPulse+Pro\',\'_blank\');closeModal();">💬 Falar sobre o Pro</button>'
+    + '<button class="btn btn-outline" style="width:100%;margin-bottom:8px;" onclick="window.open(\'https://wa.me/5541996427444?text=Quero+assinar+o+MyPulse+Pro\',\'_blank\');closeModal();">💬 Falar sobre o Pro</button>'
     + '<button class="btn btn-outline" onclick="closeModal()">Continuar no plano gratuito</button>'
     + '</div>'
   );
@@ -2299,18 +2300,32 @@ function showActivateKey() {
 }
 
 function activateProKey() {
-  const key = (document.getElementById('pro-key') || {}).value || '';
+  const key = ((document.getElementById('pro-key') || {}).value || '').trim().toUpperCase();
   const valid = S.security.validProKeys || [];
-  if (!key.trim()) { toast('Digite a chave de ativação', 'err'); return; }
-  if (valid.includes(key.trim().toUpperCase()) || key.trim().toUpperCase().startsWith('PRO-')) {
-    S.security.proKey = key.trim().toUpperCase();
+  if (!key) { toast('Digite a chave de ativação', 'err'); return; }
+  
+  // Validação: deve estar na lista vinda da nuvem (dados.json)
+  if (valid.includes(key)) {
+    S.security.proKey = key;
     save();
     closeModal();
     toast('🎉 Plano Pro ativado! Obrigado!', 'ok');
     setTimeout(() => location.reload(), 1500);
   } else {
-    toast('Chave inválida. Verifique e tente novamente.', 'err');
+    toast('Chave inválida ou não encontrada na nuvem.', 'err');
   }
+}
+
+// Função administrativa para gerar chaves (usar via console pelo Douglas)
+function adminGenerateProKey() {
+  if (S.userRole !== 'admin') { console.error('Acesso negado'); return; }
+  const newKey = 'PRO-2026-' + Math.random().toString(36).substring(2, 6).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+  if (!S.security.validProKeys) S.security.validProKeys = [];
+  S.security.validProKeys.push(newKey);
+  save();
+  console.log('%c NOVA CHAVE GERADA: ' + newKey, 'background: #222; color: #bada55; font-size: 20px; padding: 10px;');
+  toast('Chave gerada e salva na nuvem!', 'ok');
+  if (S.ghToken && S.ghRepo) syncNow();
 }
 
 

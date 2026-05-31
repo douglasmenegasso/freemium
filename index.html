@@ -306,6 +306,31 @@ let S = {
   returned: DB.load('csn_returned', {})
 };
 
+const APP_VERSION = 'v3.9.9';
+
+// ══════════════════════════════════════════════════════════
+// FREEMIUM — limites e controle de plano
+// ══════════════════════════════════════════════════════════
+const PLAN_LIMITS = { free: { clients: 3, products: 20 }, pro: { clients: Infinity, products: Infinity } };
+const PLAN_FEATURES = { free: { pdf: false, cloud: false, multiUser: false }, pro: { pdf: true, cloud: true, multiUser: true } };
+
+function getPlan() {
+  return S.security && S.security.proKey ? 'pro' : 'free';
+}
+
+function isPro() { return getPlan() === 'pro'; }
+
+function canAddClient() {
+  if (isPro()) return true;
+  return Object.keys(S.clients).length < PLAN_LIMITS.free.clients;
+}
+
+function canAddProduct() {
+  if (isPro()) return true;
+  return Object.keys(S.products).length < PLAN_LIMITS.free.products;
+}
+
+
 function saveLocal() {
   DB.save('csn_products', S.products);
   DB.save('csn_clients',  S.clients);
@@ -2203,29 +2228,7 @@ function start() {
     }
 
     // ── Verificação automática de versão ─────────────────────
-const APP_VERSION = 'v3.9.9';
 
-// ══════════════════════════════════════════════════════════
-// FREEMIUM — limites e controle de plano
-// ══════════════════════════════════════════════════════════
-const PLAN_LIMITS = { free: { clients: 3, products: 20 }, pro: { clients: Infinity, products: Infinity } };
-const PLAN_FEATURES = { free: { pdf: false, cloud: false, multiUser: false }, pro: { pdf: true, cloud: true, multiUser: true } };
-
-function getPlan() {
-  return S.security && S.security.proKey ? 'pro' : 'free';
-}
-
-function isPro() { return getPlan() === 'pro'; }
-
-function canAddClient() {
-  if (isPro()) return true;
-  return Object.keys(S.clients).length < PLAN_LIMITS.free.clients;
-}
-
-function canAddProduct() {
-  if (isPro()) return true;
-  return Object.keys(S.products).length < PLAN_LIMITS.free.products;
-}
 
 function showPaywall(feature) {
   const msgs = {

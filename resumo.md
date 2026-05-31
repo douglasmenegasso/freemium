@@ -18,6 +18,13 @@
 - **Base:** Copiado de `testeversao` v3.9.8 em 30/05/2026.
 
 ---
+### 📝 Registro (fix syntax & login block — Manus AI)
+- [x] **Bug corrigido:** Erro de sintaxe na linha 2261 (aspas aninhadas no ) que impedia o carregamento do JavaScript.
+- [x] **Bloqueio Freemium:** Função  agora bloqueia o acesso com o Paywall caso o plano seja Grátis (conforme Roadmap Fase 1).
+- [x] **Acesso Admin:** Mantido acesso para configuração, mas restrições de funcionalidades Pro (PDF, Nuvem) permanecem ativas dentro do sistema.
+- [x] Brace balance=0, sintaxe validada com Node.js.
+- **IA:** Manus AI | **Conta:** Douglas Menegasso
+
 
 ## 🚀 ROADMAP Freemium
 

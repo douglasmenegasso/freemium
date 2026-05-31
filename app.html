@@ -2471,31 +2471,31 @@ function showUpdateBanner(newVersion) {
 
 function doAppUpdate() {
   const b = document.getElementById('update-banner');
-  if (b) b.innerHTML = '<div style="text-align:center;color:#fff;padding:4px 0;font-size:13px;">Atualizando... Aguarde.</div>';
+  if (b) b.innerHTML = '<div style="text-align:center;color:#fff;padding:4px 0;font-size:13px;">Limpando cache profundo...</div>';
   
-  if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-    navigator.serviceWorker.controller.postMessage('SKIP_WAITING');
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(registrations => {
+      for (let r of registrations) r.unregister();
+    });
   }
 
   if ('caches' in window) {
     caches.keys().then(keys => {
-      return Promise.all(keys.map(k => caches.delete(k)));
-    }).then(() => {
-      const url = new URL(window.location.href);
-      url.searchParams.set('v', Date.now());
-      window.location.replace(url.toString());
-    }).catch(() => {
-      window.location.reload(true);
+      for (let k of keys) caches.delete(k);
     });
-  } else {
-    window.location.reload(true);
   }
+
+  localStorage.removeItem('last_sw_reset');
+  
+  setTimeout(() => {
+    window.location.href = 'index.html?t=' + Date.now();
+  }, 1000);
 }
 
 async function checkAppUpdate() {
   if (!navigator.onLine) return;
   try {
-    const res = await fetch('version.json', { cache: 'no-store', signal: AbortSignal.timeout(5000) });
+    const res = await fetch('version_v41.json', { cache: 'no-store', signal: AbortSignal.timeout(5000) });
     if (!res.ok) return;
     const data = await res.json();
     if (data.version && data.version !== APP_VERSION) {

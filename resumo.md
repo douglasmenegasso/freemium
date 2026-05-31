@@ -60,6 +60,13 @@
 - [x] Brace balance=0, sem backticks escapados. Changelog atualizado.
 - **IA:** Claude (Anthropic) — claude-sonnet-4-6 | **Conta:** Douglas Menegasso
 
+### 📝 Registro (fix login — Claude / Anthropic)
+- [x] **Bug:** `loginAsUser` bloqueava entrada com `showPaywall` para qualquer plano grátis — impedia login completamente.
+- [x] **Decisão de produto:** perfil Usuário pode entrar em qualquer plano. Restrições (PDF, nuvem) são aplicadas ao usar cada função, não no login. O paywall de 'user' era incorreto neste contexto.
+- [x] `loginAsUser` simplificado: chama `doLogin('user')` diretamente.
+- **IA:** Claude (Anthropic) — claude-sonnet-4-6 | **Conta:** Douglas Menegasso
+
+
 ### 📝 Registro (fix v3.9.9 — Claude / Anthropic)
 - [x] Backup criado antes da correção.
 - [x] **Bug 1:** `loginAsUser` não chamava `showPaywall` — corrigido para verificar `isPro()` antes de `doLogin`.

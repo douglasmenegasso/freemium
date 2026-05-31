@@ -1,35 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Atualizando...</title>
+    <title>Carregando MyPulse...</title>
     <script>
-        // 1. Limpa Service Workers
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(registrations => {
-                for (let registration of registrations) {
-                    registration.unregister();
-                }
-            });
+            navigator.serviceWorker.getRegistrations().then(rs => { for(let r of rs) r.unregister(); });
         }
-        // 2. Limpa Caches
         if ('caches' in window) {
-            caches.keys().then(names => {
-                for (let name of names) caches.delete(name);
-            });
+            caches.keys().then(ns => { for(let n of ns) caches.delete(n); });
         }
-        // 3. Limpa LocalStorage de controle
-        localStorage.removeItem('last_sw_reset');
-        
-        // 4. Redireciona para o novo arquivo limpo
-        setTimeout(() => {
-            window.location.href = 'app.html?v=' + Date.now();
-        }, 1000);
+        window.location.href = 'mypulse.html?v=' + Date.now();
     </script>
 </head>
-<body style="background:#0f172a;color:white;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;">
-    <div style="text-align:center;">
-        <div style="font-size:24px;margin-bottom:10px;">🚀 Atualizando MyPulse...</div>
-        <div style="color:#94a3b8;">Limpando cache e carregando nova versão v4.1.0</div>
-    </div>
+<body style="background:#0f172a;color:white;display:flex;align-items:center;justify-content:center;height:100vh;">
+    <div style="text-align:center;">🚀 Carregando MyPulse v4.1.0...</div>
 </body>
 </html>

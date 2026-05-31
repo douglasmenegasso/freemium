@@ -60,6 +60,15 @@
 - [x] Brace balance=0, sem backticks escapados. Changelog atualizado.
 - **IA:** Claude (Anthropic) — claude-sonnet-4-6 | **Conta:** Douglas Menegasso
 
+### 📝 Registro (fix ordem declaração — Claude / Anthropic)
+- [x] Backup criado: `backup/pre-fix-order_20260531_1232`.
+- [x] **Causa raiz do login não funcionar:** bloco freemium (`APP_VERSION`, `PLAN_LIMITS`, `isPro()`) estava na linha 2206, após o `loadLibs()` que chama `start()`. Quando `loginAsUser` era chamado (linha 326), `isPro` ainda não havia sido declarada.
+- [x] **Fix:** bloco freemium movido para logo após o objeto `S` (linha ~290), garantindo que `isPro()` e `canAddClient()` estejam disponíveis antes de qualquer função de login.
+- [x] Verificado: `isPro` declarada em char 62967, `loginAsUser` em char 63717 — ordem correta.
+- [x] Brace balance=0, sem backticks problemáticos.
+- **IA:** Claude (Anthropic) — claude-sonnet-4-6 | **Conta:** Douglas Menegasso
+
+
 ### 📝 Registro (fix login — Claude / Anthropic)
 - [x] **Bug:** `loginAsUser` bloqueava entrada com `showPaywall` para qualquer plano grátis — impedia login completamente.
 - [x] **Decisão de produto:** perfil Usuário pode entrar em qualquer plano. Restrições (PDF, nuvem) são aplicadas ao usar cada função, não no login. O paywall de 'user' era incorreto neste contexto.

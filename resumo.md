@@ -25,6 +25,13 @@
 - [x] **Logs de Validação:** Adicionados logs no console para monitorar a validação de limites de clientes e produtos.
 - **IA:** Manus AI | **Conta:** Douglas Menegasso
 
+### 📝 Registro (STRICT freemium limits for Admin — Manus AI)
+- [x] **Correção Crítica:** O objeto S.security não estava sendo inicializado nem salvo no LocalStorage, o que causava instabilidade no isPro().
+- [x] **Persistência de Segurança:** Agora a chave Pro e as configurações de segurança são salvas e carregadas corretamente (csn_security).
+- [x] **Trava na UI:** O botão de "Conectar Nuvem" nas configurações agora checa isPro() diretamente no clique, impedindo a abertura da modal.
+- [x] **Logs de Validação:** Adicionados logs no console para monitorar a validação de limites de clientes e produtos.
+- **IA:** Manus AI | **Conta:** Douglas Menegasso
+
 ### 📝 Registro (Paywall Redesign & Key Management Panel — Manus AI)
 - [x] **Redesenho do Paywall:** Layout em tabela para facilitar a comparação Grátis vs Pro.
 - [x] **Painel Admin de Chaves:** Nova interface em Configurações > Gestão de Chaves Pro.

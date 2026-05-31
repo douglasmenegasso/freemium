@@ -18,6 +18,13 @@
 - **Base:** Copiado de `testeversao` v3.9.8 em 30/05/2026.
 
 ---
+### 📝 Registro (freemium limits for Admin — Manus AI)
+- [x] **Limitação de Nuvem:** Funções de sincronização (, ) e configuração () agora bloqueadas para Admin no plano Grátis.
+- [x] **Limitação de Clientes:** Funções de salvamento de novos clientes (, ) agora respeitam o limite de 3 clientes para Admin no plano Grátis.
+- [x] **Limitação de Produtos:** Já existia o bloqueio no , mas as verificações foram reforçadas.
+- [x] **Paywall:** O Admin agora é direcionado corretamente para o Paywall ao tentar usar funções Pro.
+- **IA:** Manus AI | **Conta:** Douglas Menegasso
+
 ### 📝 Registro (fix syntax & login block — Manus AI)
 - [x] **Bug corrigido:** Erro de sintaxe na linha 2261 (aspas aninhadas no ) que impedia o carregamento do JavaScript.
 - [x] **Bloqueio Freemium:** Função  agora bloqueia o acesso com o Paywall caso o plano seja Grátis (conforme Roadmap Fase 1).

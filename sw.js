@@ -1,21 +1,16 @@
-const CACHE_NAME = 'mypulse-v4.1.0';
+const CACHE_NAME = 'mypulse-v4.1.0-final';
 const ASSETS = [
   './',
   'index.html',
   'manifest.json',
-  'icon-192-dark.png',
-  'icon-512-dark.png',
-  'icon-192.png',
-  'icon-512.png',
-  'apple-touch-icon-dark.png',
-  'apple-touch-icon.png'
+  'version.json'
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
@@ -27,16 +22,25 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+// Estratégia: Network First (Tenta rede, se falhar usa cache)
 self.addEventListener('fetch', (event) => {
-  if (event.request.url.includes('version.json')) {
-    event.respondWith(
-      fetch(event.request, { cache: 'no-store' })
-        .catch(() => new Response('{}', { headers: { 'Content-Type': 'application/json' } }))
-    );
-    return;
-  }
+  // Ignora chamadas de API ou externas
+  if (!event.request.url.startsWith(self.location.origin)) return;
+
   event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request))
+    fetch(event.request)
+      .then((response) => {
+        // Se a rede funcionar, atualiza o cache e retorna
+        if (response && response.status === 200) {
+          const cacheCopy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cacheCopy));
+        }
+        return response;
+      })
+      .catch(() => {
+        // Se a rede falhar, tenta o cache
+        return caches.match(event.request);
+      })
   );
 });
 

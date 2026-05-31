@@ -307,7 +307,7 @@ let S = {
   security: DB.load('csn_security', { proKey: '', validProKeys: [] })
 };
 
-const APP_VERSION = 'v3.9.9';
+const APP_VERSION = 'v4.0.0';
 
 // ══════════════════════════════════════════════════════════
 // FREEMIUM — limites e controle de plano
@@ -2317,8 +2317,12 @@ function activateProKey() {
 }
 
 // Função administrativa para gerar chaves (usar via console pelo Douglas)
-function adminGenerateProKey() {
-  if (S.userRole !== 'admin') { console.error('Acesso negado'); return; }
+window.adminGenerateProKey = function() {
+  if (S.userRole !== 'admin') { 
+    console.error('Acesso negado: você precisa estar logado como Administrador para gerar chaves.'); 
+    toast('Acesso negado: Logue como Admin', 'err');
+    return; 
+  }
   const newKey = 'PRO-2026-' + Math.random().toString(36).substring(2, 6).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
   if (!S.security.validProKeys) S.security.validProKeys = [];
   S.security.validProKeys.push(newKey);
@@ -2326,7 +2330,8 @@ function adminGenerateProKey() {
   console.log('%c NOVA CHAVE GERADA: ' + newKey, 'background: #222; color: #bada55; font-size: 20px; padding: 10px;');
   toast('Chave gerada e salva na nuvem!', 'ok');
   if (S.ghToken && S.ghRepo) syncNow();
-}
+  return "Chave gerada: " + newKey;
+};
 
 
 function showUpdateBanner(newVersion) {

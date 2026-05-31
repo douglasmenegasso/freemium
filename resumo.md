@@ -18,6 +18,14 @@
 - **Base:** Copiado de `testeversao` v3.9.8 em 30/05/2026.
 
 ---
+### 📝 Registro (Paywall Redesign & Key Management Panel — Manus AI)
+- [x] **Redesenho do Paywall:** Layout em tabela para facilitar a comparação Grátis vs Pro.
+- [x] **Painel Admin de Chaves:** Nova interface em Configurações > Gestão de Chaves Pro.
+- [x] **Chaves Múltiplas:** Agora é possível definir o limite de ativações por chave (ex: 1, 5, 10 usos).
+- [x] **Controle de Uso:** O app valida o limite de ativações na nuvem e impede o uso de chaves esgotadas.
+- [x] **Segurança:** Chaves são sincronizadas via dados.json para garantir consistência global.
+- **IA:** Manus AI | **Conta:** Douglas Menegasso
+
 ### 📝 Registro (STRICT freemium limits for Admin — Manus AI)
 - [x] **Correção Crítica:** O objeto S.security não estava sendo inicializado nem salvo no LocalStorage, o que causava instabilidade no isPro().
 - [x] **Persistência de Segurança:** Agora a chave Pro e as configurações de segurança são salvas e carregadas corretamente (csn_security).

@@ -2438,19 +2438,24 @@ function showUpdateBanner(newVersion) {
     'animation:slideUp .3s ease;';
   banner.innerHTML =
     '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">' +
-      '<div><div style="font-weight:700;font-size:14px;color:#fff;">Nova versao disponivel!</div>' +
-      '<div style="font-size:12px;color:rgba(255,255,255,.8);">' + newVersion + ' pronto para instalar</div></div>' +
-      '<button onclick="doAppUpdate()" style="background:var(--accent);color:#fff;border:none;' +
-        'border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">' +
-        'Atualizar agora' +
-      '</button>' +
+      '<div style="flex:1;">' +
+        '<div style="font-weight:700;font-size:14px;color:#fff;">Nova versão disponível!</div>' +
+        '<div style="font-size:12px;color:rgba(255,255,255,.8);">' + newVersion + ' pronta para instalar</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:8px;align-items:center;">' +
+        '<button onclick="doAppUpdate()" style="background:var(--accent);color:#fff;border:none;' +
+          'border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">' +
+          'Atualizar' +
+        '</button>' +
+        '<button onclick="document.getElementById(\'update-banner\').remove()" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:4px;">✕</button>' +
+      '</div>' +
     '</div>';
   document.body.appendChild(banner);
 }
 
 function doAppUpdate() {
   const b = document.getElementById('update-banner');
-  if (b) b.innerHTML = '<div style="text-align:center;color:#fff;padding:4px 0;font-size:13px;">Limpando cache e reiniciando...</div>';
+  if (b) b.innerHTML = '<div style="text-align:center;color:#fff;padding:4px 0;font-size:13px;">Atualizando... Aguarde.</div>';
   
   if (navigator.serviceWorker && navigator.serviceWorker.controller) {
     navigator.serviceWorker.controller.postMessage('SKIP_WAITING');
@@ -2460,8 +2465,9 @@ function doAppUpdate() {
     caches.keys().then(keys => {
       return Promise.all(keys.map(k => caches.delete(k)));
     }).then(() => {
-      window.location.reload(true);
-      setTimeout(() => { window.location.href = window.location.origin + window.location.pathname + '?v=' + Date.now(); }, 500);
+      const url = new URL(window.location.href);
+      url.searchParams.set('v', Date.now());
+      window.location.replace(url.toString());
     }).catch(() => {
       window.location.reload(true);
     });
@@ -2478,184 +2484,7 @@ async function checkAppUpdate() {
     const data = await res.json();
     if (data.version && data.version !== APP_VERSION) {
       showUpdateBanner(data.version);
-      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage('SKIP_WAITING');
-      }
     } else {
-      // Versão atual — remove banner caso tenha ficado de sessão anterior
-      const b = document.getElementById('update-banner');
-      if (b) b.remove();
-    }
-  } catch(e) {}
-}
-
-if (navigator.onLine) checkAppUpdate();
-setInterval(checkAppUpdate, 5 * 60 * 1000);
-window.addEventListener('online', checkAppUpdate);
-
-(function loadLibs() {
-  const zxing = document.createElement('script');
-  zxing.src = 'https://unpkg.com/@zxing/library@0.19.1/umd/index.min.js';
-  zxing.async = true;
-  zxing.onload = () => { console.log('ZXing loaded'); };
-  document.head.appendChild(zxing);
-  start();
-})();
-</script>
-</body>
-</html>
-    save();
-    toast('🎉 Plano Pro ativado! Sincronizando...', 'ok');
-    
-    // Tenta sincronizar o uso da chave imediatamente
-    if (S.ghToken && S.ghRepo) {
-      _ghDoSave().then(() => {
-        closeModal();
-        setTimeout(() => location.reload(), 1000);
-      }).catch(() => {
-        closeModal();
-        setTimeout(() => location.reload(), 1000);
-      });
-    } else {
-      closeModal();
-      setTimeout(() => location.reload(), 1000);
-    }
-  } else {
-    // Fallback para chaves antigas se houver
-    const validLegacy = S.security.validProKeys || [];
-    if (validLegacy.includes(key)) {
-      S.security.proKey = key;
-      save();
-      closeModal();
-      toast('🎉 Plano Pro ativado!', 'ok');
-      setTimeout(() => location.reload(), 1000);
-    } else {
-      toast('Chave inválida ou não encontrada.', 'err');
-    }
-  }
-}
-
-// Interface de Gestão de Chaves
-function showKeyManager() {
-  if (S.userRole !== 'admin') { toast('Acesso restrito ao Admin', 'err'); return; }
-  
-  const keysMap = S.security.proKeysMap || {};
-  const keys = Object.keys(keysMap).sort((a,b) => (keysMap[b].createdAt || '').localeCompare(keysMap[a].createdAt || ''));
-
-  let html = `
-    <div class="modal-handle"></div>
-    <div class="modal-title">🔑 Gestão de Chaves Pro</div>
-    <div class="card" style="margin-bottom:16px;padding:12px;">
-      <div class="form-group">
-        <label class="form-label">Limite de Ativações (1 = uso único)</label>
-        <input type="number" id="key-limit" class="form-input" value="1" min="1">
-      </div>
-      <button class="btn btn-primary" onclick="generateNewProKey()">✨ Gerar Nova Chave</button>
-    </div>
-    <div style="max-height:300px;overflow-y:auto;margin-bottom:16px;">
-      ${keys.length === 0 ? '<div style="text-align:center;color:var(--text3);padding:20px;">Nenhuma chave gerada ainda.</div>' : ''}
-      ${keys.map(k => {
-        const d = keysMap[k];
-        const status = d.usedCount >= d.maxUses ? '<span style="color:var(--red);">Esgotada</span>' : '<span style="color:var(--green);">Ativa</span>';
-        return `
-          <div class="card" style="margin-bottom:8px;padding:10px;font-size:12px;">
-            <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-              <b style="font-family:monospace;font-size:14px;color:var(--accent2);">${k}</b>
-              <b>${status}</b>
-            </div>
-            <div style="display:flex;justify-content:space-between;color:var(--text2);">
-              <span>Usos: ${d.usedCount || 0} / ${d.maxUses}</span>
-              <span>${d.createdAt ? new Date(d.createdAt).toLocaleDateString('pt-BR') : ''}</span>
-            </div>
-          </div>
-        `;
-      }).join('')}
-    </div>
-    <button class="btn btn-outline" onclick="closeModal()">Fechar</button>
-  `;
-  showModal(html);
-}
-
-function generateNewProKey() {
-  const limit = parseInt(document.getElementById('key-limit').value) || 1;
-  const key = 'PRO-2026-' + Math.random().toString(36).substring(2, 6).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
-  
-  if (!S.security.proKeysMap) S.security.proKeysMap = {};
-  S.security.proKeysMap[key] = {
-    key: key,
-    maxUses: limit,
-    usedCount: 0,
-    createdAt: new Date().toISOString(),
-    lastUsedAt: null
-  };
-  
-  save();
-  toast('Chave ' + key + ' gerada!', 'ok');
-  showKeyManager(); // Refresh
-  if (S.ghToken && S.ghRepo) syncNow();
-}
-
-// Expor para o console também
-window.adminGenerateProKey = function() {
-  if (S.userRole !== 'admin') { toast('Logue como Admin', 'err'); return; }
-  generateNewProKey();
-};
-
-function showUpdateBanner(newVersion) {
-  if (document.getElementById('update-banner')) return;
-  const banner = document.createElement('div');
-  banner.id = 'update-banner';
-  banner.style.cssText = 'position:fixed;bottom:80px;left:12px;right:12px;z-index:9999;' +
-    'background:linear-gradient(135deg,#1e1b4b,#312e81);border:1px solid var(--accent);' +
-    'border-radius:16px;padding:14px 16px;box-shadow:0 8px 32px rgba(108,99,255,.4);' +
-    'animation:slideUp .3s ease;';
-  banner.innerHTML =
-    '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">' +
-      '<div><div style="font-weight:700;font-size:14px;color:#fff;">Nova versao disponivel!</div>' +
-      '<div style="font-size:12px;color:rgba(255,255,255,.8);">' + newVersion + ' pronto para instalar</div></div>' +
-      '<button onclick="doAppUpdate()" style="background:var(--accent);color:#fff;border:none;' +
-        'border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">' +
-        'Atualizar agora' +
-      '</button>' +
-    '</div>';
-  document.body.appendChild(banner);
-}
-
-function doAppUpdate() {
-  const b = document.getElementById('update-banner');
-  if (b) b.innerHTML = '<div style="text-align:center;color:#fff;padding:4px 0;font-size:13px;">Limpando cache e reiniciando...</div>';
-  
-  if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-    navigator.serviceWorker.controller.postMessage('SKIP_WAITING');
-  }
-
-  if ('caches' in window) {
-    caches.keys().then(keys => {
-      return Promise.all(keys.map(k => caches.delete(k)));
-    }).then(() => {
-      window.location.reload(true);
-      setTimeout(() => { window.location.href = window.location.origin + window.location.pathname + '?v=' + Date.now(); }, 500);
-    }).catch(() => {
-      window.location.reload(true);
-    });
-  } else {
-    window.location.reload(true);
-  }
-}
-
-async function checkAppUpdate() {
-  if (!navigator.onLine) return;
-  try {
-    const res = await fetch('version.json', { cache: 'no-store', signal: AbortSignal.timeout(5000) });
-    if (!res.ok) return;
-    const data = await res.json();
-    if (data.version && data.version !== APP_VERSION) {
-      showUpdateBanner(data.version);
-      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage('SKIP_WAITING');
-      }
-    } else {
-      // Versão atual — remove banner caso tenha ficado de sessão anterior
       const b = document.getElementById('update-banner');
       if (b) b.remove();
     }

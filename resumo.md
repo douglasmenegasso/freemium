@@ -18,6 +18,13 @@
 - **Base:** Copiado de `testeversao` v3.9.8 em 30/05/2026.
 
 ---
+### 📝 Registro (Manual Pro Activation & Support Update — Manus AI)
+- [x] **Suporte Atualizado:** Número alterado para 41996427444 em todos os links do WhatsApp.
+- [x] **Ativação Manual:** Implementada validação de chaves Pro através da nuvem (dados.json).
+- [x] **Gerador de Chaves:** Criada função adminGenerateProKey() para uso administrativo via console.
+- [x] **Sincronização de Segurança:** validProKeys agora é persistido na nuvem e compartilhado entre dispositivos conectados ao mesmo repositório.
+- **IA:** Manus AI | **Conta:** Douglas Menegasso
+
 ### 📝 Registro (STRICT freemium limits for Admin — Manus AI)
 - [x] **Correção Crítica:** O objeto S.security não estava sendo inicializado nem salvo no LocalStorage, o que causava instabilidade no isPro().
 - [x] **Persistência de Segurança:** Agora a chave Pro e as configurações de segurança são salvas e carregadas corretamente (csn_security).

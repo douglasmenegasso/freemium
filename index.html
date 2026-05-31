@@ -325,7 +325,7 @@ function save() {
 // ══════════════════════════════════════════════════════════
 function loginAsUser() {
   console.log('Login direto como Usuário');
-  if (typeof isPro === 'function' && !isPro()) { showPaywall('user'); return; }
+  // Usuário pode entrar em qualquer plano — restrições aplicadas ao usar funções Pro
   doLogin('user');
 }
 

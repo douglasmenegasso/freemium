@@ -60,6 +60,14 @@
 - [x] Brace balance=0, sem backticks escapados. Changelog atualizado.
 - **IA:** Claude (Anthropic) — claude-sonnet-4-6 | **Conta:** Douglas Menegasso
 
+### 📝 Registro (fix v3.9.9 — Claude / Anthropic)
+- [x] Backup criado antes da correção.
+- [x] **Bug 1:** `loginAsUser` não chamava `showPaywall` — corrigido para verificar `isPro()` antes de `doLogin`.
+- [x] **Bug 2:** Displays estáticos de versão mostravam `v3.9.2` e `v3.8.0` — todos corrigidos para `v3.9.9`.
+- [x] Sem bump de versão — correções de display e lógica sem nova funcionalidade.
+- **IA:** Claude (Anthropic) — claude-sonnet-4-6 | **Conta:** Douglas Menegasso
+
+
 ---
 **Última Atualização:** 30 de Maio de 2026
 **IA Responsável:** Claude (Anthropic) — claude-sonnet-4-6

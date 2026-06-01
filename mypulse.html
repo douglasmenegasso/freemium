@@ -2074,7 +2074,36 @@ function confirmClearAll() { S.products = {}; S.clients = {}; S.orders = {}; S.c
 // ══════════════════════════════════════════════════════════
 
 
+function checkLicense() {
+  if (!isPro()) return;
+  const expDate = new Date(S.security.proExpiresAt);
+  const now = new Date();
+  const diffTime = expDate - now;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays <= 0) {
+    S.security.proKey = '';
+    save();
+    showModal(`
+      <div class="modal-handle"></div>
+      <div class="modal-title">⌛ Licença Expirada</div>
+      <div class="modal-sub">Sua licença Pro venceu. O app voltou ao modo gratuito, mas seus dados estão seguros.</div>
+      <button class="btn btn-primary" onclick="showPlans()">Renovar Agora</button>
+      <button class="btn btn-outline" style="margin-top:8px;" onclick="closeModal()">Continuar no Grátis</button>
+    `);
+  } else if (diffDays <= 5) {
+    showModal(`
+      <div class="modal-handle"></div>
+      <div class="modal-title">⚠️ Licença Vencendo</div>
+      <div class="modal-sub">Sua licença Pro vence em <b>${diffDays} dias</b>. Renove agora para evitar o bloqueio dos recursos ilimitados.</div>
+      <button class="btn btn-primary" onclick="showPlans()">Renovar Licença</button>
+      <button class="btn btn-outline" style="margin-top:8px;" onclick="closeModal()">Lembrar mais tarde</button>
+    `);
+  }
+}
+
 function initApp() {
+  checkLicense();
   const badge = document.getElementById('plan-badge');
   if (badge) {
     if (isPro()) {
@@ -2093,7 +2122,6 @@ function initApp() {
   });
   showTab('scan');
   if (!S.activeClient) { 
-    // Apenas mostra se houver clientes cadastrados
     if (Object.keys(S.clients).length > 0) {
       setTimeout(() => showClientPicker(), 500); 
     }
@@ -2305,9 +2333,35 @@ function showPaywall(feature) {
     + '<div style="grid-template-columns:1fr 60px 80px;gap:8px;align-items:center;display:grid;"><span>👤 Perfil Usuário</span><span style="text-align:center;color:var(--red);">✗</span><span style="text-align:right;color:var(--green);">✓</span></div>'
     + '</div></div>'
     + '<button class="btn btn-primary" onclick="showActivateKey();closeModal();" style="width:100%;margin-bottom:8px;">🔑 Tenho uma chave de ativação</button>'
-    + '<button class="btn btn-outline" style="width:100%;margin-bottom:8px;" onclick="window.open(\'https://wa.me/5541996427444?text=Quero+assinar+o+MyPulse+Pro\',\'_blank\');closeModal();">💬 Falar sobre o Pro</button>'
+    + '<button class="btn btn-outline" style="width:100%;margin-bottom:8px;" onclick="showPlans();">💰 Ver Planos e Preços</button>'
     + '<button class="btn btn-outline" onclick="closeModal()">Continuar no plano gratuito</button>'
     + '</div>'
+  );
+}
+
+function showPlans() {
+  showModal(
+    '<div class="modal-handle"></div>'
+    + '<div class="modal-title">💎 Planos MyPulse Pro</div>'
+    + '<div class="modal-sub">Escolha a melhor opção para o seu negócio.</div>'
+    + '<div style="display:grid;gap:12px;margin-top:16px;">'
+    +   '<div style="background:var(--bg3);padding:16px;border-radius:12px;border:1px solid var(--border);position:relative;overflow:hidden;">'
+    +     '<div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;">Plano Mensal</div>'
+    +     '<div style="font-size:24px;font-weight:800;margin:4px 0;">R$ 19,90<span style="font-size:14px;color:var(--text3);">/mês</span></div>'
+    +     '<div style="font-size:11px;color:var(--text2);">Renove quando quiser. Sem fidelidade.</div>'
+    +     '<button class="btn btn-primary btn-sm" style="margin-top:12px;width:100%;" onclick="window.open(\'https://wa.me/5541996427444?text=Olá!+Quero+assinar+o+plano+MENSAL+do+MyPulse+Pro\',\'_blank\')">Assinar Mensal</button>'
+    +   '</div>'
+    +   '<div style="background:var(--bg3);padding:16px;border-radius:12px;border:1px solid var(--accent);position:relative;overflow:hidden;">'
+    +     '<div style="background:var(--accent);color:white;font-size:9px;font-weight:900;padding:2px 20px;position:absolute;top:10px;right:-20px;transform:rotate(45deg);">10% OFF</div>'
+    +     '<div style="font-size:12px;font-weight:700;color:var(--accent2);text-transform:uppercase;">Plano Anual</div>'
+    +     '<div style="font-size:24px;font-weight:800;margin:4px 0;">R$ 214,90<span style="font-size:14px;color:var(--text3);">/ano</span></div>'
+    +     '<div style="font-size:11px;color:var(--text2);">Pagamento único. Melhor custo-benefício.</div>'
+    +     '<button class="btn btn-primary btn-sm" style="margin-top:12px;width:100%;" onclick="window.open(\'https://wa.me/5541996427444?text=Olá!+Quero+assinar+o+plano+ANUAL+do+MyPulse+Pro\',\'_blank\')">Assinar Anual</button>'
+    +   '</div>'
+    + '</div>'
+    + '<div style="margin-top:16px;font-size:11px;color:var(--text3);text-align:center;">Pagamento via PIX ou Mercado Pago.</div>'
+    + '<button class="btn btn-outline btn-sm" style="width:100%;margin-top:16px;" onclick="showActivateKey()">🔑 Já tenho uma chave</button>'
+    + '<button class="btn btn-outline btn-sm" style="width:100%;margin-top:8px;" onclick="closeModal()">Voltar</button>'
   );
 }
 
@@ -2317,53 +2371,72 @@ function showActivateKey() {
     + '<div class="modal-title">🔑 Ativar plano Pro</div>'
     + '<div class="modal-sub">Insira a chave de ativação recebida após o pagamento.</div>'
     + '<div class="form-group" style="margin-top:12px;">'
-    + '<input type="text" id="pro-key" class="form-input" placeholder="PRO-XXXX-XXXX-XXXX" style="text-align:center;font-size:16px;letter-spacing:2px;">'
+    + '<input type="text" id="pro-key" class="form-input" placeholder="PRO-2026-XXXX" style="text-align:center;font-size:16px;letter-spacing:1px;">'
     + '</div>'
     + '<button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="activateProKey();">✅ Ativar</button>'
-    + '<button class="btn btn-outline" style="width:100%;margin-top:8px;" onclick="closeModal()">Cancelar</button>'
+    + '<button class="btn btn-outline" style="width:100%;margin-top:8px;" onclick="showPlans()">Voltar</button>'
   );
 }
 
-function activateProKey() {
+async function activateProKey() {
   const keyInput = document.getElementById('pro-key');
   const key = (keyInput ? keyInput.value : '').trim().toUpperCase();
   if (!key) { toast('Digite a chave de ativação', 'err'); return; }
   
-  const keysMap = S.security.proKeysMap || {};
-  const keyData = keysMap[key];
-
-  if (keyData) {
-    const used = keyData.usedCount || 0;
-    const limit = keyData.maxUses || 1;
-
-    if (used >= limit) {
-      toast('Esta chave já atingiu o limite de ativações.', 'err');
+  toast('Validando chave...', 'info');
+  
+  try {
+    if (!S.ghToken || !S.ghRepo) {
+      toast('Conecte a nuvem primeiro nas configurações.', 'err');
       return;
     }
 
-    // Ativar
-    S.security.proKey = key;
-    keyData.usedCount = used + 1;
-    keyData.lastUsedAt = new Date().toISOString();
+    const res = await fetch(`https://api.github.com/repos/${S.ghRepo}/contents/dados.json`, {
+      headers: { 'Authorization': `token ${S.ghToken}` }
+    });
+    const fileData = await res.json();
+    const content = JSON.parse(atob(fileData.content));
+    const validKeys = content.security?.validProKeys || [];
     
-    save();
-    toast('🎉 Plano Pro ativado! Sincronizando...', 'ok');
-    
-    // Tenta sincronizar o uso da chave imediatamente
-    if (S.ghToken && S.ghRepo) {
-      _ghDoSave().then(() => {
-        closeModal();
-        setTimeout(() => location.reload(), 1000);
-      }).catch(() => {
-        closeModal();
-        setTimeout(() => location.reload(), 1000);
+    const keyData = validKeys.find(k => k.key === key);
+
+    if (keyData) {
+      if (keyData.uses >= keyData.limit) {
+        toast('Esta chave já atingiu o limite de ativações.', 'err');
+        return;
+      }
+
+      keyData.uses += 1;
+      keyData.lastUsedAt = new Date().toISOString();
+      
+      const updatedContent = btoa(JSON.stringify(content, null, 2));
+      await fetch(`https://api.github.com/repos/${S.ghRepo}/contents/dados.json`, {
+        method: 'PUT',
+        headers: { 'Authorization': `token ${S.ghToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: `fix: activate key ${key}`, content: updatedContent, sha: fileData.sha })
       });
+
+      S.security.proKey = key;
+      const expDate = new Date();
+      expDate.setDate(expDate.getDate() + (keyData.days || 30));
+      S.security.proExpiresAt = expDate.toISOString();
+      
+      save();
+      toast('🎉 Plano Pro ativado com sucesso!', 'ok');
+      setTimeout(() => {
+          closeModal();
+          location.reload();
+      }, 1500);
     } else {
-      closeModal();
-      setTimeout(() => location.reload(), 1000);
+      toast('Chave inválida ou inexistente.', 'err');
     }
-  } else {
-    // Fallback para chaves antigas se houver
+  } catch (e) {
+    console.error(e);
+    toast('Erro ao validar chave na nuvem.', 'err');
+  }
+}
+
+function fallbackActivate() {
     const validLegacy = S.security.validProKeys || [];
     if (validLegacy.includes(key)) {
       S.security.proKey = key;

@@ -6,7 +6,16 @@
   "security": {
     "adminPass": "",
     "recoveryKey": "",
-    "recoveryEmail": ""
+    "recoveryEmail": "",
+    "validProKeys": [
+      {
+        "key": "PRO-2026-LC3EYP",
+        "days": 30,
+        "limit": 1,
+        "uses": 0,
+        "created": "2026-06-01T00:57:23.088Z"
+      }
+    ]
   },
   "savedAt": "2026-05-30T11:19:41.562866"
 }

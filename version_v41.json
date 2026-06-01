@@ -1,1 +1,8 @@
-{"version": "v4.1.0"}
+{
+  "version": "v4.1.2",
+  "changelog": [
+    { "v": "v4.1.2", "msg": "Geração de chaves Pro movida para portal separado (KeyActivation). Removido acesso interno ao gerador de chaves." },
+    { "v": "v4.1.1", "msg": "Corrigido bug crítico de SyntaxError em fallbackActivate que impedia o carregamento do app." },
+    { "v": "v4.1.0", "msg": "Novo fluxo de login, sistema freemium Fase 1." }
+  ]
+}

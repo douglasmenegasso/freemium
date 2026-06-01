@@ -180,3 +180,13 @@
 **Última Atualização:** 30 de Maio de 2026
 **IA Responsável:** Claude (Anthropic) — claude-sonnet-4-6
 **Conta Conectada:** Douglas Menegasso
+
+
+### 📝 Registro (fix v4.1.1 — bug login tela inicial — Claude / Anthropic)
+
+- [x] **Backup criado:** `mypulse_backup_v4.1.0_pre-fix.html` antes de qualquer alteração.
+- [x] **Bug crítico corrigido:** `SyntaxError: Unexpected token '}'` na função `fallbackActivate`. A função possuía um `}` extra no fechamento, causando falha total no carregamento do JavaScript — `loginAsAdmin` e `loginAsUser` retornavam `undefined` no escopo global.
+- [x] **Correção aplicada:** Removido o `}` sobrando no final de `fallbackActivate`. Brace balance=0 verificado com `node --check`.
+- [x] **loginAsUser corrigido:** Removida verificação `isPro()` no login — perfil Usuário pode entrar em qualquer plano. Restrições aplicam-se às funções individuais dentro do app.
+- [x] **Versão bump:** `v4.1.0` → `v4.1.1` em `APP_VERSION`, divs estáticas e service worker.
+- **IA:** Claude (Anthropic) — claude-sonnet-4-6 | **Conta:** Douglas Menegasso

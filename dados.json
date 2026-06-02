@@ -14,6 +14,14 @@
         "limit": 1,
         "uses": 0,
         "created": "2026-06-01T00:57:23.088Z"
+      },
+      {
+        "key": "PRO-2026-3P64-IMCR",
+        "limit": 5,
+        "uses": 0,
+        "days": 90,
+        "createdAt": "2026-06-02T01:03:06.060Z",
+        "lastUsedAt": null
       }
     ]
   },

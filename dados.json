@@ -22,6 +22,14 @@
         "days": 90,
         "createdAt": "2026-06-02T01:03:06.060Z",
         "lastUsedAt": null
+      },
+      {
+        "key": "PRO-2026-CAIV-1M7G",
+        "limit": 1,
+        "uses": 0,
+        "days": 365,
+        "createdAt": "2026-06-02T01:03:38.452Z",
+        "lastUsedAt": null
       }
     ]
   },

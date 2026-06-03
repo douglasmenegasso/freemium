@@ -59,9 +59,11 @@
         .toast.warning { background: var(--warning); color: #000; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         .error-box { background: var(--error); color: #fff; padding: 16px; border-radius: var(--radius); margin: 16px; text-align: center; }
+        .user-type-info { font-size: 12px; color: var(--text3); margin-top: 8px; padding: 8px; background: var(--bg3); border-radius: 6px; }
     </style>
 </head>
 <body>
+    <!-- TELA INICIAL DE SELEÇÃO -->
     <div id="login-screen">
         <div class="login-card">
             <img src="icon-192-dark.png" class="login-logo" alt="Kayla">
@@ -69,6 +71,7 @@
             <div class="login-sub">Selecione seu perfil de acesso</div>
             <button class="btn btn-primary" onclick="abrirLogin('admin')">👑 Administrador</button>
             <button class="btn btn-outline" onclick="abrirLogin('user')">👤 Usuário</button>
+            <div class="user-type-info">👑 Admin: Acesso total<br>👤 Usuário: Acesso limitado</div>
             <div style="font-size:11px;color:var(--text3);margin-top:20px">v4.1.4</div>
         </div>
     </div>
@@ -114,51 +117,23 @@
                 console.log('Supabase conectado');
             } catch(e) { 
                 console.error('Erro Supabase:', e); 
-                toast('Erro de conexão', 'error');
             }
-            // NUNCA loga automaticamente - sempre mostra login
-            mostrarLogin();
+            // SEMPRE mostra a tela de seleção inicial
+            mostrarTelaSelecao();
         });
 
-        // VERIFICA SE TABELAS EXISTEM
-        async function verificarTabelas() {
-            try {
-                var test = await supabaseClient.from('clientes').select('id').limit(1);
-                if (test.error && test.error.message.includes('could not find table')) {
-                    dbError = true;
-                    toast('⚠️ Tabelas não criadas no banco. Execute o SQL no Supabase!', 'error');
-                    setTimeout(mostrarErroTabelas, 2000);
-                    return false;
-                }
-                return true;
-            } catch(e) {
-                dbError = true;
-                return false;
-            }
-        }
-
-        function mostrarErroTabelas() {
-            var html = '<div class="modal-title">⚠️ Banco de Dados Não Configurado</div>';
-            html += '<div class="modal-sub">As tabelas necessárias não existem</div>';
-            html += '<div class="error-box">';
-            html += '<strong>Para corrigir:</strong><br><br>';
-            html += '1. Acesse o Supabase<br>';
-            html += '2. Vá em SQL Editor<br>';
-            html += '3. Execute o script de criação das tabelas<br><br>';
-            html += '<a href="https://supabase.com/dashboard" target="_blank" class="btn btn-primary">Abrir Supabase</a>';
-            html += '<button class="btn btn-outline" onclick="fecharModal()">Fechar</button></div>';
-            document.getElementById('modal-body').innerHTML = html;
-            document.getElementById('modal-overlay').classList.add('show');
+        function mostrarTelaSelecao() {
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('app').style.display = 'none';
+            localStorage.removeItem('kayla_lembrar_me');
         }
 
         async function verificarSessao() {
-            if (!supabaseClient) { mostrarLogin(); return; }
+            if (!supabaseClient) { mostrarTelaSelecao(); return; }
             
-            // Verifica se tem "lembrar de mim"
             var lembrarMe = localStorage.getItem('kayla_lembrar_me');
             
             if (lembrarMe === 'true') {
-                // Tenta recuperar sessão salva
                 var result = await supabaseClient.auth.getSession();
                 if (result.data && result.data.session && result.data.session.user) {
                     currentUser = result.data.session.user;
@@ -171,15 +146,37 @@
                 }
             }
             
-            // Se não tem "lembrar de mim" ou falhou, mostra login
-            mostrarLogin();
+            mostrarTelaSelecao();
         }
 
-        function mostrarLogin() {
-            document.getElementById('login-screen').style.display = 'flex';
-            document.getElementById('app').style.display = 'none';
-            // Limpa sessão ao mostrar login (segurança)
-            localStorage.removeItem('kayla_lembrar_me');
+        async function verificarTabelas() {
+            try {
+                var test = await supabaseClient.from('clientes').select('id').limit(1);
+                if (test.error && test.error.message.includes('could not find table')) {
+                    dbError = true;
+                    toast('⚠️ Tabelas não criadas no banco!', 'error');
+                    setTimeout(mostrarErroTabelas, 2000);
+                    return false;
+                }
+                return true;
+            } catch(e) {
+                dbError = true;
+                return false;
+            }
+        }
+
+        function mostrarErroTabelas() {
+            var html = '<div class="modal-title">⚠️ Banco Não Configurado</div>';
+            html += '<div class="modal-sub">Execute o SQL no Supabase</div>';
+            html += '<div class="error-box">';
+            html += '<strong>Passos:</strong><br><br>';
+            html += '1. Acesse Supabase Dashboard<br>';
+            html += '2. SQL Editor → New Query<br>';
+            html += '3. Cole e execute o script<br><br>';
+            html += '<a href="https://supabase.com/dashboard" target="_blank" class="btn btn-primary" style="text-decoration:none;display:inline-block">Abrir Supabase</a>';
+            html += '<button class="btn btn-outline" onclick="fecharModal()" style="margin-top:10px">Fechar</button></div>';
+            document.getElementById('modal-body').innerHTML = html;
+            document.getElementById('modal-overlay').classList.add('show');
         }
 
         function mostrarApp() {
@@ -194,66 +191,141 @@
             var html = '<div class="modal-title">' + titulo + '</div>';
             html += '<div class="modal-sub">Digite suas credenciais</div>';
             html += '<div class="form-group"><label class="form-label">E-mail</label><input class="form-input" id="email" type="email" placeholder="seu@email.com"></div>';
-            html += '<div class="form-group"><label class="form-label">Senha</label><input class="form-input" id="senha" type="password" placeholder="Sua senha"></div>';
-            html += '<div class="checkbox-group"><input type="checkbox" id="lembrar-me"><label for="lembrar-me" style="color:var(--text2);font-size:13px">Lembrar de mim (somente neste dispositivo)</label></div>';
-            html += '<button class="btn btn-primary" onclick="fazerLogin()">Entrar</button>';
-            html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
+            html += '<div class="form-group"><label class="form-label">Senha</label><input class="form-input" id="senha" type="password" placeholder="Mínimo 6 caracteres"></div>';
+            html += '<div class="checkbox-group"><input type="checkbox" id="lembrar-me"><label for="lembrar-me" style="color:var(--text2);font-size:13px">Lembrar de mim</label></div>';
+            html += '<button class="btn btn-primary" onclick="verificarELogin()">Entrar</button>';
+            html += '<button class="btn btn-outline" onclick="fecharModal(); mostrarTelaSelecao()">Cancelar</button>';
             document.getElementById('modal-body').innerHTML = html;
             document.getElementById('modal-overlay').classList.add('show');
             setTimeout(function() { document.getElementById('email').focus(); }, 100);
         }
 
-        async function fazerLogin() {
+        async function verificarELogin() {
             var email = document.getElementById('email').value.trim();
             var senha = document.getElementById('senha').value;
-            var lembrarMe = document.getElementById('lembrar-me').checked;
             
             if (!email || !senha) { toast('Preencha e-mail e senha', 'error'); return; }
+            if (senha.length < 6) { toast('Senha deve ter no mínimo 6 caracteres', 'error'); return; }
             
+            // Verifica se usuário existe tentando login
             var btn = event.target;
             var textoAntigo = btn.innerText;
-            btn.innerText = 'Entrando...';
+            btn.innerText = 'Verificando...';
             btn.disabled = true;
             
             try {
-                var result = await supabaseClient.auth.signInWithPassword({ email: email, password: senha });
-                if (result.error) throw result.error;
+                var result = await supabaseClient.auth.signInWithPassword({ 
+                    email: email, 
+                    password: senha 
+                });
                 
-                currentUser = result.data.user;
-                
-                // Salva "lembrar de mim" se marcado
-                if (lembrarMe) {
-                    localStorage.setItem('kayla_lembrar_me', 'true');
-                    localStorage.setItem('kayla_email', email);
+                if (result.error) {
+                    // Usuário não existe ou senha errada
+                    if (result.error.message.includes('Invalid login credentials') || 
+                        result.error.message.includes('Email not confirmed')) {
+                        // Pergunta se quer criar conta
+                        perguntarSeCriaConta(email, senha);
+                    } else {
+                        toast('Erro: ' + result.error.message, 'error');
+                    }
                 } else {
-                    localStorage.removeItem('kayla_lembrar_me');
-                    localStorage.removeItem('kayla_email');
+                    // Login bem-sucedido
+                    await loginSucesso(result.data.user);
                 }
                 
-                // Verifica se tabelas existem
-                var ok = await verificarTabelas();
-                if (!ok) {
-                    toast('Login realizado, mas configure o banco de dados', 'warning');
-                    fecharModal();
+            } catch (error) {
+                toast('Erro de conexão', 'error');
+            }
+            
+            btn.innerText = textoAntigo;
+            btn.disabled = false;
+        }
+
+        function perguntarSeCriaConta(email, senha) {
+            var html = '<div class="modal-title">📝 Usuário Não Encontrado</div>';
+            html += '<div class="modal-sub">E-mail: ' + email + '</div>';
+            html += '<div class="card" style="background:var(--bg3);padding:16px;margin:12px 0;">';
+            html += '<strong>Este usuário não está cadastrado.</strong><br><br>';
+            html += 'Deseja criar uma nova conta?<br><br>';
+            html += '<small style="color:var(--text3)">';
+            if (perfilAtual === 'admin') {
+                html += '👑 <strong>Admin:</strong> Acesso total ao sistema';
+            } else {
+                html += '👤 <strong>Usuário:</strong> Acesso limitado (somente visualização)';
+            }
+            html += '</small></div>';
+            html += '<button class="btn btn-primary" onclick="criarNovaConta(\'' + email + '\', \'' + senha.replace(/'/g, "\\'") + '\')">✅ Criar Conta</button>';
+            html += '<button class="btn btn-outline" onclick="fecharModal(); abrirLogin(\'' + perfilAtual + '\')">❌ Voltar</button>';
+            document.getElementById('modal-body').innerHTML = html;
+        }
+
+        async function criarNovaConta(email, senha) {
+            var btn = event.target;
+            btn.innerText = 'Criando...';
+            btn.disabled = true;
+            
+            try {
+                // Cria usuário no Supabase Auth
+                var result = await supabaseClient.auth.signUp({
+                    email: email,
+                    password: senha,
+                    options: {
+                        data: {
+                            perfil: perfilAtual,
+                            tipo: perfilAtual === 'admin' ? 'administrador' : 'usuario'
+                        }
+                    }
+                });
+                
+                if (result.error) {
+                    if (result.error.message.includes('already registered')) {
+                        toast('Este e-mail já está em uso. Tente fazer login.', 'error');
+                    } else {
+                        toast('Erro: ' + result.error.message, 'error');
+                    }
+                    btn.innerText = '✅ Criar Conta';
+                    btn.disabled = false;
                     return;
                 }
                 
-                localStorage.setItem('perfilAcesso', perfilAtual);
-                await carregarDados();
-                fecharModal();
-                toast('Bem-vindo!', 'success');
-                mostrarApp();
+                // Conta criada com sucesso
+                if (result.data.user) {
+                    toast('✅ Conta criada com sucesso!', 'success');
+                    await loginSucesso(result.data.user);
+                }
                 
             } catch (error) {
-                console.error('Erro login:', error);
-                var msg = error.message;
-                if (msg.includes('Invalid login credentials')) {
-                    msg = 'E-mail ou senha incorretos';
-                }
-                toast('Erro: ' + msg, 'error');
-                btn.innerText = textoAntigo;
+                toast('Erro ao criar conta: ' + error.message, 'error');
+                btn.innerText = '✅ Criar Conta';
                 btn.disabled = false;
             }
+        }
+
+        async function loginSucesso(user) {
+            currentUser = user;
+            
+            var lembrarMe = document.getElementById('lembrar-me');
+            if (lembrarMe && lembrarMe.checked) {
+                localStorage.setItem('kayla_lembrar_me', 'true');
+                localStorage.setItem('kayla_email', document.getElementById('email').value);
+            } else {
+                localStorage.removeItem('kayla_lembrar_me');
+                localStorage.removeItem('kayla_email');
+            }
+            
+            // Verifica tabelas
+            var ok = await verificarTabelas();
+            if (!ok) {
+                toast('Login realizado, mas configure o banco', 'warning');
+                fecharModal();
+                return;
+            }
+            
+            localStorage.setItem('perfilAcesso', perfilAtual);
+            await carregarDados();
+            fecharModal();
+            toast('Bem-vindo, ' + (perfilAtual === 'admin' ? 'Administrador' : 'Usuário') + '!', 'success');
+            mostrarApp();
         }
 
         async function fazerLogout() {
@@ -264,7 +336,7 @@
             if (html5QrCode) { html5QrCode.stop(); }
             currentUser = null;
             toast('Logout realizado', 'success');
-            mostrarLogin();
+            mostrarTelaSelecao();
         }
 
         async function carregarDados() {
@@ -272,34 +344,13 @@
             
             try {
                 var resultClientes = await supabaseClient.from('clientes').select('*');
-                if (resultClientes.error) {
-                    if (!resultClientes.error.message.includes('table')) {
-                        toast('Erro ao carregar clientes', 'error');
-                    }
-                    clientes = [];
-                } else {
-                    clientes = resultClientes.data || [];
-                }
+                clientes = resultClientes.error ? [] : (resultClientes.data || []);
                 
                 var resultProdutos = await supabaseClient.from('produtos').select('*');
-                if (resultProdutos.error) {
-                    if (!resultProdutos.error.message.includes('table')) {
-                        toast('Erro ao carregar produtos', 'error');
-                    }
-                    produtos = [];
-                } else {
-                    produtos = resultProdutos.data || [];
-                }
+                produtos = resultProdutos.error ? [] : (resultProdutos.data || []);
                 
                 var resultPedidos = await supabaseClient.from('pedidos').select('*');
-                if (resultPedidos.error) {
-                    if (!resultPedidos.error.message.includes('table')) {
-                        toast('Erro ao carregar pedidos', 'error');
-                    }
-                    pedidos = [];
-                } else {
-                    pedidos = resultPedidos.data || [];
-                }
+                pedidos = resultPedidos.error ? [] : (resultPedidos.data || []);
             } catch(e) {
                 console.error('Erro carregar dados:', e);
             }
@@ -314,7 +365,7 @@
             var sub = document.getElementById('header-sub');
             
             if (dbError && aba !== 'settings') {
-                content.innerHTML = '<div class="error-box">⚠️ Banco de dados não configurado. Vá em Config para ver como corrigir.</div>';
+                content.innerHTML = '<div class="error-box">⚠️ Banco não configurado. Vá em Config.</div>';
                 return;
             }
             
@@ -348,8 +399,7 @@
         }
 
         function getAbaIndex(aba) {
-            var abas = ['scan', 'clients', 'products', 'orders', 'history', 'settings'];
-            return abas.indexOf(aba) + 1;
+            return ['scan', 'clients', 'products', 'orders', 'history', 'settings'].indexOf(aba) + 1;
         }
 
         function renderizarScanner() {
@@ -396,11 +446,11 @@
             var html = '<div class="card"><div class="card-title">📋 Pedidos em Aberto</div>' +
                       '<button class="btn btn-primary" onclick="novoPedido()">+ Novo Pedido</button></div>';
             if (pedidos.length === 0) {
-                html += '<div class="card"><p style="color:var(--text3);text-align:center;padding:20px">Nenhum pedido em aberto</p></div>';
+                html += '<div class="card"><p style="color:var(--text3);text-align:center;padding:20px">Nenhum pedido</p></div>';
             } else {
                 html += '<div class="item-list">';
                 pedidos.forEach(function(p) {
-                    html += '<div class="item-card"><div class="item-info"><div class="item-name">Pedido #' + p.id.substr(0,8) + '</div><div class="item-detail">' + p.cliente_nome + ' | ' + p.itens + ' itens | R$ ' + p.total + '</div></div>' +
+                    html += '<div class="item-card"><div class="item-info"><div class="item-name">Pedido #' + p.id.substr(0,8) + '</div><div class="item-detail">' + p.cliente_nome + '</div></div>' +
                            '<button class="btn btn-sm btn-outline" onclick="verPedido(\'' + p.id + '\')">Ver</button></div>';
                 });
                 html += '</div>';
@@ -409,81 +459,62 @@
         }
 
         function renderizarHistorico() {
-            return '<div class="card"><div class="card-title">📊 Histórico de Vendas</div>' +
-                   '<p style="color:var(--text3);text-align:center;padding:40px">Nenhuma venda registrada</p></div>';
+            return '<div class="card"><div class="card-title">📊 Histórico</div>' +
+                   '<p style="color:var(--text3);text-align:center;padding:40px">Nenhuma venda</p></div>';
         }
 
         function renderizarConfig() {
-            var isPro = localStorage.getItem('kayla_pro') === 'true';
             var html = '<div class="card"><div class="card-title">⚙️ Configurações</div>';
-            
             if (dbError) {
-                html += '<div class="error-box">⚠️ <strong>Atenção:</strong> Tabelas do banco não encontradas!<br><br>';
-                html += 'Siga o SQL fornecido para criar as tabelas no Supabase.</div>';
+                html += '<div class="error-box">⚠️ Tabelas não encontradas!</div>';
             }
-            
-            html += '<div class="form-group"><label class="form-label">Usuário Logado</label><div style="background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:12px">' + (currentUser ? currentUser.email : 'Não logado') + '</div></div>';
-            html += '<div class="form-group"><label class="form-label">Plano</label><div style="background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:12px"><span style="display:inline-block;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:600;background:' + (isPro ? '#7c5cfc' : '#606070') + ';color:#fff">' + (isPro ? 'PRO' : 'GRÁTIS') + '</span></div></div>';
+            html += '<div class="form-group"><label class="form-label">Usuário</label><div style="background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:12px">' + (currentUser ? currentUser.email : 'Não logado') + '</div></div>';
+            html += '<div class="form-group"><label class="form-label">Perfil</label><div style="background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:12px">' + (perfilAtual === 'admin' ? '👑 Administrador' : '👤 Usuário') + '</div></div>';
             html += '<div class="form-group"><label class="form-label">Versão</label><div style="background:var(--bg3);padding:12px;border-radius:8px">v4.1.4</div></div>';
-            html += '<button class="btn btn-red" onclick="fazerLogout()">🚪 Sair / Logout</button></div>';
+            html += '<button class="btn btn-red" onclick="fazerLogout()">🚪 Sair</button></div>';
             return html;
         }
 
         function iniciarScanner() {
             if (dbError) return;
-            if (html5QrCode) { 
-                html5QrCode.stop();
-                html5QrCode = null;
-            }
+            if (html5QrCode) { html5QrCode.stop(); html5QrCode = null; }
             html5QrCode = new Html5Qrcode("reader");
-            var config = { fps: 10, qrbox: { width: 250, height: 250 } };
-            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
+            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } }, onScanSuccess)
                 .catch(function(err) { 
-                    console.log("Erro scanner:", err);
-                    document.getElementById('reader').innerHTML = '<p style="color:var(--text3);text-align:center;padding:20px">Câmera não disponível</p>';
+                    document.getElementById('reader').innerHTML = '<p style="color:var(--text3);text-align:center;padding:20px">Câmera indisponível</p>';
                 });
         }
 
-        function onScanSuccess(decodedText, decodedResult) {
-            if (html5QrCode) {
-                html5QrCode.pause();
-            }
+        function onScanSuccess(decodedText) {
+            if (html5QrCode) html5QrCode.pause();
             toast('Código: ' + decodedText, 'success');
             verificarProdutoCodigo(decodedText);
         }
 
         async function verificarProdutoCodigo(codigo) {
-            var produtoExistente = produtos.find(function(p) { return p.codigo === codigo; });
-            if (produtoExistente) {
-                toast('Produto encontrado: ' + produtoExistente.nome, 'success');
-                selecionarClienteParaProduto(produtoExistente);
+            var produto = produtos.find(function(p) { return p.codigo === codigo; });
+            if (produto) {
+                toast('Produto: ' + produto.nome, 'success');
+                selecionarClienteParaProduto(produto);
             } else {
-                toast('Produto não cadastrado. Cadastre agora!', 'warning');
-                setTimeout(function() {
-                    abrirModalProdutoComCodigo(codigo);
-                }, 1500);
+                toast('Produto não cadastrado!', 'warning');
+                setTimeout(function() { abrirModalProdutoComCodigo(codigo); }, 1500);
             }
         }
 
         async function selecionarClienteParaProduto(produto) {
-            var clienteSelecionado = localStorage.getItem('clienteSelecionado');
-            if (clienteSelecionado) {
-                var cliente = JSON.parse(clienteSelecionado);
-                await adicionarProdutoAoPedido(produto, cliente);
+            var clienteSel = localStorage.getItem('clienteSelecionado');
+            if (clienteSel) {
+                await adicionarProdutoAoPedido(produto, JSON.parse(clienteSel));
             } else {
                 var html = '<div class="modal-title">👥 Selecionar Cliente</div>';
-                html += '<div class="modal-sub">Produto: ' + produto.nome + ' - R$ ' + produto.preco + '</div>';
+                html += '<div class="modal-sub">' + produto.nome + ' - R$ ' + produto.preco + '</div>';
                 if (clientes.length === 0) {
-                    html += '<div class="card" style="background:var(--bg3);padding:16px;margin:12px 0;">';
-                    html += '<p style="color:var(--text3);text-align:center">Nenhum cliente cadastrado</p>';
-                    html += '<button class="btn btn-primary" onclick="abrirModalClienteDoScanner()" style="margin-top:12px">+ Cadastrar Cliente</button></div>';
+                    html += '<div class="card" style="background:var(--bg3);padding:16px;"><p style="color:var(--text3);text-align:center">Nenhum cliente</p><button class="btn btn-primary" onclick="abrirModalClienteDoScanner()" style="margin-top:12px">+ Cliente</button></div>';
                 } else {
                     html += '<div class="item-list" style="margin-bottom:16px">';
                     clientes.forEach(function(c) {
-                        html += '<div class="item-card" style="cursor:pointer" onclick="selecionarCliente(\'' + c.id + '\', \'' + c.nome.replace(/'/g, "\\'") + '\')">';
-                        html += '<div class="item-info"><div class="item-name">' + c.nome + '</div>';
-                        html += '<div class="item-detail">' + (c.telefone || 'Sem telefone') + '</div></div>';
-                        html += '<span style="color:var(--accent)">Selecionar →</span></div>';
+                        html += '<div class="item-card" style="cursor:pointer" onclick="selecionarCliente(\'' + c.id + '\', \'' + c.nome.replace(/'/g, "\\'") + '\')"><div class="item-info"><div class="item-name">' + c.nome + '</div></div><span style="color:var(--accent)">Selecionar →</span></div>';
                     });
                     html += '</div>';
                 }
@@ -493,108 +524,62 @@
             }
         }
 
-        function selecionarCliente(clienteId, clienteNome) {
-            localStorage.setItem('clienteSelecionado', JSON.stringify({id: clienteId, nome: clienteNome}));
-            toast('Cliente selecionado: ' + clienteNome, 'success');
+        function selecionarCliente(id, nome) {
+            localStorage.setItem('clienteSelecionado', JSON.stringify({id: id, nome: nome}));
+            toast('Cliente: ' + nome, 'success');
             fecharModal();
             retomarScanner();
         }
 
         async function adicionarProdutoAoPedido(produto, cliente) {
-            var pedidoExistente = pedidos.find(function(p) { 
-                return p.cliente_id === cliente.id && p.status === 'aberto'; 
-            });
-            if (pedidoExistente) {
-                toast('Adicionado ao pedido #' + pedidoExistente.id.substr(0,8), 'success');
+            var pedido = pedidos.find(function(p) { return p.cliente_id === cliente.id && p.status === 'aberto'; });
+            if (pedido) {
+                toast('Pedido #' + pedido.id.substr(0,8), 'success');
             } else {
-                var data = {
-                    cliente_id: cliente.id,
-                    cliente_nome: cliente.nome,
-                    status: 'aberto',
-                    itens: 1,
-                    total: produto.preco,
-                    user_id: currentUser.id,
-                    created_at: new Date().toISOString()
-                };
+                var data = { cliente_id: cliente.id, cliente_nome: cliente.nome, status: 'aberto', itens: 1, total: produto.preco, user_id: currentUser.id, created_at: new Date().toISOString() };
                 var result = await supabaseClient.from('pedidos').insert(data);
-                if (result.error) {
-                    toast('Erro ao criar pedido: ' + result.error.message, 'error');
-                    retomarScanner();
-                    return;
-                }
-                toast('Pedido #' + result.data[0].id.substr(0,8) + ' criado!', 'success');
+                if (result.error) { toast('Erro: ' + result.error.message, 'error'); retomarScanner(); return; }
+                toast('Pedido criado!', 'success');
                 await carregarDados();
             }
             setTimeout(retomarScanner, 2000);
         }
 
-        function retomarScanner() {
-            if (html5QrCode) {
-                html5QrCode.resume();
-            }
-        }
+        function retomarScanner() { if (html5QrCode) html5QrCode.resume(); }
+        function buscarProdutoManual() { var codigo = document.getElementById('codigo-manual').value.trim(); if (codigo) { if (html5QrCode) html5QrCode.pause(); verificarProdutoCodigo(codigo); } }
 
-        function buscarProdutoManual() {
-            var codigo = document.getElementById('codigo-manual').value.trim();
-            if (codigo) {
-                if (html5QrCode) html5QrCode.pause();
-                verificarProdutoCodigo(codigo);
-            }
-        }
-
-        function abrirModalProdutoComCodigo(codigoBarras) {
-            var html = '<div class="modal-title">🏷️ Cadastrar Produto</div>';
-            html += '<div class="modal-sub">Produto não encontrado. Cadastre agora!</div>';
-            html += '<div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="produto-nome" placeholder="Nome do produto"></div>';
-            html += '<div class="form-group"><label class="form-label">Código de Barras</label><input class="form-input" id="produto-codigo" value="' + (codigoBarras || '') + '" readonly></div>';
-            html += '<div class="form-group"><label class="form-label">Preço (R$)</label><input class="form-input" id="produto-preco" type="number" step="0.01" placeholder="0,00"></div>';
-            html += '<button class="btn btn-primary" onclick="salvarProdutoDoScanner()">Salvar Produto</button>';
+        function abrirModalProdutoComCodigo(codigo) {
+            var html = '<div class="modal-title">🏷️ Cadastrar Produto</div><div class="modal-sub">Produto não encontrado</div>';
+            html += '<div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="produto-nome"></div>';
+            html += '<div class="form-group"><label class="form-label">Código</label><input class="form-input" id="produto-codigo" value="' + codigo + '" readonly></div>';
+            html += '<div class="form-group"><label class="form-label">Preço (R$)</label><input class="form-input" id="produto-preco" type="number" step="0.01"></div>';
+            html += '<button class="btn btn-primary" onclick="salvarProdutoDoScanner()">Salvar</button>';
             html += '<button class="btn btn-outline" onclick="fecharModal(); retomarScanner()">Cancelar</button>';
             document.getElementById('modal-body').innerHTML = html;
             document.getElementById('modal-overlay').classList.add('show');
-            setTimeout(function() {
-                document.getElementById('produto-nome').focus();
-            }, 300);
+            setTimeout(function() { document.getElementById('produto-nome').focus(); }, 300);
         }
 
         async function salvarProdutoDoScanner() {
             var nome = document.getElementById('produto-nome').value.trim();
             var codigo = document.getElementById('produto-codigo').value.trim();
             var preco = parseFloat(document.getElementById('produto-preco').value);
-            if (!nome || !codigo || !preco) {
-                toast('Preencha todos os campos', 'error');
-                return;
-            }
-            var produtoExistente = produtos.find(function(p) { return p.codigo === codigo; });
-            if (produtoExistente) {
-                toast('Produto já cadastrado!', 'error');
-                return;
-            }
-            var data = { 
-                nome: nome, 
-                codigo: codigo, 
-                preco: preco, 
-                user_id: currentUser.id,
-                created_at: new Date().toISOString()
-            };
-            var result = await supabaseClient.from('produtos').insert(data);
-            if (result.error) {
-                toast('Erro: ' + result.error.message, 'error');
-                return;
-            }
-            toast('Produto cadastrado!', 'success');
+            if (!nome || !codigo || !preco) { toast('Preencha tudo', 'error'); return; }
+            if (produtos.find(function(p) { return p.codigo === codigo; })) { toast('Já cadastrado!', 'error'); return; }
+            var result = await supabaseClient.from('produtos').insert({ nome: nome, codigo: codigo, preco: preco, user_id: currentUser.id, created_at: new Date().toISOString() });
+            if (result.error) { toast('Erro: ' + result.error.message, 'error'); return; }
+            toast('Produto salvo!', 'success');
             fecharModal();
             await carregarDados();
             setTimeout(retomarScanner, 1000);
         }
 
         function abrirModalClienteDoScanner() {
-            var html = '<div class="modal-title">👥 Cadastrar Cliente</div>';
-            html += '<div class="modal-sub">Preencha os dados do cliente</div>';
-            html += '<div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="cliente-nome" placeholder="Nome completo"></div>';
-            html += '<div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="cliente-telefone" placeholder="(00) 00000-0000"></div>';
-            html += '<div class="form-group"><label class="form-label">Endereço</label><input class="form-input" id="cliente-endereco" placeholder="Endereço completo"></div>';
-            html += '<button class="btn btn-primary" onclick="salvarClienteDoScanner()">Salvar Cliente</button>';
+            var html = '<div class="modal-title">👥 Novo Cliente</div><div class="modal-sub">Preencha os dados</div>';
+            html += '<div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="cliente-nome"></div>';
+            html += '<div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="cliente-telefone"></div>';
+            html += '<div class="form-group"><label class="form-label">Endereço</label><input class="form-input" id="cliente-endereco"></div>';
+            html += '<button class="btn btn-primary" onclick="salvarClienteDoScanner()">Salvar</button>';
             html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
             document.getElementById('modal-body').innerHTML = html;
             document.getElementById('modal-overlay').classList.add('show');
@@ -602,36 +587,20 @@
 
         async function salvarClienteDoScanner() {
             var nome = document.getElementById('cliente-nome').value.trim();
-            var telefone = document.getElementById('cliente-telefone').value.trim();
-            var endereco = document.getElementById('cliente-endereco').value.trim();
-            if (!nome) {
-                toast('Nome obrigatório', 'error');
-                return;
-            }
-            var data = { 
-                nome: nome, 
-                telefone: telefone, 
-                endereco: endereco, 
-                user_id: currentUser.id,
-                created_at: new Date().toISOString()
-            };
-            var result = await supabaseClient.from('clientes').insert(data);
-            if (result.error) {
-                toast('Erro: ' + result.error.message, 'error');
-                return;
-            }
-            toast('Cliente cadastrado!', 'success');
+            if (!nome) { toast('Nome obrigatório', 'error'); return; }
+            var result = await supabaseClient.from('clientes').insert({ nome: nome, telefone: document.getElementById('cliente-telefone').value, endereco: document.getElementById('cliente-endereco').value, user_id: currentUser.id, created_at: new Date().toISOString() });
+            if (result.error) { toast('Erro: ' + result.error.message, 'error'); return; }
+            toast('Cliente salvo!', 'success');
             fecharModal();
             await carregarDados();
         }
 
         function abrirModalCliente() {
-            var html = '<div class="modal-title">👥 Cadastrar Cliente</div>';
-            html += '<div class="modal-sub">Preencha os dados do cliente</div>';
-            html += '<div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="cliente-nome" placeholder="Nome completo"></div>';
-            html += '<div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="cliente-telefone" placeholder="(00) 00000-0000"></div>';
-            html += '<div class="form-group"><label class="form-label">Endereço</label><input class="form-input" id="cliente-endereco" placeholder="Endereço completo"></div>';
-            html += '<button class="btn btn-primary" onclick="salvarCliente()">Salvar Cliente</button>';
+            var html = '<div class="modal-title">👥 Cadastrar Cliente</div><div class="modal-sub">Preencha os dados</div>';
+            html += '<div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="cliente-nome"></div>';
+            html += '<div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="cliente-telefone"></div>';
+            html += '<div class="form-group"><label class="form-label">Endereço</label><input class="form-input" id="cliente-endereco"></div>';
+            html += '<button class="btn btn-primary" onclick="salvarCliente()">Salvar</button>';
             html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
             document.getElementById('modal-body').innerHTML = html;
             document.getElementById('modal-overlay').classList.add('show');
@@ -639,37 +608,21 @@
 
         async function salvarCliente() {
             var nome = document.getElementById('cliente-nome').value.trim();
-            var telefone = document.getElementById('cliente-telefone').value.trim();
-            var endereco = document.getElementById('cliente-endereco').value.trim();
-            if (!nome) {
-                toast('Nome obrigatório', 'error');
-                return;
-            }
-            var data = { 
-                nome: nome, 
-                telefone: telefone, 
-                endereco: endereco, 
-                user_id: currentUser.id,
-                created_at: new Date().toISOString()
-            };
-            var result = await supabaseClient.from('clientes').insert(data);
-            if (result.error) {
-                toast('Erro: ' + result.error.message, 'error');
-                return;
-            }
-            toast('Cliente cadastrado!', 'success');
+            if (!nome) { toast('Nome obrigatório', 'error'); return; }
+            var result = await supabaseClient.from('clientes').insert({ nome: nome, telefone: document.getElementById('cliente-telefone').value, endereco: document.getElementById('cliente-endereco').value, user_id: currentUser.id, created_at: new Date().toISOString() });
+            if (result.error) { toast('Erro: ' + result.error.message, 'error'); return; }
+            toast('Cliente salvo!', 'success');
             fecharModal();
             await carregarDados();
             mudarAba('clients');
         }
 
         function abrirModalProdutoManual() {
-            var html = '<div class="modal-title">🏷️ Cadastrar Produto</div>';
-            html += '<div class="modal-sub">Preencha os dados do produto</div>';
-            html += '<div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="produto-nome-manual" placeholder="Nome do produto"></div>';
-            html += '<div class="form-group"><label class="form-label">Código de Barras</label><input class="form-input" id="produto-codigo-manual" placeholder="Código"></div>';
-            html += '<div class="form-group"><label class="form-label">Preço (R$)</label><input class="form-input" id="produto-preco-manual" type="number" step="0.01" placeholder="0,00"></div>';
-            html += '<button class="btn btn-primary" onclick="salvarProdutoManual()">Salvar Produto</button>';
+            var html = '<div class="modal-title">🏷️ Cadastrar Produto</div><div class="modal-sub">Preencha os dados</div>';
+            html += '<div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="produto-nome-manual"></div>';
+            html += '<div class="form-group"><label class="form-label">Código</label><input class="form-input" id="produto-codigo-manual"></div>';
+            html += '<div class="form-group"><label class="form-label">Preço (R$)</label><input class="form-input" id="produto-preco-manual" type="number" step="0.01"></div>';
+            html += '<button class="btn btn-primary" onclick="salvarProdutoManual()">Salvar</button>';
             html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
             document.getElementById('modal-body').innerHTML = html;
             document.getElementById('modal-overlay').classList.add('show');
@@ -679,28 +632,11 @@
             var nome = document.getElementById('produto-nome-manual').value.trim();
             var codigo = document.getElementById('produto-codigo-manual').value.trim();
             var preco = parseFloat(document.getElementById('produto-preco-manual').value);
-            if (!nome || !codigo || !preco) {
-                toast('Preencha todos os campos', 'error');
-                return;
-            }
-            var produtoExistente = produtos.find(function(p) { return p.codigo === codigo; });
-            if (produtoExistente) {
-                toast('Produto já cadastrado!', 'error');
-                return;
-            }
-            var data = { 
-                nome: nome, 
-                codigo: codigo, 
-                preco: preco, 
-                user_id: currentUser.id,
-                created_at: new Date().toISOString()
-            };
-            var result = await supabaseClient.from('produtos').insert(data);
-            if (result.error) {
-                toast('Erro: ' + result.error.message, 'error');
-                return;
-            }
-            toast('Produto cadastrado!', 'success');
+            if (!nome || !codigo || !preco) { toast('Preencha tudo', 'error'); return; }
+            if (produtos.find(function(p) { return p.codigo === codigo; })) { toast('Já cadastrado!', 'error'); return; }
+            var result = await supabaseClient.from('produtos').insert({ nome: nome, codigo: codigo, preco: preco, user_id: currentUser.id, created_at: new Date().toISOString() });
+            if (result.error) { toast('Erro: ' + result.error.message, 'error'); return; }
+            toast('Produto salvo!', 'success');
             fecharModal();
             await carregarDados();
             mudarAba('products');
@@ -719,11 +655,10 @@
         function editarProduto(id) { toast('Editar produto', 'success'); }
 
         function toast(msg, tipo) {
-            var container = document.getElementById('toast-container');
             var el = document.createElement('div');
             el.className = 'toast ' + tipo;
             el.textContent = msg;
-            container.appendChild(el);
+            document.getElementById('toast-container').appendChild(el);
             setTimeout(function() { el.style.opacity = '0'; setTimeout(function() { el.remove(); }, 300); }, 3000);
         }
     </script>

@@ -1,18 +1,1 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Carregando MyPulse...</title>
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(rs => { for(let r of rs) r.unregister(); });
-        }
-        if ('caches' in window) {
-            caches.keys().then(ns => { for(let n of ns) caches.delete(n); });
-        }
-        window.location.href = 'mypulse.html?v=' + Date.now();
-    </script>
-</head>
-<body style="background:#0f172a;color:white;display:flex;align-items:center;justify-content:center;height:100vh;">
-    <div style="text-align:center;">🚀 Carregando MyPulse v4.1.0...</div>
-</body>
-</html>
+window.location.href = 'kayla.html';

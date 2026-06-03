@@ -421,37 +421,56 @@ async function setupAdmin() {
 
     const btn = event.target;
     const textoOriginal = btn.innerText;
-    btn.innerText = '⏳ Criando...';
+    btn.innerText = ' Processando...';
     btn.disabled = true;
 
     try {
-        const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+        // 1. Primeiro tenta fazer LOGIN (se o usuário já existe)
+        let { data: authData, error: loginError } = await supabaseClient.auth.signInWithPassword({
             email: email,
             password: senha,
         });
 
-        if (authError) throw authError;
+        // 2. Se falhar o login, tenta CRIAR o usuário
+        if (loginError && loginError.message.includes('Invalid login credentials')) {
+            console.log('Usuário não existe, criando...');
+            
+            const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
+                email: email,
+                password: senha,
+            });
 
-        if (authData.user) {
-            const { error: profileError } = await supabaseClient
-                .from('profiles')
-                .insert({
-                    id: authData.user.id,
-                    email: email,
-                    is_pro: true,
-                    plan_expires_at: null
-                });
+            if (signUpError) throw signUpError;
+            authData = signUpData;
 
-            if (profileError) console.error('Erro perfil:', profileError);
+            // Cria o perfil na tabela profiles
+            if (authData.user) {
+                const { error: profileError } = await supabaseClient
+                    .from('profiles')
+                    .insert({
+                        id: authData.user.id,
+                        email: email,
+                        is_pro: true,
+                        plan_expires_at: null
+                    });
+
+                if (profileError && !profileError.message.includes('duplicate')) {
+                    console.error('Erro perfil:', profileError);
+                }
+            }
+
+            // Faz login após criar
+            const { error: loginAfterCreate } = await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: senha,
+            });
+
+            if (loginAfterCreate) throw loginAfterCreate;
+        } else if (loginError) {
+            throw loginError;
         }
 
-        const { error: loginError } = await supabaseClient.auth.signInWithPassword({
-            email: email,
-            password: senha,
-        });
-
-        if (loginError) throw loginError;
-
+        // 3. Salva localmente
         S.adminPass = senha;
         S.recoveryEmail = email;
         DB.save('csn_adminpass', senha);
@@ -459,6 +478,7 @@ async function setupAdmin() {
 
         toast('✅ Administrador configurado!', 'success');
 
+        // 4. Fecha modal e recarrega
         if (typeof closeModal === 'function') {
             closeModal();
         }
@@ -470,7 +490,6 @@ async function setupAdmin() {
         btn.disabled = false;
     }
 }
-
 function renderLoginScreen() {
   document.getElementById('login-screen').innerHTML = `
     <div class="login-card">

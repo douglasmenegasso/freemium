@@ -134,8 +134,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <div class="login-logo"><img src="icon-192-dark.png" style="width:80px;height:80px;border-radius:20px;box-shadow:0 10px 20px rgba(0,0,0,0.3);"></div>
     <div class="login-title">Venda Consignada</div>
     <div class="login-sub">Escolha seu perfil de acesso</div>
-		    <button class="btn btn-primary login-btn" onclick="loginAsAdmin()">👑 Administrador</button>
-		    <button class="btn btn-outline login-btn" onclick="loginAsUser()">👤 Usuário</button>
+		    <button class="btn btn-primary login-btn" onclick="solicitarLogin()">👑 Administrador</button>
+		    <button class="btn btn-outline login-btn" onclick="solicitarLogin()">👤 Usuário</button>
 		    <div style="font-size:11px;color:var(--text3);margin-top:16px;" id="login-ver">v4.1.2</div>
   </div>
 </div>
@@ -2543,6 +2543,74 @@ window.addEventListener('online', checkAppUpdate);
 </script>
 <!-- ========================================== -->
 <!-- FIM: CONEXÃO KAYLA                         -->
+<!-- ========================================== -->
+
+	<!-- ========================================== -->
+<!-- AUTENTICAÇÃO KAYLA - SUPABASE              -->
+<!-- ========================================== -->
+<script>
+    // Verifica se o usuário está logado ao abrir o app
+    async function verificarSessao() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        if (session && session.user) {
+            // Logado: esconde a tela de login e mostra o app
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            console.log('✅ Logado como:', session.user.email);
+        } else {
+            // Não logado: mostra a tela de login
+            document.getElementById('login-screen').style.display = 'block';
+            document.getElementById('app').style.display = 'none';
+        }
+    }
+
+    // Quando clicar em "Administrador" ou "Usuário", abre o prompt de login
+    function solicitarLogin(tipo) {
+        const email = prompt('📧 Digite seu e-mail de Administrador:');
+        if (!email) return;
+        
+        const senha = prompt('🔒 Digite sua senha:');
+        if (!senha) return;
+
+        fazerLoginComSupabase(email, senha, tipo);
+    }
+
+    async function fazerLoginComSupabase(email, senha, tipo) {
+        try {
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: senha,
+            });
+
+            if (error) {
+                alert('❌ Erro: ' + error.message);
+                return;
+            }
+
+            // Salvamos o tipo de perfil no localStorage
+            localStorage.setItem('perfilAcesso', tipo);
+            console.log('✅ Login realizado como:', tipo);
+            
+            // Recarrega para aplicar
+            location.reload();
+        } catch (erro) {
+            alert('Erro de conexão. Verifique sua internet.');
+        }
+    }
+
+    // Logout (pode usar no botão de sair)
+    async function fazerLogout() {
+        await supabaseClient.auth.signOut();
+        localStorage.removeItem('perfilAcesso');
+        location.reload();
+    }
+
+    // Executa a verificação quando a página carregar
+    document.addEventListener('DOMContentLoaded', verificarSessao);
+</script>
+<!-- ========================================== -->
+<!-- FIM: AUTENTICAÇÃO KAYLA                    -->
 <!-- ========================================== -->
 	
 </body>

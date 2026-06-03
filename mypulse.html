@@ -419,6 +419,63 @@ async function setupAdmin() {
         return;
     }
 
+    const btn = event.target;
+    const textoOriginal = btn.innerText;
+    btn.innerText = '⏳ Criando...';
+    btn.disabled = true;
+
+    try {
+        const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+            email: email,
+            password: senha,
+        });
+
+        if (authError) throw authError;
+
+        if (authData.user) {
+            const { error: profileError } = await supabaseClient
+                .from('profiles')
+                .insert({
+                    id: authData.user.id,
+                    email: email,
+                    is_pro: true,
+                    plan_expires_at: null
+                });
+
+            if (profileError) console.error('Erro perfil:', profileError);
+        }
+
+        const { error: loginError } = await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: senha,
+        });
+
+        if (loginError) throw loginError;
+
+        S.adminPass = senha;
+        S.recoveryEmail = email;
+        DB.save('csn_adminpass', senha);
+        DB.save('csn_recoveryemail', email);
+
+        toast('✅ Administrador configurado!', 'success');
+
+        if (typeof closeModal === 'function') {
+            closeModal();
+        }
+        location.reload();
+
+    } catch (error) {
+        toast('❌ ' + error.message, 'err');
+        btn.innerText = textoOriginal;
+        btn.disabled = false;
+    }
+}
+
+    if (senha.length < 6) {
+        toast('Senha deve ter pelo menos 6 caracteres', 'err');
+        return;
+    }
+
     // Mostra loading
     const btn = event.target;
     const textoOriginal = btn.innerText;

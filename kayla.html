@@ -48,7 +48,8 @@
         .toast.success { background: var(--success); color: #fff; }
         .toast.error { background: var(--error); color: #fff; }
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        #modal-root { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 2500; display: flex; align-items: flex-end; justify-content: center; }
+        #modal-root { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 2500; display: none; align-items: flex-end; justify-content: center; }
+        #modal-root.active { display: flex; }
         .modal-content { background: var(--bg2); border-radius: 20px 20px 0 0; padding: 24px 20px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 20px; }
@@ -193,11 +194,17 @@
         }
 
         function showModal(html) {
-            document.getElementById('modal-root').innerHTML = `<div class="modal-content">${html}</div>`;
+    const modal = document.getElementById('modal-root');
+    modal.innerHTML = `<div class="modal-content">${html}</div>`;
+    modal.classList.add('active');
+}
         }
 
         function closeModal() {
-            document.getElementById('modal-root').innerHTML = '';
+    const modal = document.getElementById('modal-root');
+    modal.innerHTML = '';
+    modal.classList.remove('active');
+}
         }
 
         function toast(msg, type = 'success') {

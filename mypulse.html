@@ -183,8 +183,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <div class="login-logo"><img src="icon-192-dark.png" style="width:80px;height:80px;border-radius:20px;box-shadow:0 10px 20px rgba(0,0,0,0.3);"></div>
     <div class="login-title">Venda Consignada</div>
     <div class="login-sub">Escolha seu perfil de acesso</div>
-		    <button class="btn btn-primary login-btn" onclick="solicitarLogin()">👑 Administrador</button>
-		    <button class="btn btn-outline login-btn" onclick="solicitarLogin()">👤 Usuário</button>
+	<button class="btn btn-primary login-btn" onclick="solicitarLogin('admin')">👑 Administrador</button>
+	<button class="btn btn-outline login-btn" onclick="solicitarLogin('user')">👤 Usuário</button>
 		    <div style="font-size:11px;color:var(--text3);margin-top:16px;" id="login-ver">v4.1.2</div>
   </div>
 </div>
@@ -2671,7 +2671,7 @@ window.addEventListener('online', checkAppUpdate);
     }
 
     // Quando clicar em "Administrador" ou "Usuário", abre o prompt de login
-    function solicitarLogin(tipo) {
+    function solicitarLogin(tipo = 'admin') {
         const email = prompt('📧 Digite seu e-mail de Administrador:');
         if (!email) return;
         
@@ -2713,7 +2713,7 @@ window.addEventListener('online', checkAppUpdate);
 
     // Executa a verificação quando a página carregar
     document.addEventListener('DOMContentLoaded', verificarSessao);
-<script>
+
 // Verifica sessão ao iniciar o app
 async function checkSessionAndLoad() {
     console.log('🔍 Verificando sessão...');

@@ -471,13 +471,6 @@ async function setupAdmin() {
     }
 }
 
-  window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-  
-  closeModal();
-  doLogin('admin');
-  toast('Chave enviada para o seu e-mail!', 'ok');
-}
-
 function renderLoginScreen() {
   document.getElementById('login-screen').innerHTML = `
     <div class="login-card">

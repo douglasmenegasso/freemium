@@ -1,1 +1,29 @@
-{"version": "v4.1.0"}
+{
+    "version": "4.1.4",
+    "versionCode": 414,
+    "versionName": "Kayla Consignado",
+    "releaseDate": "2026-06-04",
+    "build": "20260604-001",
+    "changelog": [
+        "Correção: Barra de navegação fixa na parte inferior",
+        "Correção: Scroll funcionando em todas as telas",
+        "Correção: Tela de login centralizada",
+        "Correção: Fluxo de login corrigido (abre scanner após login)",
+        "Correção: Removida tag <script> duplicada que quebrava o app",
+        "Melhoria: Nome do app alterado para Kayla Consignado",
+        "Melhoria: Configurações centralizadas em config.js",
+        "Melhoria: Versionamento separado em version.json",
+        "Melhoria: Código JavaScript organizado em seções comentadas",
+        "Melhoria: Histórico de versões em HISTORICO.md"
+    ],
+    "previousVersions": [
+        { "version": "4.1.3", "date": "2026-06-03", "note": "Integração Supabase inicial" },
+        { "version": "4.1.2", "date": "2026-06-02", "note": "Correções de layout e login local" },
+        { "version": "4.1.1", "date": "2026-06-01", "note": "Ajustes de UI e responsividade" },
+        { "version": "4.1.0", "date": "2026-05-31", "note": "Implementação do sistema freemium" },
+        { "version": "3.9.9", "date": "2026-05-30", "note": "Última versão estável antes do freemium" }
+    ],
+    "minSupportedVersion": "4.0.0",
+    "forceUpdate": false,
+    "maintenance": false
+}

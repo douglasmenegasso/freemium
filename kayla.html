@@ -26,11 +26,15 @@
         .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 2px 12px; cursor: pointer; border: none; background: transparent; color: var(--text2); font-size: 11px; }
         .nav-btn.active { color: var(--accent); }
         .nav-btn .icon { font-size: 20px; }
+        
+        /* TELA DE LOGIN */
         #login-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
         .login-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 30px 20px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .login-logo { width: 80px; height: 80px; border-radius: 20px; margin-bottom: 20px; object-fit: cover; }
         .login-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
         .login-sub { font-size: 13px; color: var(--text2); margin-bottom: 24px; }
+        
+        /* BOTÕES E FORMS */
         .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; cursor: pointer; border: none; width: 100%; transition: transform 0.1s; }
         .btn:active { transform: scale(0.97); }
         .btn-primary { background: var(--accent); color: #fff; }
@@ -41,16 +45,23 @@
         .form-label { font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; display: block; }
         .form-input { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; color: var(--text); font-size: 15px; outline: none; }
         .form-input:focus { border-color: var(--accent); }
+        
+        /* CARDS */
         .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
         .card-title { font-size: 14px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 12px; }
-        #toast-root { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 3000; display: flex; flex-direction: column; gap: 8px; width: 90%; max-width: 300px; }
+        
+        /* TOAST */
+        #toast-root { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 3000; display: flex; flex-direction: column; gap: 8px; width: 90%; max-width: 300px; pointer-events: none; }
         .toast { padding: 12px 16px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; text-align: center; animation: slideDown 0.3s ease; }
         .toast.success { background: var(--success); color: #fff; }
         .toast.error { background: var(--error); color: #fff; }
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        #modal-root { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 2500; display: none; align-items: flex-end; justify-content: center; }
-        #modal-root.active { display: flex; }
-        .modal-content { background: var(--bg2); border-radius: 20px 20px 0 0; padding: 24px 20px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease; }
+        
+        /* MODAL - CORREÇÃO AQUI */
+        #modal-root { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 2500; display: none; align-items: flex-end; justify-content: center; }
+        #modal-root.show { display: flex; }
+        #modal-root::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); }
+        .modal-content { position: relative; background: var(--bg2); border-radius: 20px 20px 0 0; padding: 24px 20px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease; z-index: 1; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 20px; }
         .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; text-align: center; }
@@ -58,6 +69,7 @@
     </style>
 </head>
 <body>
+    <!-- TELA DE LOGIN -->
     <div id="login-screen">
         <div class="login-card">
             <img src="icon-192-dark.png" alt="Kayla" class="login-logo">
@@ -69,6 +81,7 @@
         </div>
     </div>
 
+    <!-- APP PRINCIPAL -->
     <div id="app" style="display:none;">
         <div class="header">
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
@@ -88,18 +101,22 @@
             <button class="nav-btn" id="nav-settings" onclick="showTab('settings')"><span class="icon">⚙️</span>Config</button>
         </div>
     </div>
+
+    <!-- MODAL E TOAST -->
     <div id="modal-root"></div>
     <div id="toast-root"></div>
 
     <script>
+        // VARIÁVEIS GLOBAIS
         let supabaseClient = null;
         let currentUser = null;
         let currentProfile = null;
-        const APP_VERSION = '4.1.4';
         const SUPABASE_URL = 'https://xwwklngrkvdwgiinycvt.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_2Viwv3t4SvejW4SEfvpxGA_5K5thi7S';
 
+        // INICIALIZAÇÃO
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Kayla Consignado iniciando...');
             try {
                 supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
                 console.log('✅ Supabase conectado');
@@ -107,13 +124,17 @@
             checkSessionAndLoad();
         });
 
+        // VERIFICA SESSÃO
         async function checkSessionAndLoad() {
+            console.log('🔍 Verificando sessão...');
             if (!supabaseClient) { showLoginScreen(); return; }
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session && session.user) {
+                console.log('✅ Usuário logado:', session.user.email);
                 currentUser = session.user;
                 showApp();
             } else {
+                console.log('❌ Sem sessão. Mostrando login.');
                 showLoginScreen();
             }
         }
@@ -129,6 +150,7 @@
             showTab('scan');
         }
 
+        // LOGIN
         function solicitarLogin(tipo) {
             currentProfile = tipo;
             const html = `
@@ -167,6 +189,7 @@
             }
         }
 
+        // LOGOUT
         async function fazerLogout() {
             if (supabaseClient) await supabaseClient.auth.signOut();
             localStorage.removeItem('perfilAcesso');
@@ -176,47 +199,51 @@
             showLoginScreen();
         }
 
+        // NAVEGAÇÃO
         function showTab(tabName) {
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('nav-' + tabName)?.classList.add('active');
             const content = document.getElementById('content');
             const headerSub = document.getElementById('header-sub');
             const tabs = {
-                scan: { title: 'Scanner', html: '<div class="card"><div class="card-title">⚡ Escanear</div><p style="color:var(--text3);text-align:center;padding:20px">Área do scanner</p></div>' },
+                scan: { title: 'Scanner', html: '<div class="card"><div class="card-title">⚡ Escanear Produto</div><p style="color:var(--text3);text-align:center;padding:40px">Área do scanner</p></div>' },
                 clients: { title: 'Clientes', html: '<div class="card"><div class="card-title">👥 Clientes</div><button class="btn btn-primary" style="margin-bottom:12px">+ Novo Cliente</button></div>' },
                 products: { title: 'Produtos', html: '<div class="card"><div class="card-title">🏷️ Produtos</div><button class="btn btn-primary" style="margin-bottom:12px">+ Novo Produto</button></div>' },
-                orders: { title: 'Pedidos', html: '<div class="card"><div class="card-title">📋 Pedidos</div><p style="color:var(--text3);text-align:center;padding:20px">Nenhum pedido</p></div>' },
-                history: { title: 'Histórico', html: '<div class="card"><div class="card-title">📊 Histórico</div><p style="color:var(--text3);text-align:center;padding:20px">Nenhuma venda</p></div>' },
-                settings: { title: 'Config', html: `<div class="card"><div class="card-title">⚙️ Configurações</div><div class="form-group"><label class="form-label">Usuário</label><div style="background:var(--bg3);padding:12px;border-radius:var(--radius-sm)">${currentUser?.email || 'Não logado'}</div></div><button class="btn btn-red" onclick="fazerLogout()" style="margin-top:10px">🚪 Sair</button></div>` }
+                orders: { title: 'Pedidos', html: '<div class="card"><div class="card-title">📋 Pedidos</div><p style="color:var(--text3);text-align:center;padding:20px">Nenhum pedido em aberto</p></div>' },
+                history: { title: 'Histórico', html: '<div class="card"><div class="card-title">📊 Histórico</div><p style="color:var(--text3);text-align:center;padding:20px">Nenhuma venda registrada</p></div>' },
+                settings: { title: 'Config', html: `<div class="card"><div class="card-title">⚙️ Configurações</div><div class="form-group"><label class="form-label">Usuário Logado</label><div style="background:var(--bg3);padding:12px;border-radius:var(--radius-sm)">${currentUser?.email || 'Não logado'}</div></div><button class="btn btn-red" onclick="fazerLogout()" style="margin-top:10px">🚪 Sair / Logout</button></div>` }
             };
             headerSub.textContent = tabs[tabName].title;
             content.innerHTML = tabs[tabName].html;
         }
 
-        function showModal(html) {
-    const modal = document.getElementById('modal-root');
-    modal.innerHTML = `<div class="modal-content">${html}</div>`;
-    modal.classList.add('active');
-}
+        // MODAL - CORREÇÃO AQUI
+        function showModal(htmlContent) {
+            const modal = document.getElementById('modal-root');
+            modal.innerHTML = `<div class="modal-content">${htmlContent}</div>`;
+            modal.classList.add('show');
         }
 
         function closeModal() {
-    const modal = document.getElementById('modal-root');
-    modal.innerHTML = '';
-    modal.classList.remove('active');
-}
+            const modal = document.getElementById('modal-root');
+            modal.innerHTML = '';
+            modal.classList.remove('show');
         }
 
-        function toast(msg, type = 'success') {
+        // TOAST
+        function toast(message, type = 'success') {
             const root = document.getElementById('toast-root');
             const el = document.createElement('div');
             el.className = `toast ${type}`;
-            el.textContent = msg;
+            el.textContent = message;
             root.appendChild(el);
             setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 3000);
         }
 
-        document.getElementById('modal-root').addEventListener('click', (e) => { if (e.target.id === 'modal-root') closeModal(); });
+        // Fecha modal ao clicar fora
+        document.getElementById('modal-root').addEventListener('click', (e) => {
+            if (e.target.id === 'modal-root') closeModal();
+        });
     </script>
 </body>
 </html>

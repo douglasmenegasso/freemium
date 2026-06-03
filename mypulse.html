@@ -2713,54 +2713,20 @@ window.addEventListener('online', checkAppUpdate);
 
     // Executa a verificação quando a página carregar
     document.addEventListener('DOMContentLoaded', verificarSessao);
-</script>
-<!-- ========================================== -->
-<!-- FIM: AUTENTICAÇÃO KAYLA                    -->
-<!-- ========================================== -->
+
 // Verifica sessão ao iniciar o app
 async function checkSessionAndLoad() {
     console.log('🔍 Verificando sessão...');
-    
-    // Tenta pegar sessão atual do Supabase
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    
-    if (session && session.user) {
-        console.log('✅ Usuário logado:', session.user.email);
-        // Tem sessão válida, carrega o app
-        document.getElementById('app').style.display = 'flex';
-        showTab('scan'); // Mostra aba inicial
-    } else {
-        console.log('❌ Sem sessão, mostrando login');
-        // Não tem sessão, mostra tela de login
-        showLoginScreen();
-    }
-}
-// Verifica sessão ao iniciar o app
-async function checkSessionAndLoad() {
-    console.log('🔍 Verificando sessão...');
-    
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    
-    if (session && session.user) {
-        console.log('✅ Usuário logado:', session.user.email);
-        document.getElementById('app').style.display = 'flex';
-        showTab('scan');
-    } else {
-        console.log('❌ Sem sessão, mostrando login');
-        showLoginScreen();
-    }
+    showLoginScreen();
+    console.log('✅ App iniciado com tela de login');
 }
 
 // Inicializa o app
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 App carregado, verificando sessão...');
-    setTimeout(checkSessionAndLoad, 500);
+    console.log('🚀 App carregado');
+    setTimeout(checkSessionAndLoad, 300);
 });
 
-// Linha 2721 - Função de logout seguro (já existe)
-async function doLogout() {
-    // ... seu código existente ...
-}
 // Função de logout seguro
 async function doLogout() {
     await supabaseClient.auth.signOut();
@@ -2770,12 +2736,6 @@ async function doLogout() {
     showLoginScreen();
     toast('Logout realizado', 'ok');
 }
-
-// Inicializa o app
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 App carregado, verificando sessão...');
-    setTimeout(checkSessionAndLoad, 500); // Aguarda 500ms para o Supabase inicializar
-});
-	
+</script>
 </body>
 </html>

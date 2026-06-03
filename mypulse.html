@@ -2524,5 +2524,56 @@ window.addEventListener('online', checkAppUpdate);
   start();
 })();
 </script>
+	<!-- ========================================== -->
+<!-- INÍCIO: CONEXÃO SUPABASE (KAYLA CONSIGNADO) -->
+<!-- ========================================== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    // 1. Configuração da Conexão
+    const SUPABASE_URL = 'https://jidfcalselebfnimgeyy.supabase.co';
+    
+    // ️ ATENÇÃO: APAGUE O TEXTO ABAIXO E COLE A SUA CHAVE "sb_publishable_..." AQUI DENTRO DAS ASPAS:
+    const SUPABASE_KEY = 'sb_publishable_03HAH6fZdMpLRrSXLO9i3Q_qmTQxULp'; 
+
+    // Cria o cliente Supabase (o "garçom" que leva e traz dados)
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // 2. Variável global para saber quem está logado
+    let usuarioAtual = null;
+
+    // 3. Função para verificar se está logado ao abrir o app
+    async function verificarSessao() {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session && session.user) {
+            usuarioAtual = session.user;
+            console.log('Usuário logado:', usuarioAtual.email);
+            // AQUI VAMOS CHECAR SE ELE É PRO (FASE 2)
+            // verificarSeEhPro(usuarioAtual.id);
+        } else {
+            console.log('Nenhum usuário logado.');
+        }
+    }
+
+    // 4. Função de Login (usaremos nos próximos passos)
+    async function fazerLogin(email, senha) {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: senha,
+        });
+        if (error) {
+            alert('Erro no login: ' + error.message);
+        } else {
+            alert('Login realizado com sucesso! Bem-vindo ao Kayla Consignado.');
+            location.reload(); // Recarrega a página para entrar no app
+        }
+    }
+
+    // Inicia a verificação quando o app carrega
+    document.addEventListener('DOMContentLoaded', verificarSessao);
+
+</script>
+<!-- ========================================== -->
+<!-- FIM: CONEXÃO SUPABASE                      -->
+<!-- ========================================== -->
 </body>
 </html>

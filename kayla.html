@@ -22,7 +22,6 @@
         .btn-primary { background: var(--accent); color: #fff; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
         .btn-red { background: var(--error); color: #fff; }
-        .btn-green { background: var(--success); color: #fff; }
         .btn-sm { padding: 8px 16px; font-size: 13px; width: auto; }
         #app { display: none; flex-direction: column; height: 100vh; position: fixed; top: 0; left: 0; right: 0; bottom: 0; }
         .header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 12px 16px; flex-shrink: 0; }
@@ -37,15 +36,16 @@
         .card-title { font-size: 14px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
         .form-group { margin-bottom: 14px; text-align: left; }
         .form-label { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; display: block; text-transform: uppercase; }
-        .form-input, .form-select { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; color: var(--text); font-size: 15px; }
+        .form-input { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; color: var(--text); font-size: 15px; }
         .form-input:focus { border-color: var(--accent); outline: none; }
+        .checkbox-group { display: flex; align-items: center; gap: 8px; margin: 12px 0; }
+        .checkbox-group input { width: 18px; height: 18px; }
         .item-list { display: flex; flex-direction: column; gap: 8px; }
         .item-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; display: flex; justify-content: space-between; align-items: center; }
         .item-info { flex: 1; }
         .item-name { font-weight: 600; margin-bottom: 4px; }
         .item-detail { font-size: 13px; color: var(--text3); }
         #reader { width: 100%; border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 16px; }
-        #reader video { width: 100%; border-radius: var(--radius-sm); }
         #modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 2500; display: none; align-items: flex-end; justify-content: center; }
         #modal-overlay.show { display: flex; }
         .modal-content { background: var(--bg2); border-radius: 20px 20px 0 0; padding: 24px 20px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s; }
@@ -58,9 +58,7 @@
         .toast.error { background: var(--error); color: #fff; }
         .toast.warning { background: var(--warning); color: #000; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
-        .badge-free { background: var(--text3); color: var(--text); }
-        .badge-pro { background: var(--accent); color: #fff; }
+        .error-box { background: var(--error); color: #fff; padding: 16px; border-radius: var(--radius); margin: 16px; text-align: center; }
     </style>
 </head>
 <body>
@@ -107,31 +105,81 @@
         var clientes = [];
         var produtos = [];
         var pedidos = [];
+        var dbError = false;
 
         window.addEventListener('DOMContentLoaded', function() {
             console.log('Iniciando Kayla...');
             try {
                 supabaseClient = supabase.createClient('https://xwwklngrkvdwgiinycvt.supabase.co', 'sb_publishable_2Viwv3t4SvejW4SEfvpxGA_5K5thi7S');
-                console.log('Supabase OK');
-            } catch(e) { console.error('Erro Supabase:', e); }
-            verificarSessao();
+                console.log('Supabase conectado');
+            } catch(e) { 
+                console.error('Erro Supabase:', e); 
+                toast('Erro de conexão', 'error');
+            }
+            // NUNCA loga automaticamente - sempre mostra login
+            mostrarLogin();
         });
+
+        // VERIFICA SE TABELAS EXISTEM
+        async function verificarTabelas() {
+            try {
+                var test = await supabaseClient.from('clientes').select('id').limit(1);
+                if (test.error && test.error.message.includes('could not find table')) {
+                    dbError = true;
+                    toast('⚠️ Tabelas não criadas no banco. Execute o SQL no Supabase!', 'error');
+                    setTimeout(mostrarErroTabelas, 2000);
+                    return false;
+                }
+                return true;
+            } catch(e) {
+                dbError = true;
+                return false;
+            }
+        }
+
+        function mostrarErroTabelas() {
+            var html = '<div class="modal-title">⚠️ Banco de Dados Não Configurado</div>';
+            html += '<div class="modal-sub">As tabelas necessárias não existem</div>';
+            html += '<div class="error-box">';
+            html += '<strong>Para corrigir:</strong><br><br>';
+            html += '1. Acesse o Supabase<br>';
+            html += '2. Vá em SQL Editor<br>';
+            html += '3. Execute o script de criação das tabelas<br><br>';
+            html += '<a href="https://supabase.com/dashboard" target="_blank" class="btn btn-primary">Abrir Supabase</a>';
+            html += '<button class="btn btn-outline" onclick="fecharModal()">Fechar</button></div>';
+            document.getElementById('modal-body').innerHTML = html;
+            document.getElementById('modal-overlay').classList.add('show');
+        }
 
         async function verificarSessao() {
             if (!supabaseClient) { mostrarLogin(); return; }
-            var result = await supabaseClient.auth.getSession();
-            if (result.data && result.data.session && result.data.session.user) {
-                currentUser = result.data.session.user;
-                await carregarDados();
-                mostrarApp();
-            } else {
-                mostrarLogin();
+            
+            // Verifica se tem "lembrar de mim"
+            var lembrarMe = localStorage.getItem('kayla_lembrar_me');
+            
+            if (lembrarMe === 'true') {
+                // Tenta recuperar sessão salva
+                var result = await supabaseClient.auth.getSession();
+                if (result.data && result.data.session && result.data.session.user) {
+                    currentUser = result.data.session.user;
+                    var ok = await verificarTabelas();
+                    if (ok) {
+                        await carregarDados();
+                        mostrarApp();
+                        return;
+                    }
+                }
             }
+            
+            // Se não tem "lembrar de mim" ou falhou, mostra login
+            mostrarLogin();
         }
 
         function mostrarLogin() {
             document.getElementById('login-screen').style.display = 'flex';
             document.getElementById('app').style.display = 'none';
+            // Limpa sessão ao mostrar login (segurança)
+            localStorage.removeItem('kayla_lembrar_me');
         }
 
         function mostrarApp() {
@@ -147,6 +195,7 @@
             html += '<div class="modal-sub">Digite suas credenciais</div>';
             html += '<div class="form-group"><label class="form-label">E-mail</label><input class="form-input" id="email" type="email" placeholder="seu@email.com"></div>';
             html += '<div class="form-group"><label class="form-label">Senha</label><input class="form-input" id="senha" type="password" placeholder="Sua senha"></div>';
+            html += '<div class="checkbox-group"><input type="checkbox" id="lembrar-me"><label for="lembrar-me" style="color:var(--text2);font-size:13px">Lembrar de mim (somente neste dispositivo)</label></div>';
             html += '<button class="btn btn-primary" onclick="fazerLogin()">Entrar</button>';
             html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
             document.getElementById('modal-body').innerHTML = html;
@@ -157,22 +206,51 @@
         async function fazerLogin() {
             var email = document.getElementById('email').value.trim();
             var senha = document.getElementById('senha').value;
+            var lembrarMe = document.getElementById('lembrar-me').checked;
+            
             if (!email || !senha) { toast('Preencha e-mail e senha', 'error'); return; }
+            
             var btn = event.target;
             var textoAntigo = btn.innerText;
             btn.innerText = 'Entrando...';
             btn.disabled = true;
+            
             try {
                 var result = await supabaseClient.auth.signInWithPassword({ email: email, password: senha });
                 if (result.error) throw result.error;
+                
                 currentUser = result.data.user;
+                
+                // Salva "lembrar de mim" se marcado
+                if (lembrarMe) {
+                    localStorage.setItem('kayla_lembrar_me', 'true');
+                    localStorage.setItem('kayla_email', email);
+                } else {
+                    localStorage.removeItem('kayla_lembrar_me');
+                    localStorage.removeItem('kayla_email');
+                }
+                
+                // Verifica se tabelas existem
+                var ok = await verificarTabelas();
+                if (!ok) {
+                    toast('Login realizado, mas configure o banco de dados', 'warning');
+                    fecharModal();
+                    return;
+                }
+                
                 localStorage.setItem('perfilAcesso', perfilAtual);
                 await carregarDados();
                 fecharModal();
                 toast('Bem-vindo!', 'success');
                 mostrarApp();
+                
             } catch (error) {
-                toast('Erro: ' + error.message, 'error');
+                console.error('Erro login:', error);
+                var msg = error.message;
+                if (msg.includes('Invalid login credentials')) {
+                    msg = 'E-mail ou senha incorretos';
+                }
+                toast('Erro: ' + msg, 'error');
                 btn.innerText = textoAntigo;
                 btn.disabled = false;
             }
@@ -181,6 +259,8 @@
         async function fazerLogout() {
             if (supabaseClient) await supabaseClient.auth.signOut();
             localStorage.removeItem('perfilAcesso');
+            localStorage.removeItem('kayla_lembrar_me');
+            localStorage.removeItem('kayla_email');
             if (html5QrCode) { html5QrCode.stop(); }
             currentUser = null;
             toast('Logout realizado', 'success');
@@ -188,20 +268,56 @@
         }
 
         async function carregarDados() {
-            var resultClientes = await supabaseClient.from('clientes').select('*');
-            if (resultClientes.data) clientes = resultClientes.data;
-            var resultProdutos = await supabaseClient.from('produtos').select('*');
-            if (resultProdutos.data) produtos = resultProdutos.data;
-            var resultPedidos = await supabaseClient.from('pedidos').select('*');
-            if (resultPedidos.data) pedidos = resultPedidos.data;
+            if (dbError) return;
+            
+            try {
+                var resultClientes = await supabaseClient.from('clientes').select('*');
+                if (resultClientes.error) {
+                    if (!resultClientes.error.message.includes('table')) {
+                        toast('Erro ao carregar clientes', 'error');
+                    }
+                    clientes = [];
+                } else {
+                    clientes = resultClientes.data || [];
+                }
+                
+                var resultProdutos = await supabaseClient.from('produtos').select('*');
+                if (resultProdutos.error) {
+                    if (!resultProdutos.error.message.includes('table')) {
+                        toast('Erro ao carregar produtos', 'error');
+                    }
+                    produtos = [];
+                } else {
+                    produtos = resultProdutos.data || [];
+                }
+                
+                var resultPedidos = await supabaseClient.from('pedidos').select('*');
+                if (resultPedidos.error) {
+                    if (!resultPedidos.error.message.includes('table')) {
+                        toast('Erro ao carregar pedidos', 'error');
+                    }
+                    pedidos = [];
+                } else {
+                    pedidos = resultPedidos.data || [];
+                }
+            } catch(e) {
+                console.error('Erro carregar dados:', e);
+            }
         }
 
         function mudarAba(aba) {
             document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
             var btn = document.querySelector('.nav-btn:nth-child(' + getAbaIndex(aba) + ')');
             if (btn) btn.classList.add('active');
+            
             var content = document.getElementById('content');
             var sub = document.getElementById('header-sub');
+            
+            if (dbError && aba !== 'settings') {
+                content.innerHTML = '<div class="error-box">⚠️ Banco de dados não configurado. Vá em Config para ver como corrigir.</div>';
+                return;
+            }
+            
             switch(aba) {
                 case 'scan':
                     sub.textContent = 'Scanner de Código de Barras';
@@ -299,14 +415,22 @@
 
         function renderizarConfig() {
             var isPro = localStorage.getItem('kayla_pro') === 'true';
-            return '<div class="card"><div class="card-title">⚙️ Configurações</div>' +
-                   '<div class="form-group"><label class="form-label">Usuário Logado</label><div style="background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:12px">' + (currentUser ? currentUser.email : 'Não logado') + '</div></div>' +
-                   '<div class="form-group"><label class="form-label">Plano</label><div style="background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:12px"><span class="badge ' + (isPro ? 'badge-pro' : 'badge-free') + '">' + (isPro ? 'PRO' : 'GRÁTIS') + '</span></div></div>' +
-                   '<div class="form-group"><label class="form-label">Versão</label><div style="background:var(--bg3);padding:12px;border-radius:8px">v4.1.4</div></div>' +
-                   '<button class="btn btn-red" onclick="fazerLogout()">🚪 Sair / Logout</button></div>';
+            var html = '<div class="card"><div class="card-title">⚙️ Configurações</div>';
+            
+            if (dbError) {
+                html += '<div class="error-box">⚠️ <strong>Atenção:</strong> Tabelas do banco não encontradas!<br><br>';
+                html += 'Siga o SQL fornecido para criar as tabelas no Supabase.</div>';
+            }
+            
+            html += '<div class="form-group"><label class="form-label">Usuário Logado</label><div style="background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:12px">' + (currentUser ? currentUser.email : 'Não logado') + '</div></div>';
+            html += '<div class="form-group"><label class="form-label">Plano</label><div style="background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:12px"><span style="display:inline-block;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:600;background:' + (isPro ? '#7c5cfc' : '#606070') + ';color:#fff">' + (isPro ? 'PRO' : 'GRÁTIS') + '</span></div></div>';
+            html += '<div class="form-group"><label class="form-label">Versão</label><div style="background:var(--bg3);padding:12px;border-radius:8px">v4.1.4</div></div>';
+            html += '<button class="btn btn-red" onclick="fazerLogout()">🚪 Sair / Logout</button></div>';
+            return html;
         }
 
         function iniciarScanner() {
+            if (dbError) return;
             if (html5QrCode) { 
                 html5QrCode.stop();
                 html5QrCode = null;

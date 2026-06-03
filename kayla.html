@@ -12,13 +12,11 @@
         :root { --bg: #0f0f13; --bg2: #1a1a24; --bg3: #252530; --text: #fff; --text2: #a0a0b0; --text3: #606070; --accent: #7c5cfc; --border: #2a2a35; --success: #00c853; --error: #ff1744; --warning: #ffab00; --radius: 12px; --radius-sm: 8px; }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-        
         #login-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
         .login-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 30px 20px; width: 100%; max-width: 360px; text-align: center; }
         .login-logo { width: 80px; height: 80px; border-radius: 20px; margin-bottom: 20px; }
         .login-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
         .login-sub { font-size: 13px; color: var(--text2); margin-bottom: 24px; }
-        
         .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; cursor: pointer; border: none; width: 100%; margin-bottom: 12px; }
         .btn:active { transform: scale(0.97); }
         .btn-primary { background: var(--accent); color: #fff; }
@@ -26,56 +24,46 @@
         .btn-red { background: var(--error); color: #fff; }
         .btn-green { background: var(--success); color: #fff; }
         .btn-sm { padding: 8px 16px; font-size: 13px; width: auto; }
-        
         #app { display: none; flex-direction: column; height: 100vh; position: fixed; top: 0; left: 0; right: 0; bottom: 0; }
         .header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 12px 16px; flex-shrink: 0; }
         .header-title { font-size: 18px; font-weight: 700; }
         .header-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
-        
         .content { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 90px; }
-        
         .nav { background: var(--bg2); border-top: 1px solid var(--border); display: flex; position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; justify-content: space-around; padding-bottom: env(safe-area-inset-bottom); }
         .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 2px; cursor: pointer; border: none; background: transparent; color: var(--text2); font-size: 11px; }
         .nav-btn.active { color: var(--accent); }
         .nav-btn .icon { font-size: 20px; margin-bottom: 2px; }
-        
         .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
         .card-title { font-size: 14px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
-        
         .form-group { margin-bottom: 14px; text-align: left; }
         .form-label { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; display: block; text-transform: uppercase; }
         .form-input, .form-select { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; color: var(--text); font-size: 15px; }
         .form-input:focus { border-color: var(--accent); outline: none; }
-        
         .item-list { display: flex; flex-direction: column; gap: 8px; }
         .item-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; display: flex; justify-content: space-between; align-items: center; }
         .item-info { flex: 1; }
         .item-name { font-weight: 600; margin-bottom: 4px; }
         .item-detail { font-size: 13px; color: var(--text3); }
-        
         #reader { width: 100%; border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 16px; }
         #reader video { width: 100%; border-radius: var(--radius-sm); }
-        
         #modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 2500; display: none; align-items: flex-end; justify-content: center; }
         #modal-overlay.show { display: flex; }
         .modal-content { background: var(--bg2); border-radius: 20px 20px 0 0; padding: 24px 20px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .modal-title { font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 8px; }
         .modal-sub { font-size: 13px; color: var(--text2); text-align: center; margin-bottom: 20px; }
-        
         #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 3000; width: 90%; max-width: 300px; }
         .toast { padding: 12px 20px; border-radius: var(--radius-sm); margin-bottom: 8px; text-align: center; animation: fadeIn 0.3s; }
         .toast.success { background: var(--success); color: #fff; }
         .toast.error { background: var(--error); color: #fff; }
+        .toast.warning { background: var(--warning); color: #000; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        
         .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
         .badge-free { background: var(--text3); color: var(--text); }
         .badge-pro { background: var(--accent); color: #fff; }
     </style>
 </head>
 <body>
-    <!-- TELA DE LOGIN -->
     <div id="login-screen">
         <div class="login-card">
             <img src="icon-192-dark.png" class="login-logo" alt="Kayla">
@@ -87,7 +75,6 @@
         </div>
     </div>
 
-    <!-- APP PRINCIPAL -->
     <div id="app">
         <div class="header">
             <div class="header-title">📦 Kayla Consignado</div>
@@ -104,18 +91,15 @@
         </div>
     </div>
 
-    <!-- MODAL -->
     <div id="modal-overlay" onclick="fecharModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div id="modal-body"></div>
         </div>
     </div>
 
-    <!-- TOAST -->
     <div id="toast-container"></div>
 
     <script>
-        // VARIÁVEIS GLOBAIS
         var supabaseClient = null;
         var currentUser = null;
         var perfilAtual = null;
@@ -124,7 +108,6 @@
         var produtos = [];
         var pedidos = [];
 
-        // INICIALIZAÇÃO
         window.addEventListener('DOMContentLoaded', function() {
             console.log('Iniciando Kayla...');
             try {
@@ -134,13 +117,12 @@
             verificarSessao();
         });
 
-        // AUTENTICAÇÃO
         async function verificarSessao() {
             if (!supabaseClient) { mostrarLogin(); return; }
             var result = await supabaseClient.auth.getSession();
             if (result.data && result.data.session && result.data.session.user) {
                 currentUser = result.data.session.user;
-                carregarDados();
+                await carregarDados();
                 mostrarApp();
             } else {
                 mostrarLogin();
@@ -206,33 +188,25 @@
         }
 
         async function carregarDados() {
-            // Carregar clientes
             var resultClientes = await supabaseClient.from('clientes').select('*');
             if (resultClientes.data) clientes = resultClientes.data;
-            
-            // Carregar produtos
             var resultProdutos = await supabaseClient.from('produtos').select('*');
             if (resultProdutos.data) produtos = resultProdutos.data;
-            
-            // Carregar pedidos
             var resultPedidos = await supabaseClient.from('pedidos').select('*');
             if (resultPedidos.data) pedidos = resultPedidos.data;
         }
 
-        // NAVEGAÇÃO
         function mudarAba(aba) {
             document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
             var btn = document.querySelector('.nav-btn:nth-child(' + getAbaIndex(aba) + ')');
             if (btn) btn.classList.add('active');
-            
             var content = document.getElementById('content');
             var sub = document.getElementById('header-sub');
-            
             switch(aba) {
                 case 'scan':
                     sub.textContent = 'Scanner de Código de Barras';
                     content.innerHTML = renderizarScanner();
-                    iniciarScanner();
+                    setTimeout(iniciarScanner, 500);
                     break;
                 case 'clients':
                     sub.textContent = 'Gestão de Clientes';
@@ -262,12 +236,11 @@
             return abas.indexOf(aba) + 1;
         }
 
-        // RENDERIZAÇÃO DAS TELAS
         function renderizarScanner() {
             return '<div class="card"><div class="card-title">⚡ Escanear Produto</div>' +
                    '<div id="reader"></div>' +
                    '<div class="form-group"><label class="form-label">Ou digite o código</label>' +
-                   '<div style="display:flex;gap:8px"><input class="form-input" id="codigo-manual" placeholder="Código de barras"><button class="btn btn-primary btn-sm" onclick="buscarProduto()">Buscar</button></div></div></div>' +
+                   '<div style="display:flex;gap:8px"><input class="form-input" id="codigo-manual" placeholder="Código de barras"><button class="btn btn-primary btn-sm" onclick="buscarProdutoManual()">Buscar</button></div></div></div>' +
                    '<div class="card"><div class="card-title">📦 Pedido Atual</div><div id="pedido-atual"><p style="color:var(--text3);text-align:center;padding:20px">Nenhum item</p></div></div>';
         }
 
@@ -289,7 +262,7 @@
 
         function renderizarProdutos() {
             var html = '<div class="card"><div class="card-title">🏷️ Produtos</div>' +
-                      '<button class="btn btn-primary" onclick="abrirModalProduto()">+ Novo Produto</button></div>';
+                      '<button class="btn btn-primary" onclick="abrirModalProdutoManual()">+ Novo Produto</button></div>';
             if (produtos.length === 0) {
                 html += '<div class="card"><p style="color:var(--text3);text-align:center;padding:20px">Nenhum produto cadastrado</p></div>';
             } else {
@@ -311,7 +284,7 @@
             } else {
                 html += '<div class="item-list">';
                 pedidos.forEach(function(p) {
-                    html += '<div class="item-card"><div class="item-info"><div class="item-name">Pedido #' + p.id + '</div><div class="item-detail">' + p.itens + ' itens | R$ ' + p.total + '</div></div>' +
+                    html += '<div class="item-card"><div class="item-info"><div class="item-name">Pedido #' + p.id.substr(0,8) + '</div><div class="item-detail">' + p.cliente_nome + ' | ' + p.itens + ' itens | R$ ' + p.total + '</div></div>' +
                            '<button class="btn btn-sm btn-outline" onclick="verPedido(\'' + p.id + '\')">Ver</button></div>';
                 });
                 html += '</div>';
@@ -333,100 +306,282 @@
                    '<button class="btn btn-red" onclick="fazerLogout()">🚪 Sair / Logout</button></div>';
         }
 
-        // SCANNER
         function iniciarScanner() {
-            setTimeout(function() {
-                if (html5QrCode) { html5QrCode.stop(); }
-                html5QrCode = new Html5Qrcode("reader");
-                html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } }, onScanSuccess)
-                    .catch(function(err) { console.log("Erro scanner:", err); });
-            }, 500);
+            if (html5QrCode) { 
+                html5QrCode.stop();
+                html5QrCode = null;
+            }
+            html5QrCode = new Html5Qrcode("reader");
+            var config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
+                .catch(function(err) { 
+                    console.log("Erro scanner:", err);
+                    document.getElementById('reader').innerHTML = '<p style="color:var(--text3);text-align:center;padding:20px">Câmera não disponível</p>';
+                });
         }
 
         function onScanSuccess(decodedText, decodedResult) {
+            if (html5QrCode) {
+                html5QrCode.pause();
+            }
             toast('Código: ' + decodedText, 'success');
-            buscarProdutoPorCodigo(decodedText);
+            verificarProdutoCodigo(decodedText);
         }
 
-        async function buscarProdutoPorCodigo(codigo) {
-            var produto = produtos.find(function(p) { return p.codigo === codigo; });
-            if (produto) {
-                toast(produto.nome + ' - R$ ' + produto.preco, 'success');
-                adicionarAoPedido(produto);
+        async function verificarProdutoCodigo(codigo) {
+            var produtoExistente = produtos.find(function(p) { return p.codigo === codigo; });
+            if (produtoExistente) {
+                toast('Produto encontrado: ' + produtoExistente.nome, 'success');
+                selecionarClienteParaProduto(produtoExistente);
             } else {
-                toast('Produto não encontrado', 'error');
+                toast('Produto não cadastrado. Cadastre agora!', 'warning');
+                setTimeout(function() {
+                    abrirModalProdutoComCodigo(codigo);
+                }, 1500);
             }
         }
 
-        function buscarProduto() {
+        async function selecionarClienteParaProduto(produto) {
+            var clienteSelecionado = localStorage.getItem('clienteSelecionado');
+            if (clienteSelecionado) {
+                var cliente = JSON.parse(clienteSelecionado);
+                await adicionarProdutoAoPedido(produto, cliente);
+            } else {
+                var html = '<div class="modal-title">👥 Selecionar Cliente</div>';
+                html += '<div class="modal-sub">Produto: ' + produto.nome + ' - R$ ' + produto.preco + '</div>';
+                if (clientes.length === 0) {
+                    html += '<div class="card" style="background:var(--bg3);padding:16px;margin:12px 0;">';
+                    html += '<p style="color:var(--text3);text-align:center">Nenhum cliente cadastrado</p>';
+                    html += '<button class="btn btn-primary" onclick="abrirModalClienteDoScanner()" style="margin-top:12px">+ Cadastrar Cliente</button></div>';
+                } else {
+                    html += '<div class="item-list" style="margin-bottom:16px">';
+                    clientes.forEach(function(c) {
+                        html += '<div class="item-card" style="cursor:pointer" onclick="selecionarCliente(\'' + c.id + '\', \'' + c.nome.replace(/'/g, "\\'") + '\')">';
+                        html += '<div class="item-info"><div class="item-name">' + c.nome + '</div>';
+                        html += '<div class="item-detail">' + (c.telefone || 'Sem telefone') + '</div></div>';
+                        html += '<span style="color:var(--accent)">Selecionar →</span></div>';
+                    });
+                    html += '</div>';
+                }
+                html += '<button class="btn btn-outline" onclick="fecharModal(); retomarScanner()">Cancelar</button>';
+                document.getElementById('modal-body').innerHTML = html;
+                document.getElementById('modal-overlay').classList.add('show');
+            }
+        }
+
+        function selecionarCliente(clienteId, clienteNome) {
+            localStorage.setItem('clienteSelecionado', JSON.stringify({id: clienteId, nome: clienteNome}));
+            toast('Cliente selecionado: ' + clienteNome, 'success');
+            fecharModal();
+            retomarScanner();
+        }
+
+        async function adicionarProdutoAoPedido(produto, cliente) {
+            var pedidoExistente = pedidos.find(function(p) { 
+                return p.cliente_id === cliente.id && p.status === 'aberto'; 
+            });
+            if (pedidoExistente) {
+                toast('Adicionado ao pedido #' + pedidoExistente.id.substr(0,8), 'success');
+            } else {
+                var data = {
+                    cliente_id: cliente.id,
+                    cliente_nome: cliente.nome,
+                    status: 'aberto',
+                    itens: 1,
+                    total: produto.preco,
+                    user_id: currentUser.id,
+                    created_at: new Date().toISOString()
+                };
+                var result = await supabaseClient.from('pedidos').insert(data);
+                if (result.error) {
+                    toast('Erro ao criar pedido: ' + result.error.message, 'error');
+                    retomarScanner();
+                    return;
+                }
+                toast('Pedido #' + result.data[0].id.substr(0,8) + ' criado!', 'success');
+                await carregarDados();
+            }
+            setTimeout(retomarScanner, 2000);
+        }
+
+        function retomarScanner() {
+            if (html5QrCode) {
+                html5QrCode.resume();
+            }
+        }
+
+        function buscarProdutoManual() {
             var codigo = document.getElementById('codigo-manual').value.trim();
-            if (codigo) buscarProdutoPorCodigo(codigo);
-        }
-
-        function adicionarAoPedido(produto) {
-            var pedidoAtual = document.getElementById('pedido-atual');
-            if (pedidoAtual) {
-                pedidoAtual.innerHTML = '<div class="item-card"><div class="item-info"><div class="item-name">' + produto.nome + '</div><div class="item-detail">R$ ' + produto.preco + '</div></div></div>';
+            if (codigo) {
+                if (html5QrCode) html5QrCode.pause();
+                verificarProdutoCodigo(codigo);
             }
         }
 
-        // MODAL CLIENTE
+        function abrirModalProdutoComCodigo(codigoBarras) {
+            var html = '<div class="modal-title">🏷️ Cadastrar Produto</div>';
+            html += '<div class="modal-sub">Produto não encontrado. Cadastre agora!</div>';
+            html += '<div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="produto-nome" placeholder="Nome do produto"></div>';
+            html += '<div class="form-group"><label class="form-label">Código de Barras</label><input class="form-input" id="produto-codigo" value="' + (codigoBarras || '') + '" readonly></div>';
+            html += '<div class="form-group"><label class="form-label">Preço (R$)</label><input class="form-input" id="produto-preco" type="number" step="0.01" placeholder="0,00"></div>';
+            html += '<button class="btn btn-primary" onclick="salvarProdutoDoScanner()">Salvar Produto</button>';
+            html += '<button class="btn btn-outline" onclick="fecharModal(); retomarScanner()">Cancelar</button>';
+            document.getElementById('modal-body').innerHTML = html;
+            document.getElementById('modal-overlay').classList.add('show');
+            setTimeout(function() {
+                document.getElementById('produto-nome').focus();
+            }, 300);
+        }
+
+        async function salvarProdutoDoScanner() {
+            var nome = document.getElementById('produto-nome').value.trim();
+            var codigo = document.getElementById('produto-codigo').value.trim();
+            var preco = parseFloat(document.getElementById('produto-preco').value);
+            if (!nome || !codigo || !preco) {
+                toast('Preencha todos os campos', 'error');
+                return;
+            }
+            var produtoExistente = produtos.find(function(p) { return p.codigo === codigo; });
+            if (produtoExistente) {
+                toast('Produto já cadastrado!', 'error');
+                return;
+            }
+            var data = { 
+                nome: nome, 
+                codigo: codigo, 
+                preco: preco, 
+                user_id: currentUser.id,
+                created_at: new Date().toISOString()
+            };
+            var result = await supabaseClient.from('produtos').insert(data);
+            if (result.error) {
+                toast('Erro: ' + result.error.message, 'error');
+                return;
+            }
+            toast('Produto cadastrado!', 'success');
+            fecharModal();
+            await carregarDados();
+            setTimeout(retomarScanner, 1000);
+        }
+
+        function abrirModalClienteDoScanner() {
+            var html = '<div class="modal-title">👥 Cadastrar Cliente</div>';
+            html += '<div class="modal-sub">Preencha os dados do cliente</div>';
+            html += '<div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="cliente-nome" placeholder="Nome completo"></div>';
+            html += '<div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="cliente-telefone" placeholder="(00) 00000-0000"></div>';
+            html += '<div class="form-group"><label class="form-label">Endereço</label><input class="form-input" id="cliente-endereco" placeholder="Endereço completo"></div>';
+            html += '<button class="btn btn-primary" onclick="salvarClienteDoScanner()">Salvar Cliente</button>';
+            html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
+            document.getElementById('modal-body').innerHTML = html;
+            document.getElementById('modal-overlay').classList.add('show');
+        }
+
+        async function salvarClienteDoScanner() {
+            var nome = document.getElementById('cliente-nome').value.trim();
+            var telefone = document.getElementById('cliente-telefone').value.trim();
+            var endereco = document.getElementById('cliente-endereco').value.trim();
+            if (!nome) {
+                toast('Nome obrigatório', 'error');
+                return;
+            }
+            var data = { 
+                nome: nome, 
+                telefone: telefone, 
+                endereco: endereco, 
+                user_id: currentUser.id,
+                created_at: new Date().toISOString()
+            };
+            var result = await supabaseClient.from('clientes').insert(data);
+            if (result.error) {
+                toast('Erro: ' + result.error.message, 'error');
+                return;
+            }
+            toast('Cliente cadastrado!', 'success');
+            fecharModal();
+            await carregarDados();
+        }
+
         function abrirModalCliente() {
-            var html = '<div class="modal-title">+ Novo Cliente</div><div class="modal-sub">Preencha os dados</div>' +
-                      '<div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="cliente-nome"></div>' +
-                      '<div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="cliente-telefone"></div>' +
-                      '<div class="form-group"><label class="form-label">Endereço</label><input class="form-input" id="cliente-endereco"></div>' +
-                      '<button class="btn btn-primary" onclick="salvarCliente()">Salvar</button>' +
-                      '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
+            var html = '<div class="modal-title">👥 Cadastrar Cliente</div>';
+            html += '<div class="modal-sub">Preencha os dados do cliente</div>';
+            html += '<div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="cliente-nome" placeholder="Nome completo"></div>';
+            html += '<div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="cliente-telefone" placeholder="(00) 00000-0000"></div>';
+            html += '<div class="form-group"><label class="form-label">Endereço</label><input class="form-input" id="cliente-endereco" placeholder="Endereço completo"></div>';
+            html += '<button class="btn btn-primary" onclick="salvarCliente()">Salvar Cliente</button>';
+            html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
             document.getElementById('modal-body').innerHTML = html;
             document.getElementById('modal-overlay').classList.add('show');
         }
 
         async function salvarCliente() {
-            var nome = document.getElementById('cliente-nome').value;
-            var telefone = document.getElementById('cliente-telefone').value;
-            var endereco = document.getElementById('cliente-endereco').value;
-            if (!nome) { toast('Nome obrigatório', 'error'); return; }
-            
-            var data = { nome: nome, telefone: telefone, endereco: endereco, user_id: currentUser.id };
+            var nome = document.getElementById('cliente-nome').value.trim();
+            var telefone = document.getElementById('cliente-telefone').value.trim();
+            var endereco = document.getElementById('cliente-endereco').value.trim();
+            if (!nome) {
+                toast('Nome obrigatório', 'error');
+                return;
+            }
+            var data = { 
+                nome: nome, 
+                telefone: telefone, 
+                endereco: endereco, 
+                user_id: currentUser.id,
+                created_at: new Date().toISOString()
+            };
             var result = await supabaseClient.from('clientes').insert(data);
-            if (result.error) { toast('Erro: ' + result.error.message, 'error'); return; }
-            
-            toast('Cliente salvo!', 'success');
+            if (result.error) {
+                toast('Erro: ' + result.error.message, 'error');
+                return;
+            }
+            toast('Cliente cadastrado!', 'success');
             fecharModal();
             await carregarDados();
             mudarAba('clients');
         }
 
-        // MODAL PRODUTO
-        function abrirModalProduto() {
-            var html = '<div class="modal-title">+ Novo Produto</div><div class="modal-sub">Preencha os dados</div>' +
-                      '<div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="produto-nome"></div>' +
-                      '<div class="form-group"><label class="form-label">Código de Barras</label><input class="form-input" id="produto-codigo"></div>' +
-                      '<div class="form-group"><label class="form-label">Preço (R$)</label><input class="form-input" id="produto-preco" type="number" step="0.01"></div>' +
-                      '<button class="btn btn-primary" onclick="salvarProduto()">Salvar</button>' +
-                      '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
+        function abrirModalProdutoManual() {
+            var html = '<div class="modal-title">🏷️ Cadastrar Produto</div>';
+            html += '<div class="modal-sub">Preencha os dados do produto</div>';
+            html += '<div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="produto-nome-manual" placeholder="Nome do produto"></div>';
+            html += '<div class="form-group"><label class="form-label">Código de Barras</label><input class="form-input" id="produto-codigo-manual" placeholder="Código"></div>';
+            html += '<div class="form-group"><label class="form-label">Preço (R$)</label><input class="form-input" id="produto-preco-manual" type="number" step="0.01" placeholder="0,00"></div>';
+            html += '<button class="btn btn-primary" onclick="salvarProdutoManual()">Salvar Produto</button>';
+            html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
             document.getElementById('modal-body').innerHTML = html;
             document.getElementById('modal-overlay').classList.add('show');
         }
 
-        async function salvarProduto() {
-            var nome = document.getElementById('produto-nome').value;
-            var codigo = document.getElementById('produto-codigo').value;
-            var preco = parseFloat(document.getElementById('produto-preco').value);
-            if (!nome || !codigo || !preco) { toast('Preencha todos os campos', 'error'); return; }
-            
-            var data = { nome: nome, codigo: codigo, preco: preco, user_id: currentUser.id };
+        async function salvarProdutoManual() {
+            var nome = document.getElementById('produto-nome-manual').value.trim();
+            var codigo = document.getElementById('produto-codigo-manual').value.trim();
+            var preco = parseFloat(document.getElementById('produto-preco-manual').value);
+            if (!nome || !codigo || !preco) {
+                toast('Preencha todos os campos', 'error');
+                return;
+            }
+            var produtoExistente = produtos.find(function(p) { return p.codigo === codigo; });
+            if (produtoExistente) {
+                toast('Produto já cadastrado!', 'error');
+                return;
+            }
+            var data = { 
+                nome: nome, 
+                codigo: codigo, 
+                preco: preco, 
+                user_id: currentUser.id,
+                created_at: new Date().toISOString()
+            };
             var result = await supabaseClient.from('produtos').insert(data);
-            if (result.error) { toast('Erro: ' + result.error.message, 'error'); return; }
-            
-            toast('Produto salvo!', 'success');
+            if (result.error) {
+                toast('Erro: ' + result.error.message, 'error');
+                return;
+            }
+            toast('Produto cadastrado!', 'success');
             fecharModal();
             await carregarDados();
             mudarAba('products');
         }
 
-        // MODAL GENÉRICO
         function fecharModal(e) {
             if (!e || e.target.id === 'modal-overlay') {
                 document.getElementById('modal-overlay').classList.remove('show');
@@ -434,7 +589,11 @@
             }
         }
 
-        // FUNÇÕES AUXILIARES
+        function novoPedido() { toast('Em desenvolvimento', 'success'); }
+        function verPedido(id) { toast('Pedido #' + id.substr(0,8), 'success'); }
+        function editarCliente(id) { toast('Editar cliente', 'success'); }
+        function editarProduto(id) { toast('Editar produto', 'success'); }
+
         function toast(msg, tipo) {
             var container = document.getElementById('toast-container');
             var el = document.createElement('div');
@@ -443,11 +602,6 @@
             container.appendChild(el);
             setTimeout(function() { el.style.opacity = '0'; setTimeout(function() { el.remove(); }, 300); }, 3000);
         }
-
-        function novoPedido() { toast('Em desenvolvimento', 'success'); }
-        function verPedido(id) { toast('Pedido #' + id, 'success'); }
-        function editarCliente(id) { toast('Editar cliente ' + id, 'success'); }
-        function editarProduto(id) { toast('Editar produto ' + id, 'success'); }
     </script>
 </body>
 </html>

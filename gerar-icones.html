@@ -1,24 +1,104 @@
-{
-    "name": "Kayla Consignado",
-    "short_name": "Kayla",
-    "description": "Sistema de Gestão de Vendas Consignadas Kayla",
-    "start_url": "/freemium/kayla.html",
-    "display": "standalone",
-    "background_color": "#12121a",
-    "theme_color": "#7c5cfc",
-    "orientation": "portrait",
-    "icons": [
-        {
-            "src": "icon-192-dark.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "any maskable"
-        },
-        {
-            "src": "icon-512-dark.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any maskable"
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerador de Ícones Kayla</title>
+    <style>
+        body { background: #12121a; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 40px; }
+        h1 { color: #7c5cfc; }
+        button { background: #7c5cfc; color: #fff; border: none; padding: 12px 24px; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 10px; }
+        button:hover { background: #9b82fc; }
+        .preview { margin: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body>
+    <h1>🎨 Gerador de Ícones Kayla</h1>
+    <p>Clique abaixo para baixar os ícones com o nome "Kayla"</p>
+    <div id="preview-container"></div>
+    <button onclick="baixarTodos()">📥 Baixar Todos os Ícones</button>
+
+    <script>
+        function desenharIcone(ctx, tamanho) {
+            // Fundo escuro arredondado
+            ctx.fillStyle = '#12121a';
+            ctx.beginPath();
+            if (ctx.roundRect) ctx.roundRect(0, 0, tamanho, tamanho, tamanho * 0.22);
+            else ctx.rect(0, 0, tamanho, tamanho);
+            ctx.fill();
+
+            // Sacola de compras (Roxo)
+            const scale = tamanho / 192;
+            ctx.fillStyle = '#7c5cfc';
+            ctx.beginPath();
+            ctx.moveTo(56 * scale, 80 * scale);
+            ctx.lineTo(136 * scale, 80 * scale);
+            ctx.lineTo(136 * scale, 136 * scale);
+            ctx.quadraticCurveTo(136 * scale, 152 * scale, 120 * scale, 152 * scale);
+            ctx.lineTo(72 * scale, 152 * scale);
+            ctx.quadraticCurveTo(56 * scale, 152 * scale, 56 * scale, 136 * scale);
+            ctx.fill();
+
+            // Alça da sacola
+            ctx.strokeStyle = '#7c5cfc';
+            ctx.lineWidth = 8 * scale;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(76 * scale, 80 * scale);
+            ctx.lineTo(76 * scale, 64 * scale);
+            ctx.quadraticCurveTo(76 * scale, 44 * scale, 96 * scale, 44 * scale);
+            ctx.quadraticCurveTo(116 * scale, 44 * scale, 116 * scale, 64 * scale);
+            ctx.lineTo(116 * scale, 80 * scale);
+            ctx.stroke();
+
+            // Gráfico na sacola (Branco)
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 5 * scale;
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.moveTo(72 * scale, 115 * scale);
+            ctx.lineTo(88 * scale, 131 * scale);
+            ctx.lineTo(112 * scale, 99 * scale);
+            ctx.stroke();
+
+            // Texto "Kayla"
+            ctx.fillStyle = '#a0a0b0';
+            ctx.font = `bold ${22 * scale}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText('Kayla', tamanho / 2, tamanho * 0.87);
         }
-    ]
-}
+
+        function gerarCanvas(tamanho) {
+            const canvas = document.createElement('canvas');
+            canvas.width = tamanho;
+            canvas.height = tamanho;
+            const ctx = canvas.getContext('2d');
+            desenharIcone(ctx, tamanho);
+            return canvas;
+        }
+
+        function baixarArquivo(canvas, nome) {
+            const link = document.createElement('a');
+            link.download = nome;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function baixarTodos() {
+            setTimeout(() => baixarArquivo(gerarCanvas(192), 'icon-192-dark.png'), 100);
+            setTimeout(() => baixarArquivo(gerarCanvas(512), 'icon-512-dark.png'), 400);
+            setTimeout(() => baixarArquivo(gerarCanvas(180), 'apple-touch-icon-dark.png'), 700);
+            setTimeout(() => baixarArquivo(gerarCanvas(192), 'apple-touch-icon.png'), 1000);
+            setTimeout(() => baixarArquivo(gerarCanvas(192), 'icon-192.png'), 1300);
+            setTimeout(() => baixarArquivo(gerarCanvas(512), 'icon-512.png'), 1600);
+            setTimeout(() => alert('✅ Todos os ícones foram baixados! \n\nAgora suba-os no GitHub substituindo os antigos.'), 1800);
+        }
+
+        // Mostrar preview
+        window.onload = () => {
+            const preview = gerarCanvas(192);
+            preview.className = 'preview';
+            document.getElementById('preview-container').appendChild(preview);
+        };
+    </script>
+</body>
+</html>

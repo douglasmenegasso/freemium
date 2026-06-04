@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="google" content="notranslate">
 <title>Kayla - Venda Consignada</title>
 <link rel="manifest" href="manifest.json">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -10,8 +11,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root { --bg: #0f0f13; --bg2: #1a1a24; --bg3: #252530; --text: #fff; --text2: #a0a0b0; --text3: #606070; --accent: #7c5cfc; --accent2: #9b82fc; --border: #2a2a35; --success: #00c853; --error: #ff1744; --warning: #ffab00; --radius: 12px; --radius-sm: 8px; }
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; overflow: hidden; }
 
 #login-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
 .login-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 30px 20px; width: 100%; max-width: 360px; text-align: center; }
@@ -27,7 +28,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .btn-green { background: var(--success); color: #fff; }
 .btn-warning { background: var(--warning); color: #000; }
 .btn-sm { padding: 10px 16px; font-size: 13px; width: auto; }
-.btn-icon { width: 40px; height: 40px; padding: 0; border-radius: 10px; }
 
 #app { display: none; flex-direction: column; height: 100vh; position: fixed; top: 0; left: 0; right: 0; bottom: 0; }
 .header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 12px 16px; flex-shrink: 0; }
@@ -57,7 +57,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .item-info { flex: 1; min-width: 0; }
 .item-name { font-weight: 600; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .item-detail { font-size: 13px; color: var(--text3); }
-.item-code { font-size: 12px; color: var(--text3); margin-top: 2px; }
 
 #reader { width: 100%; border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 12px; }
 
@@ -115,7 +114,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .file-input-label { display: block; padding: 12px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); text-align: center; cursor: pointer; }
 .file-input-label:hover { border-color: var(--accent); }
 
-/* Modal de Produtos */
 .product-modal-list { max-height: 400px; overflow-y: auto; }
 .product-search-box { position: relative; margin-bottom: 16px; }
 .product-search-box input { width: 100%; padding: 12px 16px 12px 44px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 15px; color: var(--text); }
@@ -136,14 +134,21 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 .backup-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
 
-/* Modal Duplicado com +/- */
 .qty-selector { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 20px 0; }
 .qty-selector .qty-btn { width: 44px; height: 44px; font-size: 24px; }
 .qty-selector .qty-value { font-size: 28px; min-width: 60px; }
 .qty-selector-label { text-align: center; color: var(--text2); font-size: 12px; margin-bottom: 8px; text-transform: uppercase; }
 
-/* Toast duplo clique */
+.update-banner { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; padding: 16px; border-radius: var(--radius); margin-bottom: 16px; display: none; }
+.update-banner.show { display: block; }
+.update-banner-title { font-weight: 700; margin-bottom: 8px; }
+.update-banner-text { font-size: 13px; margin-bottom: 12px; opacity: 0.9; }
+.update-banner button { margin-top: 8px; }
+
 #exit-toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: #fff; padding: 12px 24px; border-radius: var(--radius-sm); font-size: 14px; z-index: 3500; display: none; }
+
+.menu-item { padding: 16px; background: var(--bg3); border-radius: var(--radius-sm); margin-bottom: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.menu-item:active { background: var(--bg2); }
 </style>
 </head>
 <body>
@@ -156,7 +161,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
         <div class="login-sub">Selecione seu perfil de acesso</div>
         <button class="btn btn-primary" onclick="abrirLogin('admin')">👑 Administrador</button>
         <button class="btn btn-outline" onclick="abrirLogin('user')">👤 Usuário</button>
-        <div style="font-size:11px;color:var(--text3);margin-top:20px">v4.3.1</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:20px">v4.4.0</div>
     </div>
 </div>
 
@@ -174,7 +179,15 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
             </div>
         </div>
     </div>
-    <div class="content" id="content"></div>
+    <div class="content" id="content">
+        <!-- Banner de atualização -->
+        <div id="update-banner" class="update-banner">
+            <div class="update-banner-title">🚀 Atualização Disponível!</div>
+            <div class="update-banner-text">Nova versão disponível. Atualize agora para ter acesso às últimas melhorias.</div>
+            <button class="btn btn-primary" onclick="atualizarApp()">🔄 Atualizar Agora</button>
+            <button class="btn btn-outline" onclick="fecharBannerAtualizacao()" style="margin-top:8px;border-color:#fff;color:#fff">Agora não</button>
+        </div>
+    </div>
     <div class="nav">
         <button class="nav-btn active" onclick="mudarAba('scan')"><span class="icon">⚡</span>Vender</button>
         <button class="nav-btn" onclick="mudarAba('clients')"><span class="icon">👥</span>Clientes</button>
@@ -212,12 +225,14 @@ var LIMITES = { freeClientes: 3, freeProdutos: 20, proAtivo: false };
 var isOnline = navigator.onLine;
 var lastSync = localStorage.getItem('kayla_last_sync') || null;
 var lastBackPress = 0;
+var appVersion = '4.4.0';
 
 // ============ INICIALIZAÇÃO ============
 window.addEventListener('DOMContentLoaded', function() {
     verificarStatusPro();
     carregarConfigEmpresa();
     carregarDadosLocais();
+    verificarAtualizacao();
     
     try {
         supabaseClient = supabase.createClient('https://xwwklngrkvdwgiinycvt.supabase.co', 'sb_publishable_2Viwv3t4SvejW4SEfvpxGA_5K5thi7S');
@@ -228,14 +243,18 @@ window.addEventListener('DOMContentLoaded', function() {
         isOnline = true; 
         atualizarBadgeConexao();
         if (currentUser) sincronizarDados();
+        verificarAtualizacao();
     });
     window.addEventListener('offline', function() { 
         isOnline = false; 
         atualizarBadgeConexao();
     });
     
-    // Back button handler
     document.addEventListener('backbutton', onBackButton, false);
+    
+    // Prevenir seleção de texto e menu de contexto
+    document.addEventListener('selectstart', function(e) { e.preventDefault(); }, false);
+    document.addEventListener('contextmenu', function(e) { e.preventDefault(); }, false);
     
     mostrarTelaSelecao();
 });
@@ -249,7 +268,11 @@ function onBackButton() {
     
     var currentTime = Date.now();
     if (currentTime - lastBackPress < 2000) {
-        navigator.app.exitApp();
+        if (navigator.app && navigator.app.exitApp) {
+            navigator.app.exitApp();
+        } else {
+            window.close();
+        }
     } else {
         lastBackPress = currentTime;
         var toast = document.getElementById('exit-toast');
@@ -347,6 +370,46 @@ function mostrarApp() {
     atualizarBadgePlano();
     atualizarBadgeConexao();
     mudarAba('scan');
+}
+
+// ============ ATUALIZAÇÃO ============
+function verificarAtualizacao() {
+    if (!isOnline) return;
+    
+    fetch('version.json?t=' + Date.now())
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (data.version !== appVersion) {
+                mostrarBannerAtualizacao(data);
+            }
+        })
+        .catch(function(err) { console.log('Erro ao verificar atualização:', err); });
+}
+
+function mostrarBannerAtualizacao(data) {
+    var banner = document.getElementById('update-banner');
+    var content = document.querySelector('.content');
+    if (banner && content) {
+        content.insertBefore(banner, content.firstChild);
+        banner.classList.add('show');
+    }
+}
+
+function fecharBannerAtualizacao() {
+    var banner = document.getElementById('update-banner');
+    if (banner) {
+        banner.classList.remove('show');
+        localStorage.setItem('kayla_dismiss_update', Date.now().toString());
+    }
+}
+
+function atualizarApp() {
+    if ('caches' in window) {
+        caches.keys().then(function(names) {
+            for (var name of names) caches.delete(name);
+        });
+    }
+    window.location.reload(true);
 }
 
 // ============ AUTENTICAÇÃO ============
@@ -487,6 +550,12 @@ function mudarAba(aba) {
     
     var content = document.getElementById('content');
     var sub = document.getElementById('header-sub');
+    
+    // Re-insere banner se existir
+    var banner = document.getElementById('update-banner');
+    if (banner && banner.classList.contains('show')) {
+        content.insertBefore(banner, content.firstChild);
+    }
     
     switch(aba) {
         case 'scan':
@@ -631,7 +700,6 @@ function processarCodigo(codigo) {
 }
 
 function abrirModalDuplicado(produto, item) {
-    var qtdAdicionar = 1;
     var html = '<div class="modal-handle"></div>';
     html += '<div class="modal-title">📦 Já na Lista</div>';
     html += '<div class="modal-sub">' + produto.nome + '</div>';
@@ -639,21 +707,30 @@ function abrirModalDuplicado(produto, item) {
     html += '<p>Produto já está no pedido com <strong style="color:var(--accent)">' + item.qtd + ' un</strong></p></div>';
     html += '<div class="qty-selector-label">Adicionar mais</div>';
     html += '<div class="qty-selector">';
-    html += '<button class="qty-btn" onclick="document.getElementById(\'modal-qtd\').value = Math.max(1, parseInt(document.getElementById(\'modal-qtd\').value) - 1); document.querySelector(\'.qty-value\').textContent = document.getElementById(\'modal-qtd\').value;">−</button>';
-    html += '<div class="qty-value" id="modal-qtd-display">1</div>';
-    html += '<button class="qty-btn" onclick="document.getElementById(\'modal-qtd\').value = parseInt(document.getElementById(\'modal-qtd\').value) + 1; document.querySelector(\'.qty-value\').textContent = document.getElementById(\'modal-qtd\').value;">+</button>';
+    html += '<button class="qty-btn" onclick="ajustarQtdModal(-1)">−</button>';
+    html += '<div class="qty-value" id="modal-qtd-display">' + item.qtd + '</div>';
+    html += '<button class="qty-btn" onclick="ajustarQtdModal(1)">+</button>';
     html += '</div>';
-    html += '<input type="hidden" id="modal-qtd" value="1">';
     html += '<input type="hidden" id="modal-produto-id" value="' + produto.id + '">';
+    html += '<input type="hidden" id="modal-qtd-atual" value="' + item.qtd + '">';
     html += '<button class="btn btn-primary" onclick="adicionarMaisUnidadesModal()">➕ Adicionar</button>';
     html += '<button class="btn btn-outline" onclick="fecharModal(); retomarScanner()">Cancelar</button>';
     document.getElementById('modal-body').innerHTML = html;
     document.getElementById('modal-overlay').classList.add('show');
 }
 
+function ajustarQtdModal(delta) {
+    var display = document.getElementById('modal-qtd-display');
+    var hidden = document.getElementById('modal-qtd-atual');
+    var qtd = parseInt(hidden.value) + delta;
+    if (qtd < 1) qtd = 1;
+    hidden.value = qtd;
+    display.textContent = qtd;
+}
+
 function adicionarMaisUnidadesModal() {
     var produtoId = document.getElementById('modal-produto-id').value;
-    var qtdAdd = parseInt(document.getElementById('modal-qtd').value) || 1;
+    var qtdAdd = parseInt(document.getElementById('modal-qtd-atual').value);
     var item = pedidoItens.find(function(i) { return i.produto_id === produtoId; });
     if (item) {
         item.qtd += qtdAdd;
@@ -738,13 +815,12 @@ async function finalizarPedido() {
         };
         
         if (isOnline && supabaseClient) {
+            // Tenta criar com itens_json
             var result = await supabaseClient.from('pedidos').insert(pedidoData).select();
             if (result.error) {
-                if (result.error.message.includes('itens_detalhes')) {
-                    pedidoData.itens_detalhes = pedidoData.itens_json;
-                    delete pedidoData.itens_json;
-                    result = await supabaseClient.from('pedidos').insert(pedidoData).select();
-                }
+                // Se falhar, tenta sem o campo
+                delete pedidoData.itens_json;
+                result = await supabaseClient.from('pedidos').insert(pedidoData).select();
                 if (result.error) throw result.error;
             }
             await carregarDados();
@@ -765,6 +841,7 @@ async function finalizarPedido() {
         
     } catch (error) {
         toast('Erro: ' + error.message, 'error');
+        console.error(error);
     }
     
     btn.innerText = texto;
@@ -1176,7 +1253,7 @@ async function devolverPedido(pedidoId) {
     html += '<p style="color:var(--text2);margin-bottom:12px">Itens do pedido:</p>';
     
     try {
-        var itens = JSON.parse(pedido.itens_json || pedido.itens_detalhes || '[]');
+        var itens = JSON.parse(pedido.itens_json || '[]');
         itens.forEach(function(item, idx) {
             html += '<div class="item-card" style="margin-bottom:8px">';
             html += '<div class="item-info"><div class="item-name">' + item.nome + '</div><div class="item-detail">Qtd: ' + item.qtd + ' • R$ ' + item.total.toFixed(2).replace('.',',') + '</div></div>';
@@ -1204,7 +1281,7 @@ async function confirmarDevolucao(pedidoId) {
         return;
     }
     
-    var itens = JSON.parse(pedido.itens_json || pedido.itens_detalhes || '[]');
+    var itens = JSON.parse(pedido.itens_json || '[]');
     var itensDevolvidos = [];
     
     checkboxes.forEach(function(cb) {
@@ -1246,7 +1323,7 @@ function verPedido(pedidoId) {
     html += '</div>';
     
     try {
-        var itens = JSON.parse(pedido.itens_json || pedido.itens_detalhes || '[]');
+        var itens = JSON.parse(pedido.itens_json || '[]');
         html += '<div class="item-list" style="margin-bottom:16px">';
         itens.forEach(function(item) {
             html += '<div class="item-card"><div class="item-info"><div class="item-name">' + item.nome + '</div><div class="item-detail">' + item.qtd + 'x R$ ' + item.preco.toFixed(2).replace('.',',') + '</div></div><div style="font-weight:700;color:var(--accent)">R$ ' + item.total.toFixed(2).replace('.',',') + '</div></div>';
@@ -1309,7 +1386,7 @@ function gerarPDFPedido(pedido) {
         
         var y = 115;
         try {
-            var itens = JSON.parse(pedido.itens_json || pedido.itens_detalhes || '[]');
+            var itens = JSON.parse(pedido.itens_json || '[]');
             itens.forEach(function(item) {
                 doc.text(item.nome, 20, y);
                 doc.text(item.qtd + 'x R$ ' + item.preco.toFixed(2).replace('.',','), 120, y);
@@ -1395,8 +1472,13 @@ function renderizarConfig() {
         html += '<button class="btn btn-primary" onclick="sincronizarDados()">🔄 Sincronizar Agora</button>';
         
         var nomeUsuario = currentUser ? currentUser.email.split('@')[0] : 'Usuário';
-        var msgWhatsApp = 'Olá! Sou ' + nomeUsuario + ' e preciso de suporte no Kayla - Venda Consignada';
-        html += '<a href="https://wa.me/5541996427444?text=' + encodeURIComponent(msgWhatsApp) + '" target="_blank" class="btn whatsapp-btn">💬 Suporte WhatsApp</a>';
+        var plano = LIMITES.proAtivo ? 'PRO (Atendimento Prioritário)' : 'GRÁTIS';
+        var msgWhatsApp = 'Olá! Sou ' + nomeUsuario + ' (' + plano + ') e preciso de suporte no Kayla - Venda Consignada v' + appVersion;
+        html += '<a href="https://wa.me/5541996427444?text=' + encodeURIComponent(msgWhatsApp) + '" target="_blank" class="btn whatsapp-btn">💬 Suporte WhatsApp' + (LIMITES.proAtivo ? ' (Prioritário)' : '') + '</a>';
+    } else {
+        var nomeUsuarioFree = currentUser ? currentUser.email.split('@')[0] : 'Usuário';
+        var msgWhatsAppFree = 'Olá! Sou ' + nomeUsuarioFree + ' (Plano GRÁTIS - v' + appVersion + ') e preciso de suporte no Kayla - Venda Consignada';
+        html += '<a href="https://wa.me/5541996427444?text=' + encodeURIComponent(msgWhatsAppFree) + '" target="_blank" class="btn whatsapp-btn">💬 Suporte WhatsApp</a>';
     }
     
     if (!LIMITES.proAtivo) {
@@ -1404,28 +1486,11 @@ function renderizarConfig() {
     }
     
     html += '<div class="config-section">';
-    html += '<div class="config-section-title">🏢 Dados da Empresa</div>';
-    
-    html += '<div class="form-group"><label class="form-label">Nome da Empresa</label><input class="form-input" id="config-nome" value="' + (configEmpresa.nome || '') + '" placeholder="Nome fantasia"></div>';
-    
-    html += '<div class="form-group"><label class="form-label">CNPJ/CPF</label><input class="form-input" id="config-cnpj" value="' + (configEmpresa.cnpj || '') + '" placeholder="00.000.000/0000-00"></div>';
-    
-    html += '<div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="config-telefone" value="' + (configEmpresa.telefone || '') + '" placeholder="(00) 00000-0000"></div>';
-    
-    html += '<div class="form-group"><label class="form-label">Endereço</label><input class="form-input" id="config-endereco" value="' + (configEmpresa.endereco || '') + '" placeholder="Rua, número, cidade"></div>';
-    
-    html += '<div class="form-group"><label class="form-label">Logo (armazenada localmente)</label>';
-    var logoLocal = localStorage.getItem('kayla_logo_local');
-    if (logoLocal) {
-        html += '<div class="logo-preview"><img src="' + logoLocal + '" alt="Logo"></div>';
-        html += '<button class="btn btn-sm btn-outline" onclick="removerLogo()" style="margin-bottom:8px">🗑️ Remover Logo</button>';
-    }
-    html += '<div class="file-input-wrapper">';
-    html += '<input type="file" id="config-logo-file" accept="image/*" onchange="uploadLogo(this)">';
-    html += '<label for="config-logo-file" class="file-input-label">📷 Selecionar Imagem (PNG, JPG - máx 2MB)</label>';
-    html += '</div><small style="color:var(--text3);display:block;margin-top:8px">A logo fica armazenada apenas neste dispositivo</small></div>';
-    
-    html += '<button class="btn btn-primary" onclick="salvarConfiguracoesEmpresa()">💾 Salvar Configurações</button>';
+    html += '<div class="config-section-title">⚙️ Configurações</div>';
+    html += '<div class="menu-item" onclick="abrirDadosEmpresa()">';
+    html += '<span>🏢 Dados da Empresa</span><span>→</span></div>';
+    html += '<div class="menu-item" onclick="abrirConfigEmail()">';
+    html += '<span>📧 E-mail para Notificações</span><span>→</span></div>';
     html += '</div>';
     
     html += '<div class="backup-section">';
@@ -1436,11 +1501,58 @@ function renderizarConfig() {
     html += '<label for="backup-file" class="file-input-label">📤 Importar Backup</label>';
     html += '</div></div>';
     
-    html += '<div class="form-group" style="margin-top:16px"><label class="form-label">Versão</label><div style="background:var(--bg3);padding:12px;border-radius:8px">v4.3.1</div></div>';
+    html += '<div class="form-group" style="margin-top:16px"><label class="form-label">Versão</label><div style="background:var(--bg3);padding:12px;border-radius:8px">v' + appVersion + '</div></div>';
     
     html += '<button class="btn btn-red" onclick="fazerLogout()" style="margin-top:12px">🚪 Sair</button></div>';
     
     return html;
+}
+
+function abrirDadosEmpresa() {
+    var html = '<div class="modal-handle"></div>';
+    html += '<div class="modal-title">🏢 Dados da Empresa</div>';
+    html += '<div class="form-group"><label class="form-label">Nome da Empresa</label><input class="form-input" id="config-nome" value="' + (configEmpresa.nome || '') + '" placeholder="Nome fantasia"></div>';
+    html += '<div class="form-group"><label class="form-label">CNPJ/CPF</label><input class="form-input" id="config-cnpj" value="' + (configEmpresa.cnpj || '') + '" placeholder="00.000.000/0000-00"></div>';
+    html += '<div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="config-telefone" value="' + (configEmpresa.telefone || '') + '" placeholder="(00) 00000-0000"></div>';
+    html += '<div class="form-group"><label class="form-label">Endereço</label><input class="form-input" id="config-endereco" value="' + (configEmpresa.endereco || '') + '" placeholder="Rua, número, cidade"></div>';
+    html += '<div class="form-group"><label class="form-label">Logo (armazenada localmente)</label>';
+    var logoLocal = localStorage.getItem('kayla_logo_local');
+    if (logoLocal) {
+        html += '<div class="logo-preview"><img src="' + logoLocal + '" alt="Logo"></div>';
+        html += '<button class="btn btn-sm btn-outline" onclick="removerLogo()" style="margin-bottom:8px">🗑️ Remover Logo</button>';
+    }
+    html += '<div class="file-input-wrapper">';
+    html += '<input type="file" id="config-logo-file" accept="image/*" onchange="uploadLogo(this)">';
+    html += '<label for="config-logo-file" class="file-input-label">📷 Selecionar Imagem (PNG, JPG - máx 2MB)</label>';
+    html += '</div><small style="color:var(--text3);display:block;margin-top:8px">A logo fica armazenada apenas neste dispositivo</small></div>';
+    html += '<button class="btn btn-primary" onclick="salvarConfiguracoesEmpresa()">💾 Salvar</button>';
+    html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
+    document.getElementById('modal-body').innerHTML = html;
+    document.getElementById('modal-overlay').classList.add('show');
+}
+
+function abrirConfigEmail() {
+    var html = '<div class="modal-handle"></div>';
+    html += '<div class="modal-title">📧 E-mail para Notificações</div>';
+    html += '<div class="modal-sub">Receba atualizações, promoções e avisos de renovação</div>';
+    html += '<div class="form-group"><label class="form-label">E-mail</label><input class="form-input" id="config-email-notificacao" value="' + (configEmpresa.email || '') + '" placeholder="seu@email.com" type="email"></div>';
+    html += '<small style="color:var(--text3);display:block;margin-bottom:16px">Enviaremos notificações sobre atualizações, renovação de licença e promoções especiais.</small>';
+    html += '<button class="btn btn-primary" onclick="salvarEmailNotificacao()">💾 Salvar</button>';
+    html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
+    document.getElementById('modal-body').innerHTML = html;
+    document.getElementById('modal-overlay').classList.add('show');
+}
+
+function salvarEmailNotificacao() {
+    var email = document.getElementById('config-email-notificacao').value.trim();
+    if (email && !email.includes('@')) {
+        toast('E-mail inválido', 'error');
+        return;
+    }
+    configEmpresa.email = email;
+    salvarConfigEmpresa();
+    toast('✅ E-mail salvo!', 'success');
+    fecharModal();
 }
 
 function uploadLogo(input) {
@@ -1456,7 +1568,7 @@ function uploadLogo(input) {
     reader.onload = function(e) {
         localStorage.setItem('kayla_logo_local', e.target.result);
         toast('✅ Logo carregada (local)!', 'success');
-        mudarAba('settings');
+        abrirDadosEmpresa();
     };
     reader.readAsDataURL(file);
 }
@@ -1464,7 +1576,7 @@ function uploadLogo(input) {
 function removerLogo() {
     localStorage.removeItem('kayla_logo_local');
     toast('Logo removida', 'success');
-    mudarAba('settings');
+    abrirDadosEmpresa();
 }
 
 function salvarConfiguracoesEmpresa() {
@@ -1475,6 +1587,7 @@ function salvarConfiguracoesEmpresa() {
     
     salvarConfigEmpresa();
     toast('✅ Configurações salvas!', 'success');
+    fecharModal();
 }
 
 function exportarBackup() {
@@ -1484,7 +1597,7 @@ function exportarBackup() {
         pedidos: pedidos,
         config: configEmpresa,
         dataExport: new Date().toISOString(),
-        versao: '4.3.1'
+        versao: appVersion
     };
     
     var blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });

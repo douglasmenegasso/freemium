@@ -1459,57 +1459,31 @@ function renderizarConfig() {
     
     html += '<div class="form-group"><label class="form-label">Usuário</label><div style="background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:12px">' + (currentUser ? currentUser.email : 'Não logado') + '</div></div>';
     
-    html += '<div class="form-group"><label class="form-label">Perfil</label><div style="background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:12px">' + (perfilAtual === 'admin' ? '👑 Admin' : '👤 Usuário') + '</div></div>';
+    html += '<div class="form-group"><label class="form-label">Perfil</label><div style="background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:12px">' + (perfilAtual === 'admin' ? ' Admin' : '👤 Usuário') + '</div></div>';
     
     html += '<div class="form-group"><label class="form-label">Plano</label><div style="background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:12px"><span class="' + (LIMITES.proAtivo ? 'badge-pro' : 'badge-free') + '">' + (LIMITES.proAtivo ? 'PRO' : 'GRÁTIS') + '</span></div></div>';
     
     if (LIMITES.proAtivo) {
-        html += '<div class="sync-info">';
-        if (lastSync) {
-            var dataSync = new Date(lastSync).toLocaleString('pt-BR');
-            html += '<strong>✅ Último sync:</strong> ' + dataSync;
-        } else {
-            html += '<strong>Sem sincronização</strong>';
-        }
-        html += '<br><span style="color:' + (isOnline ? 'var(--success)' : 'var(--text3)') + '">' + (isOnline ? '🟢 Conectado' : '🔴 Desconectado') + '</span>';
-        html += '</div>';
-        html += '<button class="btn btn-primary" onclick="sincronizarDados()">🔄 Sincronizar Agora</button>';
+        var devices = localStorage.getItem('kayla_pro_devices') || '0/0';
+        var expires = localStorage.getItem('kayla_pro_expires');
+        var expDate = expires ? new Date(expires).toLocaleDateString('pt-BR') : 'N/A';
         
-        var nomeUsuario = currentUser ? currentUser.email.split('@')[0] : 'Usuário';
-        var plano = LIMITES.proAtivo ? 'PRO (Atendimento Prioritário)' : 'GRÁTIS';
-        var msgWhatsApp = 'Olá! Sou ' + nomeUsuario + ' (' + plano + ') e preciso de suporte no Kayla - Venda Consignada v' + appVersion;
-        html += '<a href="https://wa.me/5541996427444?text=' + encodeURIComponent(msgWhatsApp) + '" target="_blank" class="btn whatsapp-btn">💬 Suporte WhatsApp' + (LIMITES.proAtivo ? ' (Prioritário)' : '') + '</a>';
+        html += '<div class="form-group"><label class="form-label">Dispositivos</label><div style="background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:12px">' + devices + ' ativos</div></div>';
+        html += '<div class="form-group"><label class="form-label">Validade</label><div style="background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:12px">' + expDate + '</div></div>';
+        html += '<button class="btn btn-primary" onclick="gerenciarDispositivos()">📱 Gerenciar Dispositivos</button>';
     } else {
-        var nomeUsuarioFree = currentUser ? currentUser.email.split('@')[0] : 'Usuário';
-        var msgWhatsAppFree = 'Olá! Sou ' + nomeUsuarioFree + ' (Plano GRÁTIS - v' + appVersion + ') e preciso de suporte no Kayla - Venda Consignada';
-        html += '<a href="https://wa.me/5541996427444?text=' + encodeURIComponent(msgWhatsAppFree) + '" target="_blank" class="btn whatsapp-btn">💬 Suporte WhatsApp</a>';
+        html += '<button class="btn btn-primary" onclick="mostrarPlanos()">🚀 Assinar Plano Pro</button>';
+        html += '<div class="form-group" style="margin-top:12px"><label class="form-label">Já tem uma key?</label>';
+        html += '<input class="form-input" id="pro-key" placeholder="PRO-XXXX-XXXX-XXXX">';
+        html += '<button class="btn btn-outline" onclick="ativarPro()" style="margin-top:8px">🔓 Ativar Key</button></div>';
     }
     
-    if (!LIMITES.proAtivo) {
-        html += '<button class="btn btn-primary" onclick="mostrarPaywall()">🚀 Upgrade Pro</button>';
-    }
-    
-    html += '<div class="config-section">';
-    html += '<div class="config-section-title">⚙️ Configurações</div>';
-    html += '<div class="menu-item" onclick="abrirDadosEmpresa()">';
-    html += '<span>🏢 Dados da Empresa</span><span>→</span></div>';
-    html += '<div class="menu-item" onclick="abrirConfigEmail()">';
-    html += '<span>📧 E-mail para Notificações</span><span>→</span></div>';
-    html += '</div>';
-    
-    html += '<div class="backup-section">';
-    html += '<div class="config-section-title">💾 Backup</div>';
-    html += '<button class="btn btn-primary" onclick="exportarBackup()">📥 Exportar Backup</button>';
-    html += '<div class="file-input-wrapper" style="margin-top:12px">';
-    html += '<input type="file" id="backup-file" accept=".json" onchange="importarBackup(this)">';
-    html += '<label for="backup-file" class="file-input-label">📤 Importar Backup</label>';
-    html += '</div></div>';
-    
-    html += '<div class="form-group" style="margin-top:16px"><label class="form-label">Versão</label><div style="background:var(--bg3);padding:12px;border-radius:8px">v' + appVersion + '</div></div>';
+    html += '<div class="form-group" style="margin-top:16px"><label class="form-label">Versão</label><div style="background:var(--bg3);padding:12px;border-radius:8px">v4.4.0</div></div>';
     
     html += '<button class="btn btn-red" onclick="fazerLogout()" style="margin-top:12px">🚪 Sair</button></div>';
     
     return html;
+}
 }
 
 function abrirDadosEmpresa() {

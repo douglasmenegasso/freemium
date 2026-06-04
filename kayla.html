@@ -226,6 +226,10 @@ var isOnline = navigator.onLine;
 var lastSync = localStorage.getItem('kayla_last_sync') || null;
 var lastBackPress = 0;
 var appVersion = '4.4.0';
+// Adicione após as outras variáveis globais
+var SUPABASE_EDGE_URL = 'https://xwwklngrkvdwgiinycvt.supabase.co/functions/v1';
+var deviceUniqueId = localStorage.getItem('kayla_device_id') || null;
+var currentProKey = localStorage.getItem('kayla_pro_key') || null;
 
 // ============ INICIALIZAÇÃO ============
 window.addEventListener('DOMContentLoaded', function() {
@@ -1656,16 +1660,179 @@ function mostrarPaywall() {
     document.getElementById('modal-overlay').classList.add('show');
 }
 
-function ativarPro() {
+async function ativarPro() {
     var chave = document.getElementById('pro-key').value.trim().toUpperCase();
-    if (!chave || !chave.startsWith('PRO-')) { toast('Chave inválida', 'error'); return; }
-    LIMITES.proAtivo = true;
-    localStorage.setItem('kayla_pro', 'true');
-    localStorage.setItem('kayla_pro_key', chave);
-    toast('✅ Pro ativado!', 'success');
+    if (!chave || !chave.startsWith('PRO-')) { 
+        toast('Chave inválida', 'error'); 
+        return; 
+    }
+    
+    var btn = event.target;
+    var texto = btn.innerText;
+    btn.innerText = 'Validando...';
+    btn.disabled = true;
+    
+    var resultado = await validarKeyBackend(chave);
+    
+    if (resultado.valid) {
+        LIMITES.proAtivo = true;
+        localStorage.setItem('kayla_pro', 'true');
+        localStorage.setItem('kayla_pro_key', chave);
+        localStorage.setItem('kayla_pro_expires', resultado.expires_at || '');
+        localStorage.setItem('kayla_pro_devices', resultado.devices_used + '/' + resultado.max_devices);
+        
+        toast('✅ Plano PRO ativado! ' + resultado.devices_used + '/' + resultado.max_devices + ' dispositivos', 'success');
+        fecharModal();
+        atualizarBadgePlano();
+        mudarAba('settings');
+    } else {
+        toast('❌ ' + resultado.message, 'error');
+        // ============ SISTEMA DE KEYS E DISPOSITIVOS ============
+
+function getDeviceId() {
+    if (!deviceUniqueId) {
+        deviceUniqueId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('kayla_device_id', deviceUniqueId);
+    }
+    return deviceUniqueId;
+}
+
+function getDeviceName() {
+    var ua = navigator.userAgent;
+    if (ua.indexOf('Android') > -1) return 'Android';
+    if (ua.indexOf('iPhone') > -1) return 'iPhone';
+    if (ua.indexOf('iPad') > -1) return 'iPad';
+    return 'Web';
+}
+
+async function validarKeyBackend(keyCode) {
+    try {
+        var response = await fetch(SUPABASE_EDGE_URL + '/validate-key', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer sb_publishable_2Viwv3t4SvejW4SEfvpxGA_5K5thi7S'
+            },
+            body: JSON.stringify({
+                key_code: keyCode,
+                device_id: getDeviceId(),
+                device_name: getDeviceName()
+            })
+        });
+        
+        var data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Erro ao validar key:', error);
+        return { valid: false, message: 'Erro de conexão' };
+    }
+}
+
+async function removerDispositivo(keyCode, deviceId) {
+    try {
+        var response = await fetch(SUPABASE_EDGE_URL + '/remove-device', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer sb_publishable_2Viwv3t4SvejW4SEfvpxGA_5K5thi7S'
+            },
+            body: JSON.stringify({
+                key_code: keyCode,
+                device_id: deviceId
+            })
+        });
+        
+        var data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Erro ao remover dispositivo:', error);
+        return { success: false, message: 'Erro de conexão' };
+    }
+}
+
+function mostrarPlanos() {
+    var html = '<div class="modal-handle"></div>';
+    html += '<div class="modal-title">🚀 Escolha seu Plano</div>';
+    html += '<div class="modal-sub">Selecione o plano ideal para você</div>';
+    
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">';
+    html += '<div class="card" style="background:var(--bg3);padding:16px;cursor:pointer;border:2px solid var(--accent)" onclick="selecionarPlano(\'Mensal\', 19.90)">';
+    html += '<div style="font-size:24px;font-weight:700;color:var(--accent)">R$ 19,90</div>';
+    html += '<div style="font-size:13px;color:var(--text2)">Mensal<br>1 Dispositivo</div></div>';
+    
+    html += '<div class="card" style="background:var(--bg3);padding:16px;cursor:pointer;border:2px solid transparent" onclick="selecionarPlano(\'Trimestral\', 49.90)">';
+    html += '<div style="font-size:24px;font-weight:700;color:var(--accent)">R$ 49,90</div>';
+    html += '<div style="font-size:13px;color:var(--text2)">Trimestral<br>1 Dispositivo</div></div>';
+    
+    html += '<div class="card" style="background:var(--bg3);padding:16px;cursor:pointer;border:2px solid transparent" onclick="selecionarPlano(\'Semestral\', 89.90)">';
+    html += '<div style="font-size:24px;font-weight:700;color:var(--accent)">R$ 89,90</div>';
+    html += '<div style="font-size:13px;color:var(--text2)">Semestral<br>1 Dispositivo</div></div>';
+    
+    html += '<div class="card" style="background:var(--bg3);padding:16px;cursor:pointer;border:2px solid transparent" onclick="selecionarPlano(\'Anual\', 159.90)">';
+    html += '<div style="font-size:24px;font-weight:700;color:var(--accent)">R$ 159,90</div>';
+    html += '<div style="font-size:13px;color:var(--text2)">Anual<br>1 Dispositivo</div></div>';
+    html += '</div>';
+    
+    html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
+    document.getElementById('modal-body').innerHTML = html;
+    document.getElementById('modal-overlay').classList.add('show');
+}
+
+function selecionarPlano(plano, valor) {
+    toast('Em breve: Integração com Asaas para ' + plano + ' (R$ ' + valor.toFixed(2).replace('.', ',') + ')', 'warning');
     fecharModal();
-    atualizarBadgePlano();
-    mudarAba('settings');
+}
+
+async function gerenciarDispositivos() {
+    var key = localStorage.getItem('kayla_pro_key');
+    if (!key) {
+        toast('Nenhuma key ativa', 'error');
+        return;
+    }
+    
+    var devices = localStorage.getItem('kayla_pro_devices') || '0/0';
+    
+    var html = '<div class="modal-handle"></div>';
+    html += '<div class="modal-title">📱 Gerenciar Dispositivos</div>';
+    html += '<div class="modal-sub">Dispositivos ativos: ' + devices + '</div>';
+    
+    html += '<div class="card" style="background:var(--bg3);padding:16px;margin-bottom:16px">';
+    html += '<div style="margin-bottom:12px"><strong>Dispositivo atual:</strong></div>';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--bg2);border-radius:8px">';
+    html += '<div><div style="font-weight:600">' + getDeviceName() + '</div><div style="font-size:12px;color:var(--text3)">ID: ' + getDeviceId().substr(0, 20) + '...</div></div>';
+    html += '<button class="btn btn-sm btn-red" onclick="removerEsteDispositivo()" style="margin:0">Remover</button></div></div>';
+    
+    html += '<small style="color:var(--text3);display:block;margin-bottom:16px">Ao remover este dispositivo, você poderá ativar em outro.</small>';
+    html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
+    document.getElementById('modal-body').innerHTML = html;
+    document.getElementById('modal-overlay').classList.add('show');
+}
+
+async function removerEsteDispositivo() {
+    var key = localStorage.getItem('kayla_pro_key');
+    var deviceId = getDeviceId();
+    
+    if (!confirm('Remover este dispositivo? Você precisará ativar a key novamente.')) return;
+    
+    var resultado = await removerDispositivo(key, deviceId);
+    
+    if (resultado.success) {
+        localStorage.removeItem('kayla_pro');
+        localStorage.removeItem('kayla_pro_key');
+        localStorage.removeItem('kayla_pro_devices');
+        LIMITES.proAtivo = false;
+        toast('✅ Dispositivo removido!', 'success');
+        fecharModal();
+        atualizarBadgePlano();
+        mudarAba('settings');
+    } else {
+        toast('❌ ' + resultado.message, 'error');
+    }
+}
+    }
+    
+    btn.innerText = texto;
+    btn.disabled = false;
 }
 
 // ============ AUXILIARES ============

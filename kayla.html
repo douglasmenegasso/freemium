@@ -231,6 +231,20 @@ var SUPABASE_EDGE_URL = 'https://xwwklngrkvdwgiinycvt.supabase.co/functions/v1';
 var deviceUniqueId = localStorage.getItem('kayla_device_id') || null;
 var currentProKey = localStorage.getItem('kayla_pro_key') || null;
 
+function abrirLogin(tipo) {
+    perfilAtual = tipo;
+    var html = '<div class="modal-title">' + (tipo === 'admin' ? '👑 Login Admin' : '👤 Login Usuário') + '</div>';
+    html += '<div class="modal-sub">Digite suas credenciais</div>';
+    html += '<div class="form-group"><label class="form-label">E-mail</label><input class="form-input" id="email" type="email" placeholder="seu@email.com" onkeypress="if(event.key===\'Enter\')fazerLogin()"></div>';
+    html += '<div class="form-group"><label class="form-label">Senha</label><input class="form-input" id="senha" type="password" placeholder="Mínimo 6 caracteres" onkeypress="if(event.key===\'Enter\')fazerLogin()"></div>';
+    html += '<div class="checkbox-group"><input type="checkbox" id="lembrar-me"><label for="lembrar-me" style="color:var(--text2);font-size:13px">Lembrar de mim</label></div>';
+    html += '<button class="btn btn-primary" onclick="fazerLogin()">Entrar</button>';
+    html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
+    document.getElementById('modal-body').innerHTML = html;
+    document.getElementById('modal-overlay').classList.add('show');
+    setTimeout(function() { document.getElementById('email').focus(); }, 100);
+}
+
 // ============ INICIALIZAÇÃO ============
 window.addEventListener('DOMContentLoaded', function() {
     verificarStatusPro();
@@ -430,20 +444,6 @@ async function verificarSessao() {
         }
     }
     mostrarTelaSelecao();
-}
-
-function abrirLogin(tipo) {
-    perfilAtual = tipo;
-    var html = '<div class="modal-title">' + (tipo === 'admin' ? '👑 Login Admin' : '👤 Login Usuário') + '</div>';
-    html += '<div class="modal-sub">Digite suas credenciais</div>';
-    html += '<div class="form-group"><label class="form-label">E-mail</label><input class="form-input" id="email" type="email" placeholder="seu@email.com" onkeypress="if(event.key===\'Enter\')fazerLogin()"></div>';
-    html += '<div class="form-group"><label class="form-label">Senha</label><input class="form-input" id="senha" type="password" placeholder="Mínimo 6 caracteres" onkeypress="if(event.key===\'Enter\')fazerLogin()"></div>';
-    html += '<div class="checkbox-group"><input type="checkbox" id="lembrar-me"><label for="lembrar-me" style="color:var(--text2);font-size:13px">Lembrar de mim</label></div>';
-    html += '<button class="btn btn-primary" onclick="fazerLogin()">Entrar</button>';
-    html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
-    document.getElementById('modal-body').innerHTML = html;
-    document.getElementById('modal-overlay').classList.add('show');
-    setTimeout(function() { document.getElementById('email').focus(); }, 100);
 }
 
 async function fazerLogin() {

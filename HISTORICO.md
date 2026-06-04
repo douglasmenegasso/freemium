@@ -8,9 +8,9 @@
 
 | Item | Informação |
 |------|------------|
-| **Nome atual** | Kayla Consignado |
+| **Nome atual** | Kayla - Venda Consignada |
 | **Nome anterior** | MyPulse / Venda Consignada |
-| **Versão atual** | v4.1.4 |
+| **Versão atual** | v4.4.0 |
 | **Data de lançamento** | 2026-06-04 |
 | **Plataforma** | PWA (Progressive Web App) |
 | **Hospedagem** | GitHub Pages |
@@ -21,67 +21,118 @@
 
 ## 📦 Versões Lançadas
 
-### 🔷 v4.1.4 - 2026-06-04
+### 🔷 v4.4.0 - 2026-06-04
 **Status:** ✅ Atual  
-**Build:** 20260604-001
+**Build:** 20260604-002
 
 #### Correções:
-- [x] Barra de navegação fixa na parte inferior
-- [x] Scroll funcionando em todas as telas
-- [x] Tela de login centralizada corretamente
-- [x] Fluxo de login: após autenticar, abre na tela de Scanner
-- [x] Removida tag `<script>` duplicada
-- [x] Corrigido erro de "duplicate key" na criação de perfil
+- [x] Modal "Já na Lista" com botões +/- funcionando corretamente
+- [x] Correção erro DB: fallback para pedidos sem campo itens_json
+- [x] Dados da empresa movidos para tela separada (modal)
+- [x] Campo e-mail para notificações adicionado
+- [x] Banner de atualização funcional (verifica version.json)
+- [x] Botão suporte WhatsApp Free e Pro com mensagens diferentes
+- [x] Prevenção de busca Google ao tocar em títulos (user-select: none)
+- [x] Back button Android com duplo toque para sair
+- [x] Nome do app atualizado para "Kayla - Venda Consignada"
 
 #### Melhorias:
-- [x] Nome do app alterado para "Kayla Consignado"
-- [x] Configurações centralizadas em `config.js`
-- [x] Versionamento separado em `version.json`
-- [x] Código JavaScript organizado em seções comentadas
-- [x] Histórico de versões documentado em `HISTORICO.md`
+- [x] Gerador de Keys separado (pasta gerador-keys/)
+- [x] Sistema de validação de keys independente
+- [x] Exportação/importação de keys
+- [x] Envio de key por e-mail automático
+- [x] Interface de gerenciamento de keys
+
+#### Arquivos Criados:
+- [x] `gerador-keys/index.html` - Sistema de gerador de keys
+- [x] `gerador-keys/README.md` - Documentação do gerador
 
 ---
 
-### 🔷 v4.1.3 - 2026-06-03
-**Status:** 🟡 Lançada
+### 🔷 v4.3.1 - 2026-06-04
+**Status:** ✅ Estável
 
-#### Implementações:
-- [x] Integração completa com Supabase
-- [x] Tabela `profiles` criada com RLS
-- [x] Sistema de login por e-mail e senha
-- [x] Criação automática de perfil após registro
+#### Correções:
+- [x] Modal duplicado com +/- para quantidade
+- [x] Nome alterado para "Kayla - Venda Consignada"
+- [x] Correção erro ao finalizar pedido (campo itens_json)
+- [x] CRUD completo de clientes (editar/excluir)
+- [x] Back button Android com duplo toque
 
 ---
 
-### 🔷 v4.1.0 - 2026-05-31
+### 🔷 v4.3.0 - 2026-06-04
 **Status:** ✅ Estável
 
 #### Implementações:
-- [x] Sistema Freemium completo
-- [x] Limites: 3 clientes / 20 produtos (plano Grátis)
-- [x] Paywall com comparativo Grátis vs Pro (R$ 19,90/mês)
-- [x] Ativação por chave: PRO-XXXX-XXXX-XXXX
+- [x] Interface de venda estilo modal com busca
+- [x] Sistema de devolução de produtos
+- [x] Histórico completo com devolvidos
+- [x] Backup local (exportar/importar)
+- [x] Logo armazenada localmente
+- [x] Funcionamento offline
+- [x] Sincronização ao reconectar (Pro)
+- [x] Botão WhatsApp suporte (41996427444)
+- [x] Badge ONLINE/OFFLINE
 
 ---
 
-### 🔷 v3.9.9 - 2026-05-30
-**Status:** 🟡 Última versão estável antes do Freemium
+### 🔷 v4.2.0 - 2026-06-04
+**Status:** ✅ Estável
+
+#### Implementações:
+- [x] PDF personalizado com logo da empresa
+- [x] Configurações da empresa (nome, CNPJ, telefone, endereço)
+- [x] Upload de logo (PNG/JPG até 2MB)
+- [x] Histórico de compras do cliente
+- [x] Aviso quando cliente já comprou produto
+- [x] Lista de produtos para seleção manual
 
 ---
 
-## ️ Roadmap - Próximas Versões
+### 🔷 v4.1.5 - 2026-06-04
+**Status:** ✅ Estável
 
-### 🔮 v4.2.0 - Backup Automático
-- [ ] Integração com Make.com
-- [ ] Backup diário no OneDrive/SharePoint
+#### Correções:
+- [x] Fluxo de venda: selecionar cliente primeiro
+- [x] Campo código manual + botão Buscar
+- [x] Scanner pausa/retoma corretamente
+- [x] Produto duplicado avisa e pergunta quantidade
+- [x] Lista do pedido com quantidade, preço e total
+- [x] Botão Finalizar cria pedido no Supabase
 
-### 🔮 v4.3.0 - Sistema de Pagamentos
+---
+
+### 🔷 v4.1.4 - 2026-06-04
+**Status:** ✅ Estável
+
+#### Implementações:
+- [x] Login com e-mail/senha (Supabase)
+- [x] Perfis Admin e Usuário
+- [x] Limites Freemium (3 clientes, 20 produtos)
+- [x] Paywall com comparativo Grátis vs Pro
+- [x] Ativação por chave PRO-XXXX-XXXX-XXXX
+- [x] Badge GRÁTIS/PRO no cabeçalho
+
+---
+
+## 🗺️ Roadmap - Próximas Versões
+
+### 🔮 v4.5.0 - Sistema de Pagamentos
 - [ ] Integração com Asaas ou Kiwify
-- [ ] Webhook de liberação automática
+- [ ] Webhook de liberação automática de key
+- [ ] Verificação de status de assinatura
+- [ ] Planos mensais e anuais
 
-### 🔮 v4.4.0 - APK Mobile
+### 🔮 v4.6.0 - APK Mobile
 - [ ] Conversão para APK usando PWA Builder
 - [ ] Publicação na Google Play Store
+- [ ] Notificações push
+
+###  v4.7.0 - Multi-tenant
+- [ ] Suporte a múltiplas lojas
+- [ ] Dashboard administrativo
+- [ ] Relatórios avançados
 
 ---
 

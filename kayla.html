@@ -7,6 +7,7 @@
 <link rel="manifest" href="manifest.json">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root { --bg: #0f0f13; --bg2: #1a1a24; --bg3: #252530; --text: #fff; --text2: #a0a0b0; --text3: #606070; --accent: #7c5cfc; --accent2: #9b82fc; --border: #2a2a35; --success: #00c853; --error: #ff1744; --warning: #ffab00; --radius: 12px; --radius-sm: 8px; }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -24,6 +25,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
 .btn-red { background: var(--error); color: #fff; }
 .btn-green { background: var(--success); color: #fff; }
+.btn-warning { background: var(--warning); color: #000; }
 .btn-sm { padding: 10px 16px; font-size: 13px; width: auto; }
 
 #app { display: none; flex-direction: column; height: 100vh; position: fixed; top: 0; left: 0; right: 0; bottom: 0; }
@@ -91,6 +93,20 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .empty-state { text-align: center; color: var(--text3); padding: 30px 20px; }
 
 .limit-warning { background: var(--warning); color: #000; padding: 12px; border-radius: var(--radius-sm); margin: 12px 0; text-align: center; font-weight: 600; }
+
+.product-history { background: var(--bg3); border-left: 3px solid var(--warning); padding: 8px 12px; margin: 8px 0; border-radius: 4px; font-size: 12px; color: var(--text2); }
+.product-history strong { color: var(--warning); }
+
+.config-section { margin-bottom: 20px; }
+.config-section-title { font-size: 14px; font-weight: 600; color: var(--accent); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+
+.logo-preview { width: 100px; height: 100px; border: 2px dashed var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin: 12px 0; overflow: hidden; }
+.logo-preview img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+.file-input-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
+.file-input-wrapper input[type=file] { position: absolute; left: -9999px; }
+.file-input-label { display: block; padding: 12px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); text-align: center; cursor: pointer; }
+.file-input-label:hover { border-color: var(--accent); }
 </style>
 </head>
 <body>
@@ -103,7 +119,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
         <div class="login-sub">Selecione seu perfil de acesso</div>
         <button class="btn btn-primary" onclick="abrirLogin('admin')">👑 Administrador</button>
         <button class="btn btn-outline" onclick="abrirLogin('user')">👤 Usuário</button>
-        <div style="font-size:11px;color:var(--text3);margin-top:20px">v4.1.5</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:20px">v4.2.0</div>
     </div>
 </div>
 
@@ -150,11 +166,13 @@ var produtos = [];
 var pedidos = [];
 var pedidoItens = [];
 var clienteAtual = null;
+var configEmpresa = {};
 var LIMITES = { freeClientes: 3, freeProdutos: 20, proAtivo: false };
 
 // ============ INICIALIZAÇÃO ============
 window.addEventListener('DOMContentLoaded', function() {
     verificarStatusPro();
+    carregarConfigEmpresa();
     try {
         supabaseClient = supabase.createClient('https://xwwklngrkvdwgiinycvt.supabase.co', 'sb_publishable_2Viwv3t4SvejW4SEfvpxGA_5K5thi7S');
     } catch(e) { console.error('Erro:', e); }
@@ -167,6 +185,17 @@ function verificarStatusPro() {
         LIMITES.proAtivo = true;
         localStorage.setItem('kayla_pro', 'true');
     }
+}
+
+function carregarConfigEmpresa() {
+    var config = localStorage.getItem('kayla_config_empresa');
+    if (config) {
+        try { configEmpresa = JSON.parse(config); } catch(e) {}
+    }
+}
+
+function salvarConfigEmpresa() {
+    localStorage.setItem('kayla_config_empresa', JSON.stringify(configEmpresa));
 }
 
 function mostrarTelaSelecao() {
@@ -214,7 +243,7 @@ function abrirLogin(tipo) {
     html += '<div class="modal-sub">Digite suas credenciais</div>';
     html += '<div class="form-group"><label class="form-label">E-mail</label><input class="form-input" id="email" type="email" placeholder="seu@email.com"></div>';
     html += '<div class="form-group"><label class="form-label">Senha</label><input class="form-input" id="senha" type="password" placeholder="Mínimo 6 caracteres"></div>';
-    html += '<div class="checkbox-group"><input type="checkbox" id="lembrar-me"><label for="lembrar-me" style="color:var(--text2);font-size:13px">Lembrar de mim (somente neste dispositivo)</label></div>';
+    html += '<div class="checkbox-group"><input type="checkbox" id="lembrar-me"><label for="lembrar-me" style="color:var(--text2);font-size:13px">Lembrar de mim</label></div>';
     html += '<button class="btn btn-primary" onclick="fazerLogin()">Entrar</button>';
     html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
     document.getElementById('modal-body').innerHTML = html;
@@ -237,14 +266,12 @@ async function fazerLogin() {
     try {
         var result = await supabaseClient.auth.signInWithPassword({ email: email, password: senha });
         if (result.error) {
-            // Usuário não existe - NÃO cria automaticamente, só avisa
-            toast('E-mail ou senha incorretos. Usuário não encontrado.', 'error');
+            toast('E-mail ou senha incorretos', 'error');
             btn.innerText = texto;
             btn.disabled = false;
             return;
         }
         
-        // Login OK
         if (lembrarMe) {
             localStorage.setItem('kayla_lembrar_me', 'true');
             localStorage.setItem('kayla_email', email);
@@ -295,15 +322,15 @@ async function carregarDados() {
     } catch(e) { console.error('Erro:', e); }
 }
 
-// ============ LIMITES FREEMIUM ============
+// ============ LIMITES ============
 function verificarLimite(tipo) {
     if (LIMITES.proAtivo) return true;
     if (tipo === 'clientes' && clientes.length >= LIMITES.freeClientes) {
-        toast('Limite de ' + LIMITES.freeClientes + ' clientes atingido. Faça upgrade para Pro!', 'error');
+        toast('Limite de ' + LIMITES.freeClientes + ' clientes atingido!', 'error');
         return false;
     }
     if (tipo === 'produtos' && produtos.length >= LIMITES.freeProdutos) {
-        toast('Limite de ' + LIMITES.freeProdutos + ' produtos atingido. Faça upgrade para Pro!', 'error');
+        toast('Limite de ' + LIMITES.freeProdutos + ' produtos atingido!', 'error');
         return false;
     }
     return true;
@@ -348,11 +375,11 @@ function mudarAba(aba) {
     }
 }
 
-// ============ TELA DE VENDA ============
+// ============ VENDA ============
 function renderizarVenda() {
     var html = '';
     
-    // Seleção de cliente
+    // Cliente
     html += '<div class="card"><div class="card-title">👥 Cliente</div>';
     if (clienteAtual) {
         html += '<div class="client-selected"><span>✓ ' + clienteAtual.nome + '</span>';
@@ -360,25 +387,25 @@ function renderizarVenda() {
     } else {
         html += '<div class="form-group">';
         if (clientes.length === 0) {
-            html += '<p style="color:var(--warning);font-size:13px;margin-bottom:8px">⚠️ Nenhum cliente cadastrado</p>';
-            html += '<button class="btn btn-primary" onclick="abrirModalCliente()">+ Cadastrar Cliente</button>';
+            html += '<p style="color:var(--warning);font-size:13px;margin-bottom:8px">⚠️ Nenhum cliente</p>';
+            html += '<button class="btn btn-primary" onclick="abrirModalCliente()">+ Cadastrar</button>';
         } else {
             html += '<select class="form-select" id="select-cliente" onchange="selecionarClienteVenda(this.value)">';
-            html += '<option value="">-- Selecione um cliente --</option>';
+            html += '<option value="">-- Selecione --</option>';
             clientes.forEach(function(c) {
-                html += '<option value="' + c.id + '">' + c.nome + (c.telefone ? ' - ' + c.telefone : '') + '</option>';
+                html += '<option value="' + c.id + '">' + c.nome + '</option>';
             });
             html += '</select>';
         }
         html += '</div></div>';
     }
     
-    // Campo manual + Scanner
+    // Produto
     html += '<div class="card"><div class="card-title">⚡ Adicionar Produto</div>';
     if (!clienteAtual) {
-        html += '<p style="color:var(--warning);text-align:center;padding:20px">⚠️ Selecione um cliente primeiro</p>';
+        html += '<p style="color:var(--warning);text-align:center;padding:20px">⚠️ Selecione cliente primeiro</p>';
     } else {
-        html += '<div class="form-group"><label class="form-label">Código de barras</label>';
+        html += '<div class="form-group"><label class="form-label">Código</label>';
         html += '<div style="display:flex;gap:8px">';
         html += '<input class="form-input" id="codigo-manual" placeholder="Digite ou escaneie" onkeypress="if(event.key===\'Enter\')buscarProdutoManual()">';
         html += '<button class="btn btn-primary btn-sm" onclick="buscarProdutoManual()" style="margin:0">Buscar</button>';
@@ -387,13 +414,13 @@ function renderizarVenda() {
     }
     html += '</div>';
     
-    // Lista do pedido
+    // Pedido
     html += '<div class="card"><div class="card-title">📦 Pedido Atual';
     if (clienteAtual) html += ' - ' + clienteAtual.nome;
     html += '</div>';
     
     if (pedidoItens.length === 0) {
-        html += '<div class="empty-state">Nenhum item adicionado</div>';
+        html += '<div class="empty-state">Nenhum item</div>';
     } else {
         pedidoItens.forEach(function(item, idx) {
             html += '<div class="order-item">';
@@ -410,7 +437,7 @@ function renderizarVenda() {
             html += '</div></div>';
         });
         html += '<div class="order-total"><span>Total:</span><span>R$ ' + calcularTotal().toFixed(2).replace('.',',') + '</span></div>';
-        html += '<button class="btn btn-green" onclick="finalizarPedido()" style="margin-top:12px">✅ Finalizar Pedido</button>';
+        html += '<button class="btn btn-green" onclick="finalizarPedido()" style="margin-top:12px">✅ Finalizar</button>';
         html += '<button class="btn btn-outline" onclick="cancelarPedido()">❌ Cancelar</button>';
     }
     html += '</div>';
@@ -421,7 +448,7 @@ function renderizarVenda() {
 function selecionarClienteVenda(id) {
     if (!id) { clienteAtual = null; return; }
     clienteAtual = clientes.find(function(c) { return c.id === id; });
-    toast('Cliente selecionado: ' + clienteAtual.nome, 'success');
+    toast('Cliente: ' + clienteAtual.nome, 'success');
     mudarAba('scan');
 }
 
@@ -433,16 +460,13 @@ function trocarCliente() {
 
 function buscarProdutoManual() {
     var codigo = document.getElementById('codigo-manual').value.trim();
-    if (!codigo) { toast('Digite um código', 'error'); return; }
-    if (!clienteAtual) { toast('Selecione um cliente primeiro', 'error'); return; }
+    if (!codigo) { toast('Digite código', 'error'); return; }
+    if (!clienteAtual) { toast('Selecione cliente', 'error'); return; }
     processarCodigo(codigo);
 }
 
 function onScanSuccess(decodedText) {
-    if (!clienteAtual) {
-        toast('Selecione um cliente primeiro', 'warning');
-        return;
-    }
+    if (!clienteAtual) { toast('Selecione cliente', 'warning'); return; }
     if (html5QrCode) html5QrCode.pause();
     processarCodigo(decodedText);
 }
@@ -455,25 +479,81 @@ function processarCodigo(codigo) {
         return;
     }
     
-    var itemExistente = pedidoItens.find(function(i) { return i.produto_id === produto.id; });
-    if (itemExistente) {
-        abrirModalDuplicado(produto, itemExistente);
+    // Verifica histórico do cliente
+    var historico = getHistoricoCliente(clienteAtual.id);
+    var jaComprou = historico.filter(function(h) { return h.produto_id === produto.id; });
+    
+    if (jaComprou.length > 0) {
+        abrirModalHistoricoProduto(produto, jaComprou);
     } else {
-        adicionarItem(produto, 1);
-        toast('✅ ' + produto.nome + ' adicionado', 'success');
+        var itemExistente = pedidoItens.find(function(i) { return i.produto_id === produto.id; });
+        if (itemExistente) {
+            abrirModalDuplicado(produto, itemExistente);
+        } else {
+            adicionarItem(produto, 1);
+            toast('✅ ' + produto.nome, 'success');
+        }
     }
     
     var campo = document.getElementById('codigo-manual');
     if (campo) { campo.value = ''; campo.focus(); }
 }
 
+function getHistoricoCliente(clienteId) {
+    var historico = [];
+    pedidos.forEach(function(p) {
+        if (p.cliente_id === clienteId && p.itens_detalhes) {
+            try {
+                var itens = JSON.parse(p.itens_detalhes);
+                itens.forEach(function(item) {
+                    historico.push({
+                        produto_id: item.produto_id,
+                        produto_nome: item.nome,
+                        pedido_id: p.id,
+                        data: p.created_at,
+                        status: p.status
+                    });
+                });
+            } catch(e) {}
+        }
+    });
+    return historico;
+}
+
+function abrirModalHistoricoProduto(produto, historico) {
+    var html = '<div class="modal-title">⚠️ Produto Já Comprado</div>';
+    html += '<div class="modal-sub">' + produto.nome + '</div>';
+    html += '<div class="product-history">';
+    html += '<strong>Este cliente já comprou este produto ' + historico.length + ' vez(es)</strong><br><br>';
+    historico.forEach(function(h, i) {
+        if (i < 3) {
+            var data = new Date(h.data).toLocaleDateString('pt-BR');
+            html += '• Pedido #' + h.pedido_id.substr(0,8) + ' em ' + data + ' (' + h.status + ')<br>';
+        }
+    });
+    if (historico.length > 3) html += '... e mais ' + (historico.length - 3) + ' vezes';
+    html += '</div>';
+    html += '<p style="color:var(--text2);font-size:13px;margin:16px 0">Deseja adicionar mesmo assim?</p>';
+    html += '<button class="btn btn-primary" onclick="adicionarItemComHistorico(\'' + produto.id + '\')">✅ Sim, Adicionar</button>';
+    html += '<button class="btn btn-outline" onclick="fecharModal(); retomarScanner()">❌ Cancelar</button>';
+    document.getElementById('modal-body').innerHTML = html;
+    document.getElementById('modal-overlay').classList.add('show');
+}
+
+function adicionarItemComHistorico(produtoId) {
+    var produto = produtos.find(function(p) { return p.id === produtoId; });
+    if (produto) {
+        adicionarItem(produto, 1);
+        toast('✅ ' + produto.nome + ' adicionado', 'success');
+    }
+}
+
 function abrirModalDuplicado(produto, item) {
-    var html = '<div class="modal-title">📦 Produto Já na Lista</div>';
-    html += '<div class="modal-sub">' + produto.nome + ' (R$ ' + produto.preco.toFixed(2).replace('.',',') + ')</div>';
+    var html = '<div class="modal-title">📦 Já na Lista</div>';
+    html += '<div class="modal-sub">' + produto.nome + '</div>';
     html += '<div class="card" style="background:var(--bg3);padding:16px;text-align:center">';
-    html += '<p style="margin-bottom:12px">Este produto já está no pedido com <strong style="color:var(--accent)">' + item.qtd + ' unidade(s)</strong></p>';
-    html += '<p style="color:var(--text2);font-size:13px">O que deseja fazer?</p></div>';
-    html += '<div class="form-group"><label class="form-label">Adicionar mais unidades</label>';
+    html += '<p style="margin-bottom:12px">Produto já está no pedido com <strong style="color:var(--accent)">' + item.qtd + ' un</strong></p></div>';
+    html += '<div class="form-group"><label class="form-label">Adicionar mais</label>';
     html += '<input class="form-input" id="qtd-add" type="number" value="1" min="1" style="text-align:center;font-size:18px"></div>';
     html += '<button class="btn btn-primary" onclick="adicionarMaisUnidades(\'' + produto.id + '\')">➕ Adicionar</button>';
     html += '<button class="btn btn-outline" onclick="fecharModal(); retomarScanner()">Cancelar</button>';
@@ -487,7 +567,7 @@ function adicionarMaisUnidades(produtoId) {
     if (item) {
         item.qtd += qtdAdd;
     }
-    toast('➕ + ' + qtdAdd + ' unidades', 'success');
+    toast('➕ +' + qtdAdd + ' unidades', 'success');
     fecharModal();
     mudarAba('scan');
 }
@@ -523,7 +603,7 @@ function calcularTotal() {
 }
 
 function cancelarPedido() {
-    if (pedidoItens.length > 0 && !confirm('Deseja cancelar?')) return;
+    if (pedidoItens.length > 0 && !confirm('Cancelar pedido?')) return;
     pedidoItens = [];
     clienteAtual = null;
     mudarAba('scan');
@@ -531,7 +611,7 @@ function cancelarPedido() {
 
 async function finalizarPedido() {
     if (pedidoItens.length === 0) { toast('Adicione produtos', 'error'); return; }
-    if (!clienteAtual) { toast('Selecione um cliente', 'error'); return; }
+    if (!clienteAtual) { toast('Selecione cliente', 'error'); return; }
     
     var btn = event.target;
     var texto = btn.innerText;
@@ -541,7 +621,19 @@ async function finalizarPedido() {
     try {
         var total = calcularTotal();
         var totalItens = 0;
-        pedidoItens.forEach(function(i) { totalItens += i.qtd; });
+        var itensDetalhes = [];
+        
+        pedidoItens.forEach(function(i) { 
+            totalItens += i.qtd;
+            itensDetalhes.push({
+                produto_id: i.produto_id,
+                nome: i.nome,
+                codigo: i.codigo,
+                preco: i.preco,
+                qtd: i.qtd,
+                total: i.preco * i.qtd
+            });
+        });
         
         var pedidoData = {
             cliente_id: clienteAtual.id,
@@ -549,6 +641,7 @@ async function finalizarPedido() {
             status: 'aberto',
             itens: totalItens,
             total: total,
+            itens_detalhes: JSON.stringify(itensDetalhes),
             user_id: currentUser.id,
             created_at: new Date().toISOString()
         };
@@ -557,7 +650,13 @@ async function finalizarPedido() {
         if (result.error) throw result.error;
         
         var pedidoId = result.data[0].id;
-        toast('✅ Pedido #' + pedidoId.substr(0,8) + ' criado!', 'success');
+        
+        // Pergunta se quer gerar PDF
+        setTimeout(function() {
+            if (confirm('✅ Pedido #' + pedidoId.substr(0,8) + ' criado!\n\nGerar PDF do pedido?')) {
+                gerarPDFPedido(result.data[0]);
+            }
+        }, 500);
         
         pedidoItens = [];
         clienteAtual = null;
@@ -584,14 +683,14 @@ function iniciarScanner() {
 
 function retomarScanner() { if (html5QrCode) html5QrCode.resume(); }
 
-// ============ MODAL PRODUTO SELEÇÃO ============
+// ============ SELEÇÃO PRODUTO ============
 function abrirModalProdutoSelecao(codigo) {
     var html = '<div class="modal-title">🏷️ Produto Não Encontrado</div>';
     html += '<div class="modal-sub">Código: ' + codigo + '</div>';
     html += '<div class="card" style="background:var(--bg3);padding:16px;margin-bottom:16px">';
     html += '<p style="color:var(--text2);margin-bottom:16px">O que deseja fazer?</p>';
-    html += '<button class="btn btn-primary" onclick="fecharModal(); abrirModalProdutoNovo(\'' + codigo + '\')">+ Cadastrar Novo Produto</button>';
-    html += '<button class="btn btn-outline" onclick="fecharModal(); abrirModalListaProdutos(\'' + codigo + '\')">📋 Buscar na Lista de Produtos</button>';
+    html += '<button class="btn btn-primary" onclick="fecharModal(); abrirModalProdutoNovo(\'' + codigo + '\')">+ Cadastrar Novo</button>';
+    html += '<button class="btn btn-outline" onclick="fecharModal(); abrirModalListaProdutos(\'' + codigo + '\')">📋 Buscar na Lista</button>';
     html += '<button class="btn btn-outline" onclick="fecharModal(); retomarScanner()">❌ Cancelar</button></div>';
     document.getElementById('modal-body').innerHTML = html;
     document.getElementById('modal-overlay').classList.add('show');
@@ -600,16 +699,16 @@ function abrirModalProdutoSelecao(codigo) {
 function abrirModalListaProdutos(codigoBusca) {
     var html = '<div class="modal-title">📋 Selecionar Produto</div>';
     html += '<div class="modal-sub">Busca: ' + codigoBusca + '</div>';
-    html += '<div class="form-group"><input class="form-input" id="busca-produto" placeholder="Buscar produto..." onkeyup="filtrarProdutosModal(this.value)"></div>';
+    html += '<div class="form-group"><input class="form-input" id="busca-produto" placeholder="Buscar..." onkeyup="filtrarProdutosModal(this.value)"></div>';
     html += '<div id="lista-produtos-modal" style="max-height:300px;overflow-y:auto">';
     
     var filtrados = produtos.filter(function(p) {
         return p.nome.toLowerCase().includes(codigoBusca.toLowerCase()) || 
-               p.codigo.includes(codigoBusca);
+               (p.codigo && p.codigo.includes(codigoBusca));
     });
     
     if (filtrados.length === 0) {
-        html += '<p style="color:var(--text3);text-align:center;padding:20px">Nenhum produto encontrado</p>';
+        html += '<p style="color:var(--text3);text-align:center;padding:20px">Nenhum produto</p>';
     } else {
         filtrados.forEach(function(p) {
             html += '<div class="item-card" style="cursor:pointer;margin-bottom:8px" onclick="selecionarProdutoLista(\'' + p.id + '\')">';
@@ -631,7 +730,7 @@ function filtrarProdutosModal(termo) {
     
     var html = '';
     if (filtrados.length === 0) {
-        html = '<p style="color:var(--text3);text-align:center;padding:20px">Nenhum produto encontrado</p>';
+        html = '<p style="color:var(--text3);text-align:center;padding:20px">Nenhum produto</p>';
     } else {
         filtrados.forEach(function(p) {
             html += '<div class="item-card" style="cursor:pointer;margin-bottom:8px" onclick="selecionarProdutoLista(\'' + p.id + '\')">';
@@ -653,11 +752,10 @@ function selecionarProdutoLista(produtoId) {
 
 function abrirModalProdutoNovo(codigo) {
     var html = '<div class="modal-title">🏷️ Cadastrar Produto</div>';
-    html += '<div class="modal-sub">Produto não encontrado</div>';
-    html += '<div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="produto-nome" placeholder="Nome do produto"></div>';
+    html += '<div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="produto-nome"></div>';
     html += '<div class="form-group"><label class="form-label">Código</label><input class="form-input" id="produto-codigo" value="' + codigo + '" readonly></div>';
-    html += '<div class="form-group"><label class="form-label">Preço (R$)</label><input class="form-input" id="produto-preco" type="number" step="0.01" placeholder="0,00"></div>';
-    html += '<button class="btn btn-primary" onclick="salvarProdutoNovo()">💾 Salvar e Adicionar</button>';
+    html += '<div class="form-group"><label class="form-label">Preço (R$)</label><input class="form-input" id="produto-preco" type="number" step="0.01"></div>';
+    html += '<button class="btn btn-primary" onclick="salvarProdutoNovo()">💾 Salvar</button>';
     html += '<button class="btn btn-outline" onclick="fecharModal(); retomarScanner()">Cancelar</button>';
     document.getElementById('modal-body').innerHTML = html;
     document.getElementById('modal-overlay').classList.add('show');
@@ -685,18 +783,17 @@ async function salvarProdutoNovo() {
 function renderizarClientes() {
     var html = '<div class="card"><div class="card-title">👥 Clientes (' + clientes.length + (LIMITES.proAtivo ? '' : '/' + LIMITES.freeClientes) + ')</div>';
     if (!LIMITES.proAtivo && clientes.length >= LIMITES.freeClientes) {
-        html += '<div class="limit-warning">⚠️ Limite atingido! Upgrade para Pro</div>';
+        html += '<div class="limit-warning">⚠️ Limite atingido!</div>';
     }
     html += '<button class="btn btn-primary" onclick="verificarLimite(\'clientes\') && abrirModalCliente()">+ Novo Cliente</button></div>';
     
     if (clientes.length === 0) {
-        html += '<div class="card"><div class="empty-state">Nenhum cliente cadastrado</div></div>';
+        html += '<div class="card"><div class="empty-state">Nenhum cliente</div></div>';
     } else {
         html += '<div class="item-list">';
         clientes.forEach(function(c) {
-            html += '<div class="item-card"><div class="item-info"><div class="item-name">' + c.nome + '</div><div class="item-detail">' + (c.telefone || 'Sem telefone') + '</div></div>';
-            html += '<button class="btn btn-sm btn-primary" onclick="iniciarPedidoCliente(\'' + c.id + '\')">🛒 Vender</button>';
-            html += '<button class="btn btn-sm btn-outline" onclick="editarCliente(\'' + c.id + '\')">Editar</button></div>';
+            html += '<div class="item-card"><div class="item-info"><div class="item-name">' + c.nome + '</div><div class="item-detail">' + (c.telefone || 'Sem tel') + '</div></div>';
+            html += '<button class="btn btn-sm btn-primary" onclick="iniciarPedidoCliente(\'' + c.id + '\')">🛒 Vender</button></div>';
         });
         html += '</div>';
     }
@@ -705,7 +802,7 @@ function renderizarClientes() {
 
 function iniciarPedidoCliente(clienteId) {
     clienteAtual = clientes.find(function(c) { return c.id === clienteId; });
-    toast('Cliente selecionado: ' + clienteAtual.nome, 'success');
+    toast('Cliente: ' + clienteAtual.nome, 'success');
     mudarAba('scan');
 }
 
@@ -736,12 +833,12 @@ async function salvarCliente() {
 function renderizarProdutos() {
     var html = '<div class="card"><div class="card-title">🏷️ Produtos (' + produtos.length + (LIMITES.proAtivo ? '' : '/' + LIMITES.freeProdutos) + ')</div>';
     if (!LIMITES.proAtivo && produtos.length >= LIMITES.freeProdutos) {
-        html += '<div class="limit-warning">⚠️ Limite atingido! Upgrade para Pro</div>';
+        html += '<div class="limit-warning">⚠️ Limite atingido!</div>';
     }
     html += '<button class="btn btn-primary" onclick="verificarLimite(\'produtos\') && abrirModalProduto()">+ Novo Produto</button></div>';
     
     if (produtos.length === 0) {
-        html += '<div class="card"><div class="empty-state">Nenhum produto cadastrado</div></div>';
+        html += '<div class="card"><div class="empty-state">Nenhum produto</div></div>';
     } else {
         html += '<div class="item-list">';
         produtos.forEach(function(p) {
@@ -756,7 +853,7 @@ function abrirModalProduto() {
     if (!verificarLimite('produtos')) return;
     var html = '<div class="modal-title">🏷️ Cadastrar Produto</div>';
     html += '<div class="form-group"><label class="form-label">Nome *</label><input class="form-input" id="produto-nome-manual"></div>';
-    html += '<div class="form-group"><label class="form-label">Código de Barras *</label><input class="form-input" id="produto-codigo-manual"></div>';
+    html += '<div class="form-group"><label class="form-label">Código *</label><input class="form-input" id="produto-codigo-manual"></div>';
     html += '<div class="form-group"><label class="form-label">Preço (R$) *</label><input class="form-input" id="produto-preco-manual" type="number" step="0.01"></div>';
     html += '<button class="btn btn-primary" onclick="salvarProduto()">💾 Salvar</button>';
     html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
@@ -778,7 +875,7 @@ async function salvarProduto() {
     mudarAba('products');
 }
 
-// ============ PEDIDOS E HISTÓRICO ============
+// ============ PEDIDOS ============
 function renderizarPedidos() {
     var html = '<div class="card"><div class="card-title">📋 Pedidos (' + pedidos.length + ')</div></div>';
     if (pedidos.length === 0) {
@@ -787,55 +884,330 @@ function renderizarPedidos() {
         html += '<div class="item-list">';
         pedidos.forEach(function(p) {
             var data = new Date(p.created_at).toLocaleDateString('pt-BR');
-            html += '<div class="item-card"><div class="item-info"><div class="item-name">Pedido #' + p.id.substr(0,8) + '</div><div class="item-detail">' + p.cliente_nome + ' • ' + data + '<br>' + p.itens + ' itens • R$ ' + parseFloat(p.total).toFixed(2).replace('.',',') + ' • <span style="color:' + (p.status === 'aberto' ? 'var(--warning)' : 'var(--success)') + '">' + p.status.toUpperCase() + '</span></div></div><button class="btn btn-sm btn-outline" onclick="verPedido(\'' + p.id + '\')">Ver</button></div>';
+            html += '<div class="item-card"><div class="item-info"><div class="item-name">Pedido #' + p.id.substr(0,8) + '</div><div class="item-detail">' + p.cliente_nome + ' • ' + data + '<br>' + p.itens + ' itens • R$ ' + parseFloat(p.total).toFixed(2).replace('.',',') + ' • <span style="color:' + (p.status === 'aberto' ? 'var(--warning)' : 'var(--success)') + '">' + p.status.toUpperCase() + '</span></div></div>';
+            html += '<div style="display:flex;gap:8px">';
+            html += '<button class="btn btn-sm btn-primary" onclick="verPedido(\'' + p.id + '\')">Ver</button>';
+            if (p.status === 'aberto') {
+                html += '<button class="btn btn-sm btn-green" onclick="finalizarPedidoStatus(\'' + p.id + '\')">✅ Finalizar</button>';
+                html += '<button class="btn btn-sm btn-warning" onclick="devolverPedido(\'' + p.id + '\')">↩️ Devolução</button>';
+            }
+            html += '<button class="btn btn-sm btn-outline" onclick="gerarPDFPedidoPorId(\'' + p.id + '\')">📄 PDF</button>';
+            html += '</div></div>';
         });
         html += '</div>';
     }
     return html;
 }
 
+async function finalizarPedidoStatus(pedidoId) {
+    if (!confirm('Finalizar este pedido?')) return;
+    var result = await supabaseClient.from('pedidos').update({ status: 'finalizado' }).eq('id', pedidoId);
+    if (result.error) { toast('Erro: ' + result.error.message, 'error'); return; }
+    toast('✅ Pedido finalizado!', 'success');
+    await carregarDados();
+    mudarAba('orders');
+}
+
+async function devolverPedido(pedidoId) {
+    var pedido = pedidos.find(function(p) { return p.id === pedidoId; });
+    if (!pedido) return;
+    
+    var html = '<div class="modal-title">↩️ Devolução</div>';
+    html += '<div class="modal-sub">Pedido #' + pedidoId.substr(0,8) + ' - ' + pedido.cliente_nome + '</div>';
+    html += '<div class="card" style="background:var(--bg3);padding:16px;margin-bottom:16px">';
+    html += '<p style="color:var(--text2);margin-bottom:12px">Itens do pedido:</p>';
+    
+    try {
+        var itens = JSON.parse(pedido.itens_detalhes);
+        itens.forEach(function(item, idx) {
+            html += '<div class="item-card" style="margin-bottom:8px">';
+            html += '<div class="item-info"><div class="item-name">' + item.nome + '</div><div class="item-detail">Qtd: ' + item.qtd + ' • R$ ' + item.total.toFixed(2).replace('.',',') + '</div></div>';
+            html += '<label style="display:flex;align-items:center;gap:8px;cursor:pointer">';
+            html += '<input type="checkbox" id="dev-item-' + idx + '" value="' + item.qtd + '">';
+            html += '<span style="font-size:12px">Devolver</span></label></div>';
+        });
+    } catch(e) {
+        html += '<p style="color:var(--error)">Erro ao carregar itens</p>';
+    }
+    html += '</div>';
+    html += '<button class="btn btn-warning" onclick="confirmarDevolucao(\'' + pedidoId + '\')">✅ Confirmar Devolução</button>';
+    html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
+    document.getElementById('modal-body').innerHTML = html;
+    document.getElementById('modal-overlay').classList.add('show');
+}
+
+async function confirmarDevolucao(pedidoId) {
+    var pedido = pedidos.find(function(p) { return p.id === pedidoId; });
+    if (!pedido) return;
+    
+    // Verifica quais itens foram selecionados para devolução
+    var itens = JSON.parse(pedido.itens_detalhes);
+    var itensDevolvidos = [];
+    
+    itens.forEach(function(item, idx) {
+        var checkbox = document.getElementById('dev-item-' + idx);
+        if (checkbox && checkbox.checked) {
+            itensDevolvidos.push(item);
+        }
+    });
+    
+    if (itensDevolvidos.length === 0) {
+        toast('Selecione pelo menos 1 item', 'error');
+        return;
+    }
+    
+    // Atualiza pedido com status de devolvido
+    var result = await supabaseClient.from('pedidos').update({ 
+        status: 'devolvido',
+        devolucao_detalhes: JSON.stringify(itensDevolvidos),
+        devolucao_data: new Date().toISOString()
+    }).eq('id', pedidoId);
+    
+    if (result.error) { toast('Erro: ' + result.error.message, 'error'); return; }
+    
+    toast('✅ Devolução registrada!', 'success');
+    fecharModal();
+    await carregarDados();
+    mudarAba('orders');
+}
+
+function verPedido(pedidoId) {
+    var pedido = pedidos.find(function(p) { return p.id === pedidoId; });
+    if (!pedido) return;
+    
+    var html = '<div class="modal-title">📋 Pedido #' + pedidoId.substr(0,8) + '</div>';
+    html += '<div class="modal-sub">' + pedido.cliente_nome + ' - ' + new Date(pedido.created_at).toLocaleDateString('pt-BR') + '</div>';
+    html += '<div class="card" style="background:var(--bg3);padding:16px;margin-bottom:16px">';
+    html += '<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span>Status:</span><strong style="color:' + (pedido.status === 'aberto' ? 'var(--warning)' : 'var(--success)') + '">' + pedido.status.toUpperCase() + '</strong></div>';
+    html += '<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span>Itens:</span><strong>' + pedido.itens + '</strong></div>';
+    html += '<div style="display:flex;justify-content:space-between"><span>Total:</span><strong style="color:var(--accent);font-size:18px">R$ ' + parseFloat(pedido.total).toFixed(2).replace('.',',') + '</strong></div>';
+    html += '</div>';
+    
+    try {
+        var itens = JSON.parse(pedido.itens_detalhes);
+        html += '<div class="item-list" style="margin-bottom:16px">';
+        itens.forEach(function(item) {
+            html += '<div class="item-card"><div class="item-info"><div class="item-name">' + item.nome + '</div><div class="item-detail">' + item.qtd + 'x R$ ' + item.preco.toFixed(2).replace('.',',') + '</div></div><div style="font-weight:700;color:var(--accent)">R$ ' + item.total.toFixed(2).replace('.',',') + '</div></div>';
+        });
+        html += '</div>';
+    } catch(e) {}
+    
+    html += '<button class="btn btn-primary" onclick="gerarPDFPedidoPorId(\'' + pedidoId + '\')">📄 Gerar PDF</button>';
+    html += '<button class="btn btn-outline" onclick="fecharModal()">Fechar</button>';
+    document.getElementById('modal-body').innerHTML = html;
+    document.getElementById('modal-overlay').classList.add('show');
+}
+
+function gerarPDFPedidoPorId(pedidoId) {
+    var pedido = pedidos.find(function(p) { return p.id === pedidoId; });
+    if (pedido) gerarPDFPedido(pedido);
+}
+
+function gerarPDFPedido(pedido) {
+    try {
+        var { jsPDF } = window.jspdf;
+        var doc = new jsPDF();
+        
+        // Logo (se existir)
+        if (configEmpresa.logo) {
+            try {
+                doc.addImage(configEmpresa.logo, 'PNG', 15, 10, 40, 20);
+            } catch(e) {}
+        }
+        
+        // Dados da empresa
+        doc.setFontSize(16);
+        doc.setTextColor(124, 92, 252);
+        doc.text(configEmpresa.nome || 'Kayla Consignado', 105, 15, { align: 'center' });
+        
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        if (configEmpresa.cnpj) doc.text('CNPJ/CPF: ' + configEmpresa.cnpj, 105, 22, { align: 'center' });
+        if (configEmpresa.endereco) doc.text(configEmpresa.endereco, 105, 27, { align: 'center' });
+        if (configEmpresa.telefone) doc.text('Tel: ' + configEmpresa.telefone, 105, 32, { align: 'center' });
+        
+        // Linha separadora
+        doc.setDrawColor(200);
+        doc.line(10, 38, 200, 38);
+        
+        // Título
+        doc.setFontSize(14);
+        doc.setTextColor(0);
+        doc.text('PEDIDO DE VENDA', 105, 48, { align: 'center' });
+        
+        // Dados do pedido
+        doc.setFontSize(11);
+        doc.text('Pedido #' + pedido.id.substr(0,8), 15, 60);
+        doc.text('Data: ' + new Date(pedido.created_at).toLocaleDateString('pt-BR'), 15, 67);
+        doc.text('Status: ' + pedido.status.toUpperCase(), 15, 74);
+        
+        // Cliente
+        doc.setFillColor(240, 240, 240);
+        doc.rect(15, 80, 180, 15, 'F');
+        doc.setFontSize(12);
+        doc.text('Cliente: ' + pedido.cliente_nome, 20, 90);
+        
+        // Itens
+        doc.setFontSize(11);
+        doc.text('Itens do Pedido:', 15, 105);
+        
+        var y = 115;
+        try {
+            var itens = JSON.parse(pedido.itens_detalhes);
+            itens.forEach(function(item) {
+                doc.text(item.nome, 20, y);
+                doc.text(item.qtd + 'x R$ ' + item.preco.toFixed(2).replace('.',','), 120, y);
+                doc.text('R$ ' + item.total.toFixed(2).replace('.',','), 170, y, { align: 'right' });
+                y += 7;
+            });
+        } catch(e) {}
+        
+        // Total
+        y += 5;
+        doc.setDrawColor(200);
+        doc.line(15, y, 195, y);
+        y += 10;
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.text('TOTAL: R$ ' + parseFloat(pedido.total).toFixed(2).replace('.',','), 170, y, { align: 'right' });
+        
+        // Rodapé
+        doc.setFontSize(9);
+        doc.setTextColor(150);
+        doc.text('Gerado em: ' + new Date().toLocaleString('pt-BR'), 105, 280, { align: 'center' });
+        
+        // Salvar
+        doc.save('Pedido-' + pedido.id.substr(0,8) + '.pdf');
+        toast('📄 PDF gerado!', 'success');
+        
+    } catch(error) {
+        toast('Erro ao gerar PDF: ' + error.message, 'error');
+    }
+}
+
+// ============ HISTÓRICO ============
 function renderizarHistorico() {
     var finalizados = pedidos.filter(function(p) { return p.status === 'finalizado'; });
-    var html = '<div class="card"><div class="card-title">📊 Histórico (' + finalizados.length + ' vendas)</div></div>';
-    if (finalizados.length === 0) {
-        html += '<div class="card"><div class="empty-state">Nenhuma venda finalizada</div></div>';
+    var devolvidos = pedidos.filter(function(p) { return p.status === 'devolvido'; });
+    
+    var html = '<div class="card"><div class="card-title">📊 Resumo</div>';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+    html += '<div class="card" style="background:var(--bg3);padding:16px;text-align:center"><div style="font-size:24px;font-weight:700;color:var(--success)">' + finalizados.length + '</div><div style="font-size:12px;color:var(--text2)">Vendas</div></div>';
+    html += '<div class="card" style="background:var(--bg3);padding:16px;text-align:center"><div style="font-size:24px;font-weight:700;color:var(--warning)">' + devolvidos.length + '</div><div style="font-size:12px;color:var(--text2)">Devoluções</div></div>';
+    html += '</div></div>';
+    
+    var totalGeral = 0;
+    finalizados.forEach(function(p) { totalGeral += parseFloat(p.total); });
+    
+    html += '<div class="card" style="background:var(--bg3);padding:16px"><div style="display:flex;justify-content:space-between"><span>Faturamento:</span><strong style="color:var(--accent);font-size:18px">R$ ' + totalGeral.toFixed(2).replace('.',',') + '</strong></div></div>';
+    
+    html += '<div class="card"><div class="card-title">📋 Todos os Pedidos</div>';
+    if (pedidos.length === 0) {
+        html += '<div class="empty-state">Nenhum pedido</div>';
     } else {
-        var totalGeral = 0;
-        finalizados.forEach(function(p) { totalGeral += parseFloat(p.total); });
-        html += '<div class="card" style="background:var(--bg3);padding:16px"><div style="display:flex;justify-content:space-between"><span>Faturamento Total:</span><strong style="color:var(--accent)">R$ ' + totalGeral.toFixed(2).replace('.',',') + '</strong></div></div>';
         html += '<div class="item-list">';
-        finalizados.forEach(function(p) {
-            html += '<div class="item-card"><div class="item-info"><div class="item-name">Pedido #' + p.id.substr(0,8) + '</div><div class="item-detail">' + p.cliente_nome + ' • R$ ' + parseFloat(p.total).toFixed(2).replace('.',',') + '</div></div></div>';
+        pedidos.forEach(function(p) {
+            var data = new Date(p.created_at).toLocaleDateString('pt-BR');
+            var corStatus = p.status === 'aberto' ? 'var(--warning)' : (p.status === 'finalizado' ? 'var(--success)' : 'var(--error)');
+            html += '<div class="item-card"><div class="item-info"><div class="item-name">#' + p.id.substr(0,8) + '</div><div class="item-detail">' + p.cliente_nome + ' • ' + data + '<br>' + p.itens + ' itens • R$ ' + parseFloat(p.total).toFixed(2).replace('.',',') + '</div></div><span style="color:' + corStatus + ';font-weight:600;font-size:12px">' + p.status.toUpperCase() + '</span></div>';
         });
         html += '</div>';
     }
+    html += '</div>';
+    
     return html;
 }
 
+// ============ CONFIGURAÇÕES ============
 function renderizarConfig() {
     var html = '<div class="card"><div class="card-title">⚙️ Configurações</div>';
+    
     html += '<div class="form-group"><label class="form-label">Usuário</label><div style="background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:12px">' + (currentUser ? currentUser.email : 'Não logado') + '</div></div>';
-    html += '<div class="form-group"><label class="form-label">Perfil</label><div style="background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:12px">' + (perfilAtual === 'admin' ? '👑 Administrador' : '👤 Usuário') + '</div></div>';
+    
+    html += '<div class="form-group"><label class="form-label">Perfil</label><div style="background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:12px">' + (perfilAtual === 'admin' ? '👑 Admin' : '👤 Usuário') + '</div></div>';
+    
     html += '<div class="form-group"><label class="form-label">Plano</label><div style="background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:12px"><span class="' + (LIMITES.proAtivo ? 'badge-pro' : 'badge-free') + '">' + (LIMITES.proAtivo ? 'PRO' : 'GRÁTIS') + '</span></div></div>';
+    
     if (!LIMITES.proAtivo) {
-        html += '<button class="btn btn-primary" onclick="mostrarPaywall()">🚀 Upgrade para Pro</button>';
+        html += '<button class="btn btn-primary" onclick="mostrarPaywall()">🚀 Upgrade Pro</button>';
     }
-    html += '<div class="form-group" style="margin-top:16px"><label class="form-label">Versão</label><div style="background:var(--bg3);padding:12px;border-radius:8px">v4.1.5</div></div>';
+    
+    // Configurações da Empresa
+    html += '<div class="config-section">';
+    html += '<div class="config-section-title">🏢 Dados da Empresa</div>';
+    
+    html += '<div class="form-group"><label class="form-label">Nome da Empresa</label><input class="form-input" id="config-nome" value="' + (configEmpresa.nome || '') + '" placeholder="Nome fantasia"></div>';
+    
+    html += '<div class="form-group"><label class="form-label">CNPJ/CPF</label><input class="form-input" id="config-cnpj" value="' + (configEmpresa.cnpj || '') + '" placeholder="00.000.000/0000-00"></div>';
+    
+    html += '<div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="config-telefone" value="' + (configEmpresa.telefone || '') + '" placeholder="(00) 00000-0000"></div>';
+    
+    html += '<div class="form-group"><label class="form-label">Endereço</label><input class="form-input" id="config-endereco" value="' + (configEmpresa.endereco || '') + '" placeholder="Rua, número, cidade"></div>';
+    
+    html += '<div class="form-group"><label class="form-label">Logo da Empresa</label>';
+    if (configEmpresa.logo) {
+        html += '<div class="logo-preview"><img src="' + configEmpresa.logo + '" alt="Logo"></div>';
+        html += '<button class="btn btn-sm btn-outline" onclick="removerLogo()" style="margin-bottom:8px">🗑️ Remover Logo</button>';
+    }
+    html += '<div class="file-input-wrapper">';
+    html += '<input type="file" id="config-logo-file" accept="image/*" onchange="uploadLogo(this)">';
+    html += '<label for="config-logo-file" class="file-input-label">📷 Selecionar Imagem (PNG, JPG)</label>';
+    html += '</div></div>';
+    
+    html += '<button class="btn btn-primary" onclick="salvarConfiguracoesEmpresa()">💾 Salvar Configurações</button>';
+    html += '</div>';
+    
+    html += '<div class="form-group" style="margin-top:16px"><label class="form-label">Versão</label><div style="background:var(--bg3);padding:12px;border-radius:8px">v4.2.0</div></div>';
+    
     html += '<button class="btn btn-red" onclick="fazerLogout()" style="margin-top:12px">🚪 Sair</button></div>';
+    
     return html;
+}
+
+function uploadLogo(input) {
+    var file = input.files[0];
+    if (!file) return;
+    
+    if (file.size > 2 * 1024 * 1024) {
+        toast('Imagem muito grande (máx. 2MB)', 'error');
+        return;
+    }
+    
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        configEmpresa.logo = e.target.result;
+        toast('✅ Logo carregada!', 'success');
+        mudarAba('settings');
+    };
+    reader.readAsDataURL(file);
+}
+
+function removerLogo() {
+    configEmpresa.logo = null;
+    toast('Logo removida', 'success');
+    mudarAba('settings');
+}
+
+function salvarConfiguracoesEmpresa() {
+    configEmpresa.nome = document.getElementById('config-nome').value.trim();
+    configEmpresa.cnpj = document.getElementById('config-cnpj').value.trim();
+    configEmpresa.telefone = document.getElementById('config-telefone').value.trim();
+    configEmpresa.endereco = document.getElementById('config-endereco').value.trim();
+    
+    salvarConfigEmpresa();
+    toast('✅ Configurações salvas!', 'success');
 }
 
 function mostrarPaywall() {
-    var html = '<div class="modal-title" style="color:var(--accent)">🚀 Upgrade para Pro</div>';
-    html += '<div class="price-tag" style="font-size:32px;font-weight:700;color:var(--accent);text-align:center;margin:20px 0">R$ 19,90<small style="font-size:14px;color:var(--text2);display:block">/mês</small></div>';
+    var html = '<div class="modal-title" style="color:var(--accent)">🚀 Upgrade Pro</div>';
+    html += '<div style="font-size:32px;font-weight:700;color:var(--accent);text-align:center;margin:20px 0">R$ 19,90<small style="font-size:14px;color:var(--text2);display:block">/mês</small></div>';
     html += '<div class="card" style="background:var(--bg3);padding:16px">';
     html += '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>👥 Clientes</span><span style="color:var(--error)">3</span><span style="color:var(--success)">∞</span></div>';
     html += '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>🏷️ Produtos</span><span style="color:var(--error)">20</span><span style="color:var(--success)">∞</span></div>';
-    html += '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>📄 PDF</span><span style="color:var(--error)">❌</span><span style="color:var(--success)">✅</span></div>';
-    html += '<div style="display:flex;justify-content:space-between;padding:8px 0"><span>☁️ Nuvem</span><span style="color:var(--error)">❌</span><span style="color:var(--success)">✅</span></div>';
+    html += '<div style="display:flex;justify-content:space-between;padding:8px 0"><span>📄 PDF</span><span style="color:var(--error)">❌</span><span style="color:var(--success)">✅</span></div>';
     html += '</div>';
-    html += '<div class="form-group"><label class="form-label">Chave de Ativação</label><input class="form-input" id="pro-key" placeholder="PRO-XXXX-XXXX-XXXX"></div>';
-    html += '<button class="btn btn-primary" onclick="ativarPro()">🔓 Ativar Pro</button>';
+    html += '<div class="form-group"><label class="form-label">Chave</label><input class="form-input" id="pro-key" placeholder="PRO-XXXX-XXXX-XXXX"></div>';
+    html += '<button class="btn btn-primary" onclick="ativarPro()">🔓 Ativar</button>';
     html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
     document.getElementById('modal-body').innerHTML = html;
     document.getElementById('modal-overlay').classList.add('show');
@@ -847,12 +1219,12 @@ function ativarPro() {
     LIMITES.proAtivo = true;
     localStorage.setItem('kayla_pro', 'true');
     localStorage.setItem('kayla_pro_key', chave);
-    toast('✅ Plano Pro ativado!', 'success');
+    toast('✅ Pro ativado!', 'success');
     fecharModal();
     atualizarBadgePlano();
 }
 
-// ============ FUNÇÕES AUXILIARES ============
+// ============ AUXILIARES ============
 function fecharModal(e) {
     if (!e || e.target.id === 'modal-overlay') {
         document.getElementById('modal-overlay').classList.remove('show');
@@ -860,9 +1232,8 @@ function fecharModal(e) {
     }
 }
 
-function editarCliente(id) { toast('Editar cliente em breve', 'warning'); }
-function editarProduto(id) { toast('Editar produto em breve', 'warning'); }
-function verPedido(id) { toast('Detalhes do pedido em breve', 'warning'); }
+function editarCliente(id) { toast('Em breve', 'warning'); }
+function editarProduto(id) { toast('Em breve', 'warning'); }
 
 function toast(msg, tipo) {
     var el = document.createElement('div');

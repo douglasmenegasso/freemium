@@ -27,11 +27,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .btn-green { background: var(--success); color: #fff; }
 .btn-warning { background: var(--warning); color: #000; }
 .btn-sm { padding: 10px 16px; font-size: 13px; width: auto; }
+.btn-icon { width: 40px; height: 40px; padding: 0; border-radius: 10px; }
 
 #app { display: none; flex-direction: column; height: 100vh; position: fixed; top: 0; left: 0; right: 0; bottom: 0; }
 .header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 12px 16px; flex-shrink: 0; }
 .header-title { font-size: 18px; font-weight: 700; }
 .header-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.header-actions { display: flex; gap: 8px; align-items: center; }
 .content { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 90px; }
 .nav { background: var(--bg2); border-top: 1px solid var(--border); display: flex; position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; justify-content: space-around; padding-bottom: env(safe-area-inset-bottom); }
 .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 2px; cursor: pointer; border: none; background: transparent; color: var(--text2); font-size: 11px; }
@@ -50,10 +52,12 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .checkbox-group input { width: 18px; height: 18px; }
 
 .item-list { display: flex; flex-direction: column; gap: 8px; }
-.item-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; display: flex; justify-content: space-between; align-items: center; }
+.item-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+.item-card:active { background: var(--bg2); }
 .item-info { flex: 1; min-width: 0; }
 .item-name { font-weight: 600; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .item-detail { font-size: 13px; color: var(--text3); }
+.item-code { font-size: 12px; color: var(--text3); margin-top: 2px; }
 
 #reader { width: 100%; border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 12px; }
 
@@ -61,8 +65,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 #modal-overlay.show { display: flex; }
 .modal-content { background: var(--bg2); border-radius: 20px 20px 0 0; padding: 24px 20px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s; }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.modal-title { font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+.modal-title { font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .modal-sub { font-size: 13px; color: var(--text2); text-align: center; margin-bottom: 20px; }
+.modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
 
 #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 3000; width: 90%; max-width: 300px; }
 .toast { padding: 12px 20px; border-radius: var(--radius-sm); margin-bottom: 8px; text-align: center; animation: fadeIn 0.3s; }
@@ -73,6 +78,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 .badge-free { background: var(--text3); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
 .badge-pro { background: var(--accent); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.badge-online { background: var(--success); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+.badge-offline { background: var(--text3); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; }
 
 .order-item { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 8px; }
 .order-item-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
@@ -107,6 +114,27 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .file-input-wrapper input[type=file] { position: absolute; left: -9999px; }
 .file-input-label { display: block; padding: 12px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); text-align: center; cursor: pointer; }
 .file-input-label:hover { border-color: var(--accent); }
+
+/* Modal de Produtos - Estilo da Imagem */
+.product-modal-list { max-height: 400px; overflow-y: auto; }
+.product-search-box { position: relative; margin-bottom: 16px; }
+.product-search-box input { width: 100%; padding: 12px 16px 12px 44px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 15px; color: var(--text); }
+.product-search-box::before { content: '🔍'; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 16px; }
+.product-item-add { display: flex; justify-content: space-between; align-items: center; padding: 14px; background: var(--bg3); border-radius: var(--radius-sm); margin-bottom: 8px; cursor: pointer; }
+.product-item-add:active { background: var(--bg2); }
+.product-item-info { flex: 1; }
+.product-item-name { font-weight: 600; margin-bottom: 4px; }
+.product-item-code-price { font-size: 13px; color: var(--text3); }
+.btn-add-product { width: 36px; height: 36px; border-radius: 10px; background: var(--accent); color: #fff; border: none; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.btn-add-product:active { transform: scale(0.95); }
+
+.sync-info { background: var(--bg3); padding: 12px; border-radius: var(--radius-sm); margin: 12px 0; font-size: 12px; color: var(--text2); }
+.sync-info strong { color: var(--success); }
+
+.whatsapp-btn { background: #25D366; color: #fff; margin-top: 12px; }
+.whatsapp-btn:hover { background: #128C7E; }
+
+.backup-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
 </style>
 </head>
 <body>
@@ -119,7 +147,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
         <div class="login-sub">Selecione seu perfil de acesso</div>
         <button class="btn btn-primary" onclick="abrirLogin('admin')">👑 Administrador</button>
         <button class="btn btn-outline" onclick="abrirLogin('user')">👤 Usuário</button>
-        <div style="font-size:11px;color:var(--text3);margin-top:20px">v4.2.0</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:20px">v4.3.0</div>
     </div>
 </div>
 
@@ -131,7 +159,10 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
                 <div class="header-title">📦 Kayla Consignado</div>
                 <div class="header-sub" id="header-sub">Nova Venda</div>
             </div>
-            <span id="plan-badge" class="badge-free">GRÁTIS</span>
+            <div class="header-actions">
+                <span id="plan-badge" class="badge-free">GRÁTIS</span>
+                <span id="connection-badge" class="badge-offline">OFFLINE</span>
+            </div>
         </div>
     </div>
     <div class="content" id="content"></div>
@@ -168,16 +199,49 @@ var pedidoItens = [];
 var clienteAtual = null;
 var configEmpresa = {};
 var LIMITES = { freeClientes: 3, freeProdutos: 20, proAtivo: false };
+var isOnline = navigator.onLine;
+var lastSync = localStorage.getItem('kayla_last_sync') || null;
 
 // ============ INICIALIZAÇÃO ============
 window.addEventListener('DOMContentLoaded', function() {
     verificarStatusPro();
     carregarConfigEmpresa();
+    carregarDadosLocais();
+    
     try {
         supabaseClient = supabase.createClient('https://xwwklngrkvdwgiinycvt.supabase.co', 'sb_publishable_2Viwv3t4SvejW4SEfvpxGA_5K5thi7S');
+        verificarConexao();
     } catch(e) { console.error('Erro:', e); }
+    
+    window.addEventListener('online', function() { 
+        isOnline = true; 
+        atualizarBadgeConexao();
+        if (currentUser) sincronizarDados();
+    });
+    window.addEventListener('offline', function() { 
+        isOnline = false; 
+        atualizarBadgeConexao();
+    });
+    
     mostrarTelaSelecao();
 });
+
+function verificarConexao() {
+    isOnline = navigator.onLine;
+    atualizarBadgeConexao();
+}
+
+function atualizarBadgeConexao() {
+    var badge = document.getElementById('connection-badge');
+    if (!badge) return;
+    if (isOnline) {
+        badge.textContent = 'ONLINE';
+        badge.className = 'badge-online';
+    } else {
+        badge.textContent = 'OFFLINE';
+        badge.className = 'badge-offline';
+    }
+}
 
 function verificarStatusPro() {
     var chave = localStorage.getItem('kayla_pro_key');
@@ -195,7 +259,34 @@ function carregarConfigEmpresa() {
 }
 
 function salvarConfigEmpresa() {
-    localStorage.setItem('kayla_config_empresa', JSON.stringify(configEmpresa));
+    var configParaSalvar = Object.assign({}, configEmpresa);
+    delete configParaSalvar.logo;
+    localStorage.setItem('kayla_config_empresa', JSON.stringify(configParaSalvar));
+    if (configEmpresa.logo) {
+        localStorage.setItem('kayla_logo_local', configEmpresa.logo);
+    }
+}
+
+function carregarDadosLocais() {
+    var dados = localStorage.getItem('kayla_dados_locais');
+    if (dados) {
+        try {
+            var parsed = JSON.parse(dados);
+            if (parsed.clientes) clientes = parsed.clientes;
+            if (parsed.produtos) produtos = parsed.produtos;
+            if (parsed.pedidos) pedidos = parsed.pedidos;
+        } catch(e) {}
+    }
+}
+
+function salvarDadosLocais() {
+    var dados = {
+        clientes: clientes,
+        produtos: produtos,
+        pedidos: pedidos,
+        lastUpdate: new Date().toISOString()
+    };
+    localStorage.setItem('kayla_dados_locais', JSON.stringify(dados));
 }
 
 function mostrarTelaSelecao() {
@@ -205,6 +296,7 @@ function mostrarTelaSelecao() {
 
 function atualizarBadgePlano() {
     var badge = document.getElementById('plan-badge');
+    if (!badge) return;
     if (LIMITES.proAtivo) {
         badge.textContent = 'PRO';
         badge.className = 'badge-pro';
@@ -218,6 +310,7 @@ function mostrarApp() {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
     atualizarBadgePlano();
+    atualizarBadgeConexao();
     mudarAba('scan');
 }
 
@@ -241,8 +334,8 @@ function abrirLogin(tipo) {
     perfilAtual = tipo;
     var html = '<div class="modal-title">' + (tipo === 'admin' ? '👑 Login Admin' : '👤 Login Usuário') + '</div>';
     html += '<div class="modal-sub">Digite suas credenciais</div>';
-    html += '<div class="form-group"><label class="form-label">E-mail</label><input class="form-input" id="email" type="email" placeholder="seu@email.com"></div>';
-    html += '<div class="form-group"><label class="form-label">Senha</label><input class="form-input" id="senha" type="password" placeholder="Mínimo 6 caracteres"></div>';
+    html += '<div class="form-group"><label class="form-label">E-mail</label><input class="form-input" id="email" type="email" placeholder="seu@email.com" onkeypress="if(event.key===\'Enter\')fazerLogin()"></div>';
+    html += '<div class="form-group"><label class="form-label">Senha</label><input class="form-input" id="senha" type="password" placeholder="Mínimo 6 caracteres" onkeypress="if(event.key===\'Enter\')fazerLogin()"></div>';
     html += '<div class="checkbox-group"><input type="checkbox" id="lembrar-me"><label for="lembrar-me" style="color:var(--text2);font-size:13px">Lembrar de mim</label></div>';
     html += '<button class="btn btn-primary" onclick="fazerLogin()">Entrar</button>';
     html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
@@ -299,7 +392,7 @@ async function loginSucesso(user) {
 }
 
 async function fazerLogout() {
-    if (supabaseClient) await supabaseClient.auth.signOut();
+    if (supabaseClient && isOnline) await supabaseClient.auth.signOut();
     localStorage.removeItem('perfilAcesso');
     localStorage.removeItem('kayla_lembrar_me');
     localStorage.removeItem('kayla_email');
@@ -311,15 +404,29 @@ async function fazerLogout() {
 }
 
 async function carregarDados() {
+    if (!isOnline) return;
     try {
         var r;
         r = await supabaseClient.from('clientes').select('*').order('nome');
-        clientes = r.error ? [] : (r.data || []);
+        if (!r.error) { clientes = r.data || []; salvarDadosLocais(); }
+        
         r = await supabaseClient.from('produtos').select('*').order('nome');
-        produtos = r.error ? [] : (r.data || []);
+        if (!r.error) { produtos = r.data || []; salvarDadosLocais(); }
+        
         r = await supabaseClient.from('pedidos').select('*').order('created_at', { ascending: false });
-        pedidos = r.error ? [] : (r.data || []);
+        if (!r.error) { pedidos = r.data || []; salvarDadosLocais(); }
+        
+        lastSync = new Date().toISOString();
+        localStorage.setItem('kayla_last_sync', lastSync);
+        
     } catch(e) { console.error('Erro:', e); }
+}
+
+async function sincronizarDados() {
+    if (!isOnline || !currentUser) return;
+    toast('🔄 Sincronizando...', 'warning');
+    await carregarDados();
+    toast('✅ Dados sincronizados!', 'success');
 }
 
 // ============ LIMITES ============
@@ -400,16 +507,16 @@ function renderizarVenda() {
         html += '</div></div>';
     }
     
-    // Produto
+    // Botão Adicionar Produto (Estilo Imagem)
     html += '<div class="card"><div class="card-title">⚡ Adicionar Produto</div>';
     if (!clienteAtual) {
         html += '<p style="color:var(--warning);text-align:center;padding:20px">⚠️ Selecione cliente primeiro</p>';
     } else {
-        html += '<div class="form-group"><label class="form-label">Código</label>';
-        html += '<div style="display:flex;gap:8px">';
-        html += '<input class="form-input" id="codigo-manual" placeholder="Digite ou escaneie" onkeypress="if(event.key===\'Enter\')buscarProdutoManual()">';
-        html += '<button class="btn btn-primary btn-sm" onclick="buscarProdutoManual()" style="margin:0">Buscar</button>';
-        html += '</div></div>';
+        html += '<button class="btn btn-primary" onclick="abrirModalAdicionarProduto()">+ Adicionar Produto</button>';
+        html += '<div class="form-group" style="margin-top:12px">';
+        html += '<label class="form-label">Ou digite/escaneie código</label>';
+        html += '<input class="form-input" id="codigo-manual" placeholder="Código de barras" onkeypress="if(event.key===\'Enter\')buscarProdutoManual()">';
+        html += '</div>';
         html += '<div id="reader"></div>';
     }
     html += '</div>';
@@ -437,7 +544,7 @@ function renderizarVenda() {
             html += '</div></div>';
         });
         html += '<div class="order-total"><span>Total:</span><span>R$ ' + calcularTotal().toFixed(2).replace('.',',') + '</span></div>';
-        html += '<button class="btn btn-green" onclick="finalizarPedido()" style="margin-top:12px">✅ Finalizar</button>';
+        html += '<button class="btn btn-green" onclick="finalizarPedido()" onkeypress="if(event.key===\'Enter\')finalizarPedido()" style="margin-top:12px">✅ Finalizar (Enter)</button>';
         html += '<button class="btn btn-outline" onclick="cancelarPedido()">❌ Cancelar</button>';
     }
     html += '</div>';
@@ -479,7 +586,6 @@ function processarCodigo(codigo) {
         return;
     }
     
-    // Verifica histórico do cliente
     var historico = getHistoricoCliente(clienteAtual.id);
     var jaComprou = historico.filter(function(h) { return h.produto_id === produto.id; });
     
@@ -511,7 +617,8 @@ function getHistoricoCliente(clienteId) {
                         produto_nome: item.nome,
                         pedido_id: p.id,
                         data: p.created_at,
-                        status: p.status
+                        status: p.status,
+                        devolucao: p.status === 'devolvido'
                     });
                 });
             } catch(e) {}
@@ -524,16 +631,17 @@ function abrirModalHistoricoProduto(produto, historico) {
     var html = '<div class="modal-title">⚠️ Produto Já Comprado</div>';
     html += '<div class="modal-sub">' + produto.nome + '</div>';
     html += '<div class="product-history">';
-    html += '<strong>Este cliente já comprou este produto ' + historico.length + ' vez(es)</strong><br><br>';
+    html += '<strong>Cliente já comprou ' + historico.length + ' vez(es)</strong><br><br>';
     historico.forEach(function(h, i) {
         if (i < 3) {
             var data = new Date(h.data).toLocaleDateString('pt-BR');
-            html += '• Pedido #' + h.pedido_id.substr(0,8) + ' em ' + data + ' (' + h.status + ')<br>';
+            var statusText = h.devolucao ? ' (DEVOLVIDO)' : '';
+            html += '• Pedido #' + h.pedido_id.substr(0,8) + ' em ' + data + statusText + '<br>';
         }
     });
     if (historico.length > 3) html += '... e mais ' + (historico.length - 3) + ' vezes';
     html += '</div>';
-    html += '<p style="color:var(--text2);font-size:13px;margin:16px 0">Deseja adicionar mesmo assim?</p>';
+    html += '<p style="color:var(--text2);font-size:13px;margin:16px 0">Adicionar mesmo assim?</p>';
     html += '<button class="btn btn-primary" onclick="adicionarItemComHistorico(\'' + produto.id + '\')">✅ Sim, Adicionar</button>';
     html += '<button class="btn btn-outline" onclick="fecharModal(); retomarScanner()">❌ Cancelar</button>';
     document.getElementById('modal-body').innerHTML = html;
@@ -554,7 +662,7 @@ function abrirModalDuplicado(produto, item) {
     html += '<div class="card" style="background:var(--bg3);padding:16px;text-align:center">';
     html += '<p style="margin-bottom:12px">Produto já está no pedido com <strong style="color:var(--accent)">' + item.qtd + ' un</strong></p></div>';
     html += '<div class="form-group"><label class="form-label">Adicionar mais</label>';
-    html += '<input class="form-input" id="qtd-add" type="number" value="1" min="1" style="text-align:center;font-size:18px"></div>';
+    html += '<input class="form-input" id="qtd-add" type="number" value="1" min="1" style="text-align:center;font-size:18px" onkeypress="if(event.key===\'Enter\')adicionarMaisUnidades(\'' + produto.id + '\')"></div>';
     html += '<button class="btn btn-primary" onclick="adicionarMaisUnidades(\'' + produto.id + '\')">➕ Adicionar</button>';
     html += '<button class="btn btn-outline" onclick="fecharModal(); retomarScanner()">Cancelar</button>';
     document.getElementById('modal-body').innerHTML = html;
@@ -642,25 +750,27 @@ async function finalizarPedido() {
             itens: totalItens,
             total: total,
             itens_detalhes: JSON.stringify(itensDetalhes),
-            user_id: currentUser.id,
+            user_id: currentUser ? currentUser.id : 'local',
             created_at: new Date().toISOString()
         };
         
-        var result = await supabaseClient.from('pedidos').insert(pedidoData).select();
-        if (result.error) throw result.error;
+        if (isOnline && supabaseClient) {
+            var result = await supabaseClient.from('pedidos').insert(pedidoData).select();
+            if (result.error) throw result.error;
+            await carregarDados();
+        } else {
+            pedidos.unshift(pedidoData);
+            salvarDadosLocais();
+        }
         
-        var pedidoId = result.data[0].id;
-        
-        // Pergunta se quer gerar PDF
         setTimeout(function() {
-            if (confirm('✅ Pedido #' + pedidoId.substr(0,8) + ' criado!\n\nGerar PDF do pedido?')) {
-                gerarPDFPedido(result.data[0]);
+            if (confirm('✅ Pedido finalizado!\n\nGerar PDF?')) {
+                gerarPDFPedido(pedidoData);
             }
         }, 500);
         
         pedidoItens = [];
         clienteAtual = null;
-        await carregarDados();
         mudarAba('scan');
         
     } catch (error) {
@@ -669,6 +779,65 @@ async function finalizarPedido() {
     
     btn.innerText = texto;
     btn.disabled = false;
+}
+
+// ============ MODAL ADICIONAR PRODUTO (ESTILO IMAGEM) ============
+function abrirModalAdicionarProduto() {
+    var html = '<div class="modal-handle"></div>';
+    html += '<div class="modal-title">🔍 Adicionar produto</div>';
+    html += '<div class="product-search-box">';
+    html += '<input type="text" id="produto-search" placeholder="Buscar por nome ou código..." onkeyup="filtrarProdutosModalVenda(this.value)" autofocus>';
+    html += '</div>';
+    html += '<div class="product-modal-list" id="lista-produtos-venda">';
+    
+    produtos.forEach(function(p) {
+        html += '<div class="product-item-add" onclick="selecionarProdutoVenda(\'' + p.id + '\')">';
+        html += '<div class="product-item-info">';
+        html += '<div class="product-item-name">' + p.nome + '</div>';
+        html += '<div class="product-item-code-price">' + p.codigo + ' • R$ ' + p.preco.toFixed(2).replace('.',',') + '</div>';
+        html += '</div>';
+        html += '<button class="btn-add-product">+</button>';
+        html += '</div>';
+    });
+    
+    html += '</div>';
+    html += '<button class="btn btn-outline" onclick="fecharModal()" style="margin-top:16px">Cancelar</button>';
+    
+    document.getElementById('modal-body').innerHTML = html;
+    document.getElementById('modal-overlay').classList.add('show');
+    setTimeout(function() { document.getElementById('produto-search').focus(); }, 100);
+}
+
+function filtrarProdutosModalVenda(termo) {
+    var container = document.getElementById('lista-produtos-venda');
+    var filtrados = produtos.filter(function(p) {
+        return p.nome.toLowerCase().includes(termo.toLowerCase()) || 
+               (p.codigo && p.codigo.toLowerCase().includes(termo.toLowerCase()));
+    });
+    
+    var html = '';
+    if (filtrados.length === 0) {
+        html = '<div class="empty-state">Nenhum produto encontrado</div>';
+    } else {
+        filtrados.forEach(function(p) {
+            html += '<div class="product-item-add" onclick="selecionarProdutoVenda(\'' + p.id + '\')">';
+            html += '<div class="product-item-info">';
+            html += '<div class="product-item-name">' + p.nome + '</div>';
+            html += '<div class="product-item-code-price">' + p.codigo + ' • R$ ' + p.preco.toFixed(2).replace('.',',') + '</div>';
+            html += '</div>';
+            html += '<button class="btn-add-product">+</button>';
+            html += '</div>';
+        });
+    }
+    container.innerHTML = html;
+}
+
+function selecionarProdutoVenda(produtoId) {
+    var produto = produtos.find(function(p) { return p.id === produtoId; });
+    if (produto) {
+        fecharModal();
+        processarCodigo(produto.codigo);
+    }
 }
 
 // ============ SCANNER ============
@@ -685,7 +854,8 @@ function retomarScanner() { if (html5QrCode) html5QrCode.resume(); }
 
 // ============ SELEÇÃO PRODUTO ============
 function abrirModalProdutoSelecao(codigo) {
-    var html = '<div class="modal-title">🏷️ Produto Não Encontrado</div>';
+    var html = '<div class="modal-handle"></div>';
+    html += '<div class="modal-title">🏷️ Produto Não Encontrado</div>';
     html += '<div class="modal-sub">Código: ' + codigo + '</div>';
     html += '<div class="card" style="background:var(--bg3);padding:16px;margin-bottom:16px">';
     html += '<p style="color:var(--text2);margin-bottom:16px">O que deseja fazer?</p>';
@@ -697,7 +867,8 @@ function abrirModalProdutoSelecao(codigo) {
 }
 
 function abrirModalListaProdutos(codigoBusca) {
-    var html = '<div class="modal-title">📋 Selecionar Produto</div>';
+    var html = '<div class="modal-handle"></div>';
+    html += '<div class="modal-title">📋 Selecionar Produto</div>';
     html += '<div class="modal-sub">Busca: ' + codigoBusca + '</div>';
     html += '<div class="form-group"><input class="form-input" id="busca-produto" placeholder="Buscar..." onkeyup="filtrarProdutosModal(this.value)"></div>';
     html += '<div id="lista-produtos-modal" style="max-height:300px;overflow-y:auto">';
@@ -711,7 +882,7 @@ function abrirModalListaProdutos(codigoBusca) {
         html += '<p style="color:var(--text3);text-align:center;padding:20px">Nenhum produto</p>';
     } else {
         filtrados.forEach(function(p) {
-            html += '<div class="item-card" style="cursor:pointer;margin-bottom:8px" onclick="selecionarProdutoLista(\'' + p.id + '\')">';
+            html += '<div class="item-card" style="margin-bottom:8px" onclick="selecionarProdutoLista(\'' + p.id + '\')">';
             html += '<div class="item-info"><div class="item-name">' + p.nome + '</div><div class="item-detail">' + p.codigo + ' - R$ ' + p.preco.toFixed(2).replace('.',',') + '</div></div>';
             html += '<span style="color:var(--accent)">Selecionar →</span></div>';
         });
@@ -719,6 +890,7 @@ function abrirModalListaProdutos(codigoBusca) {
     html += '</div>';
     html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
     document.getElementById('modal-body').innerHTML = html;
+    document.getElementById('modal-overlay').classList.add('show');
 }
 
 function filtrarProdutosModal(termo) {
@@ -733,7 +905,7 @@ function filtrarProdutosModal(termo) {
         html = '<p style="color:var(--text3);text-align:center;padding:20px">Nenhum produto</p>';
     } else {
         filtrados.forEach(function(p) {
-            html += '<div class="item-card" style="cursor:pointer;margin-bottom:8px" onclick="selecionarProdutoLista(\'' + p.id + '\')">';
+            html += '<div class="item-card" style="margin-bottom:8px" onclick="selecionarProdutoLista(\'' + p.id + '\')">';
             html += '<div class="item-info"><div class="item-name">' + p.nome + '</div><div class="item-detail">' + p.codigo + ' - R$ ' + p.preco.toFixed(2).replace('.',',') + '</div></div>';
             html += '<span style="color:var(--accent)">Selecionar →</span></div>';
         });
@@ -751,10 +923,11 @@ function selecionarProdutoLista(produtoId) {
 }
 
 function abrirModalProdutoNovo(codigo) {
-    var html = '<div class="modal-title">🏷️ Cadastrar Produto</div>';
-    html += '<div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="produto-nome"></div>';
+    var html = '<div class="modal-handle"></div>';
+    html += '<div class="modal-title">🏷️ Cadastrar Produto</div>';
+    html += '<div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="produto-nome" onkeypress="if(event.key===\'Enter\')salvarProdutoNovo()"></div>';
     html += '<div class="form-group"><label class="form-label">Código</label><input class="form-input" id="produto-codigo" value="' + codigo + '" readonly></div>';
-    html += '<div class="form-group"><label class="form-label">Preço (R$)</label><input class="form-input" id="produto-preco" type="number" step="0.01"></div>';
+    html += '<div class="form-group"><label class="form-label">Preço (R$)</label><input class="form-input" id="produto-preco" type="number" step="0.01" onkeypress="if(event.key===\'Enter\')salvarProdutoNovo()"></div>';
     html += '<button class="btn btn-primary" onclick="salvarProdutoNovo()">💾 Salvar</button>';
     html += '<button class="btn btn-outline" onclick="fecharModal(); retomarScanner()">Cancelar</button>';
     document.getElementById('modal-body').innerHTML = html;
@@ -770,11 +943,19 @@ async function salvarProdutoNovo() {
     if (!verificarLimite('produtos')) return;
     if (produtos.find(function(p) { return p.codigo === codigo; })) { toast('Já existe!', 'error'); return; }
     
-    var result = await supabaseClient.from('produtos').insert({ nome: nome, codigo: codigo, preco: preco, user_id: currentUser.id, created_at: new Date().toISOString() }).select();
-    if (result.error) { toast('Erro: ' + result.error.message, 'error'); return; }
+    var produtoData = { nome: nome, codigo: codigo, preco: preco, user_id: currentUser ? currentUser.id : 'local', created_at: new Date().toISOString() };
+    
+    if (isOnline && supabaseClient) {
+        var result = await supabaseClient.from('produtos').insert(produtoData).select();
+        if (result.error) { toast('Erro: ' + result.error.message, 'error'); return; }
+        await carregarDados();
+    } else {
+        produtoData.id = 'local_' + Date.now();
+        produtos.push(produtoData);
+        salvarDadosLocais();
+    }
     
     toast('✅ Produto salvo!', 'success');
-    await carregarDados();
     fecharModal();
     processarCodigo(codigo);
 }
@@ -808,23 +989,35 @@ function iniciarPedidoCliente(clienteId) {
 
 function abrirModalCliente() {
     if (!verificarLimite('clientes')) return;
-    var html = '<div class="modal-title">👥 Cadastrar Cliente</div>';
-    html += '<div class="form-group"><label class="form-label">Nome *</label><input class="form-input" id="cliente-nome"></div>';
+    var html = '<div class="modal-handle"></div>';
+    html += '<div class="modal-title">👥 Cadastrar Cliente</div>';
+    html += '<div class="form-group"><label class="form-label">Nome *</label><input class="form-input" id="cliente-nome" onkeypress="if(event.key===\'Enter\')salvarCliente()"></div>';
     html += '<div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="cliente-telefone"></div>';
     html += '<div class="form-group"><label class="form-label">Endereço</label><input class="form-input" id="cliente-endereco"></div>';
     html += '<button class="btn btn-primary" onclick="salvarCliente()">💾 Salvar</button>';
     html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
     document.getElementById('modal-body').innerHTML = html;
     document.getElementById('modal-overlay').classList.add('show');
+    setTimeout(function() { document.getElementById('cliente-nome').focus(); }, 100);
 }
 
 async function salvarCliente() {
     var nome = document.getElementById('cliente-nome').value.trim();
     if (!nome) { toast('Nome obrigatório', 'error'); return; }
-    var result = await supabaseClient.from('clientes').insert({ nome: nome, telefone: document.getElementById('cliente-telefone').value.trim(), endereco: document.getElementById('cliente-endereco').value.trim(), user_id: currentUser.id, created_at: new Date().toISOString() }).select();
-    if (result.error) { toast('Erro: ' + result.error.message, 'error'); return; }
+    
+    var clienteData = { nome: nome, telefone: document.getElementById('cliente-telefone').value.trim(), endereco: document.getElementById('cliente-endereco').value.trim(), user_id: currentUser ? currentUser.id : 'local', created_at: new Date().toISOString() };
+    
+    if (isOnline && supabaseClient) {
+        var result = await supabaseClient.from('clientes').insert(clienteData).select();
+        if (result.error) { toast('Erro: ' + result.error.message, 'error'); return; }
+        await carregarDados();
+    } else {
+        clienteData.id = 'local_' + Date.now();
+        clientes.push(clienteData);
+        salvarDadosLocais();
+    }
+    
     toast('✅ Cliente salvo!', 'success');
-    await carregarDados();
     fecharModal();
     mudarAba('clients');
 }
@@ -851,14 +1044,16 @@ function renderizarProdutos() {
 
 function abrirModalProduto() {
     if (!verificarLimite('produtos')) return;
-    var html = '<div class="modal-title">🏷️ Cadastrar Produto</div>';
-    html += '<div class="form-group"><label class="form-label">Nome *</label><input class="form-input" id="produto-nome-manual"></div>';
-    html += '<div class="form-group"><label class="form-label">Código *</label><input class="form-input" id="produto-codigo-manual"></div>';
-    html += '<div class="form-group"><label class="form-label">Preço (R$) *</label><input class="form-input" id="produto-preco-manual" type="number" step="0.01"></div>';
+    var html = '<div class="modal-handle"></div>';
+    html += '<div class="modal-title">🏷️ Cadastrar Produto</div>';
+    html += '<div class="form-group"><label class="form-label">Nome *</label><input class="form-input" id="produto-nome-manual" onkeypress="if(event.key===\'Enter\')salvarProduto()"></div>';
+    html += '<div class="form-group"><label class="form-label">Código *</label><input class="form-input" id="produto-codigo-manual" onkeypress="if(event.key===\'Enter\')salvarProduto()"></div>';
+    html += '<div class="form-group"><label class="form-label">Preço (R$) *</label><input class="form-input" id="produto-preco-manual" type="number" step="0.01" onkeypress="if(event.key===\'Enter\')salvarProduto()"></div>';
     html += '<button class="btn btn-primary" onclick="salvarProduto()">💾 Salvar</button>';
     html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
     document.getElementById('modal-body').innerHTML = html;
     document.getElementById('modal-overlay').classList.add('show');
+    setTimeout(function() { document.getElementById('produto-nome-manual').focus(); }, 100);
 }
 
 async function salvarProduto() {
@@ -867,10 +1062,20 @@ async function salvarProduto() {
     var preco = parseFloat(document.getElementById('produto-preco-manual').value);
     if (!nome || !codigo || !preco) { toast('Preencha tudo', 'error'); return; }
     if (produtos.find(function(p) { return p.codigo === codigo; })) { toast('Já existe!', 'error'); return; }
-    var result = await supabaseClient.from('produtos').insert({ nome: nome, codigo: codigo, preco: preco, user_id: currentUser.id, created_at: new Date().toISOString() }).select();
-    if (result.error) { toast('Erro: ' + result.error.message, 'error'); return; }
+    
+    var produtoData = { nome: nome, codigo: codigo, preco: preco, user_id: currentUser ? currentUser.id : 'local', created_at: new Date().toISOString() };
+    
+    if (isOnline && supabaseClient) {
+        var result = await supabaseClient.from('produtos').insert(produtoData).select();
+        if (result.error) { toast('Erro: ' + result.error.message, 'error'); return; }
+        await carregarDados();
+    } else {
+        produtoData.id = 'local_' + Date.now();
+        produtos.push(produtoData);
+        salvarDadosLocais();
+    }
+    
     toast('✅ Produto salvo!', 'success');
-    await carregarDados();
     fecharModal();
     mudarAba('products');
 }
@@ -884,15 +1089,17 @@ function renderizarPedidos() {
         html += '<div class="item-list">';
         pedidos.forEach(function(p) {
             var data = new Date(p.created_at).toLocaleDateString('pt-BR');
-            html += '<div class="item-card"><div class="item-info"><div class="item-name">Pedido #' + p.id.substr(0,8) + '</div><div class="item-detail">' + p.cliente_nome + ' • ' + data + '<br>' + p.itens + ' itens • R$ ' + parseFloat(p.total).toFixed(2).replace('.',',') + ' • <span style="color:' + (p.status === 'aberto' ? 'var(--warning)' : 'var(--success)') + '">' + p.status.toUpperCase() + '</span></div></div>';
-            html += '<div style="display:flex;gap:8px">';
+            var corStatus = p.status === 'aberto' ? 'var(--warning)' : (p.status === 'finalizado' ? 'var(--success)' : 'var(--error)');
+            html += '<div class="item-card"><div class="item-info"><div class="item-name">Pedido #' + p.id.toString().substr(0,8) + '</div><div class="item-detail">' + p.cliente_nome + ' • ' + data + '<br>' + p.itens + ' itens • R$ ' + parseFloat(p.total).toFixed(2).replace('.',',') + '</div></div><span style="color:' + corStatus + ';font-weight:600;font-size:12px">' + p.status.toUpperCase() + '</span></div>';
+            
+            html += '<div style="display:flex;gap:8px;margin-bottom:12px">';
             html += '<button class="btn btn-sm btn-primary" onclick="verPedido(\'' + p.id + '\')">Ver</button>';
             if (p.status === 'aberto') {
                 html += '<button class="btn btn-sm btn-green" onclick="finalizarPedidoStatus(\'' + p.id + '\')">✅ Finalizar</button>';
                 html += '<button class="btn btn-sm btn-warning" onclick="devolverPedido(\'' + p.id + '\')">↩️ Devolução</button>';
             }
             html += '<button class="btn btn-sm btn-outline" onclick="gerarPDFPedidoPorId(\'' + p.id + '\')">📄 PDF</button>';
-            html += '</div></div>';
+            html += '</div>';
         });
         html += '</div>';
     }
@@ -901,10 +1108,20 @@ function renderizarPedidos() {
 
 async function finalizarPedidoStatus(pedidoId) {
     if (!confirm('Finalizar este pedido?')) return;
-    var result = await supabaseClient.from('pedidos').update({ status: 'finalizado' }).eq('id', pedidoId);
-    if (result.error) { toast('Erro: ' + result.error.message, 'error'); return; }
+    
+    if (isOnline && supabaseClient) {
+        var result = await supabaseClient.from('pedidos').update({ status: 'finalizado' }).eq('id', pedidoId);
+        if (result.error) { toast('Erro: ' + result.error.message, 'error'); return; }
+        await carregarDados();
+    } else {
+        var pedido = pedidos.find(function(p) { return p.id === pedidoId; });
+        if (pedido) {
+            pedido.status = 'finalizado';
+            salvarDadosLocais();
+        }
+    }
+    
     toast('✅ Pedido finalizado!', 'success');
-    await carregarDados();
     mudarAba('orders');
 }
 
@@ -912,8 +1129,9 @@ async function devolverPedido(pedidoId) {
     var pedido = pedidos.find(function(p) { return p.id === pedidoId; });
     if (!pedido) return;
     
-    var html = '<div class="modal-title">↩️ Devolução</div>';
-    html += '<div class="modal-sub">Pedido #' + pedidoId.substr(0,8) + ' - ' + pedido.cliente_nome + '</div>';
+    var html = '<div class="modal-handle"></div>';
+    html += '<div class="modal-title">↩️ Devolução</div>';
+    html += '<div class="modal-sub">Pedido #' + pedidoId.toString().substr(0,8) + ' - ' + pedido.cliente_nome + '</div>';
     html += '<div class="card" style="background:var(--bg3);padding:16px;margin-bottom:16px">';
     html += '<p style="color:var(--text2);margin-bottom:12px">Itens do pedido:</p>';
     
@@ -923,7 +1141,7 @@ async function devolverPedido(pedidoId) {
             html += '<div class="item-card" style="margin-bottom:8px">';
             html += '<div class="item-info"><div class="item-name">' + item.nome + '</div><div class="item-detail">Qtd: ' + item.qtd + ' • R$ ' + item.total.toFixed(2).replace('.',',') + '</div></div>';
             html += '<label style="display:flex;align-items:center;gap:8px;cursor:pointer">';
-            html += '<input type="checkbox" id="dev-item-' + idx + '" value="' + item.qtd + '">';
+            html += '<input type="checkbox" class="dev-item-checkbox" data-idx="' + idx + '" value="' + item.qtd + '">';
             html += '<span style="font-size:12px">Devolver</span></label></div>';
         });
     } catch(e) {
@@ -940,34 +1158,37 @@ async function confirmarDevolucao(pedidoId) {
     var pedido = pedidos.find(function(p) { return p.id === pedidoId; });
     if (!pedido) return;
     
-    // Verifica quais itens foram selecionados para devolução
-    var itens = JSON.parse(pedido.itens_detalhes);
-    var itensDevolvidos = [];
-    
-    itens.forEach(function(item, idx) {
-        var checkbox = document.getElementById('dev-item-' + idx);
-        if (checkbox && checkbox.checked) {
-            itensDevolvidos.push(item);
-        }
-    });
-    
-    if (itensDevolvidos.length === 0) {
+    var checkboxes = document.querySelectorAll('.dev-item-checkbox:checked');
+    if (checkboxes.length === 0) {
         toast('Selecione pelo menos 1 item', 'error');
         return;
     }
     
-    // Atualiza pedido com status de devolvido
-    var result = await supabaseClient.from('pedidos').update({ 
+    var itens = JSON.parse(pedido.itens_detalhes);
+    var itensDevolvidos = [];
+    
+    checkboxes.forEach(function(cb) {
+        var idx = parseInt(cb.getAttribute('data-idx'));
+        itensDevolvidos.push(itens[idx]);
+    });
+    
+    var devolucaoData = {
         status: 'devolvido',
         devolucao_detalhes: JSON.stringify(itensDevolvidos),
         devolucao_data: new Date().toISOString()
-    }).eq('id', pedidoId);
+    };
     
-    if (result.error) { toast('Erro: ' + result.error.message, 'error'); return; }
+    if (isOnline && supabaseClient) {
+        var result = await supabaseClient.from('pedidos').update(devolucaoData).eq('id', pedidoId);
+        if (result.error) { toast('Erro: ' + result.error.message, 'error'); return; }
+        await carregarDados();
+    } else {
+        Object.assign(pedido, devolucaoData);
+        salvarDadosLocais();
+    }
     
     toast('✅ Devolução registrada!', 'success');
     fecharModal();
-    await carregarDados();
     mudarAba('orders');
 }
 
@@ -975,7 +1196,8 @@ function verPedido(pedidoId) {
     var pedido = pedidos.find(function(p) { return p.id === pedidoId; });
     if (!pedido) return;
     
-    var html = '<div class="modal-title">📋 Pedido #' + pedidoId.substr(0,8) + '</div>';
+    var html = '<div class="modal-handle"></div>';
+    html += '<div class="modal-title">📋 Pedido #' + pedidoId.toString().substr(0,8) + '</div>';
     html += '<div class="modal-sub">' + pedido.cliente_nome + ' - ' + new Date(pedido.created_at).toLocaleDateString('pt-BR') + '</div>';
     html += '<div class="card" style="background:var(--bg3);padding:16px;margin-bottom:16px">';
     html += '<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span>Status:</span><strong style="color:' + (pedido.status === 'aberto' ? 'var(--warning)' : 'var(--success)') + '">' + pedido.status.toUpperCase() + '</strong></div>';
@@ -1008,14 +1230,13 @@ function gerarPDFPedido(pedido) {
         var { jsPDF } = window.jspdf;
         var doc = new jsPDF();
         
-        // Logo (se existir)
-        if (configEmpresa.logo) {
+        var logoLocal = localStorage.getItem('kayla_logo_local');
+        if (logoLocal) {
             try {
-                doc.addImage(configEmpresa.logo, 'PNG', 15, 10, 40, 20);
+                doc.addImage(logoLocal, 'PNG', 15, 10, 40, 20);
             } catch(e) {}
         }
         
-        // Dados da empresa
         doc.setFontSize(16);
         doc.setTextColor(124, 92, 252);
         doc.text(configEmpresa.nome || 'Kayla Consignado', 105, 15, { align: 'center' });
@@ -1026,28 +1247,23 @@ function gerarPDFPedido(pedido) {
         if (configEmpresa.endereco) doc.text(configEmpresa.endereco, 105, 27, { align: 'center' });
         if (configEmpresa.telefone) doc.text('Tel: ' + configEmpresa.telefone, 105, 32, { align: 'center' });
         
-        // Linha separadora
         doc.setDrawColor(200);
         doc.line(10, 38, 200, 38);
         
-        // Título
         doc.setFontSize(14);
         doc.setTextColor(0);
         doc.text('PEDIDO DE VENDA', 105, 48, { align: 'center' });
         
-        // Dados do pedido
         doc.setFontSize(11);
-        doc.text('Pedido #' + pedido.id.substr(0,8), 15, 60);
+        doc.text('Pedido #' + pedido.id.toString().substr(0,8), 15, 60);
         doc.text('Data: ' + new Date(pedido.created_at).toLocaleDateString('pt-BR'), 15, 67);
         doc.text('Status: ' + pedido.status.toUpperCase(), 15, 74);
         
-        // Cliente
         doc.setFillColor(240, 240, 240);
         doc.rect(15, 80, 180, 15, 'F');
         doc.setFontSize(12);
         doc.text('Cliente: ' + pedido.cliente_nome, 20, 90);
         
-        // Itens
         doc.setFontSize(11);
         doc.text('Itens do Pedido:', 15, 105);
         
@@ -1062,7 +1278,6 @@ function gerarPDFPedido(pedido) {
             });
         } catch(e) {}
         
-        // Total
         y += 5;
         doc.setDrawColor(200);
         doc.line(15, y, 195, y);
@@ -1071,13 +1286,11 @@ function gerarPDFPedido(pedido) {
         doc.setFont(undefined, 'bold');
         doc.text('TOTAL: R$ ' + parseFloat(pedido.total).toFixed(2).replace('.',','), 170, y, { align: 'right' });
         
-        // Rodapé
         doc.setFontSize(9);
         doc.setTextColor(150);
         doc.text('Gerado em: ' + new Date().toLocaleString('pt-BR'), 105, 280, { align: 'center' });
         
-        // Salvar
-        doc.save('Pedido-' + pedido.id.substr(0,8) + '.pdf');
+        doc.save('Pedido-' + pedido.id.toString().substr(0,8) + '.pdf');
         toast('📄 PDF gerado!', 'success');
         
     } catch(error) {
@@ -1091,9 +1304,10 @@ function renderizarHistorico() {
     var devolvidos = pedidos.filter(function(p) { return p.status === 'devolvido'; });
     
     var html = '<div class="card"><div class="card-title">📊 Resumo</div>';
-    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">';
     html += '<div class="card" style="background:var(--bg3);padding:16px;text-align:center"><div style="font-size:24px;font-weight:700;color:var(--success)">' + finalizados.length + '</div><div style="font-size:12px;color:var(--text2)">Vendas</div></div>';
     html += '<div class="card" style="background:var(--bg3);padding:16px;text-align:center"><div style="font-size:24px;font-weight:700;color:var(--warning)">' + devolvidos.length + '</div><div style="font-size:12px;color:var(--text2)">Devoluções</div></div>';
+    html += '<div class="card" style="background:var(--bg3);padding:16px;text-align:center"><div style="font-size:24px;font-weight:700;color:var(--accent)">' + pedidos.length + '</div><div style="font-size:12px;color:var(--text2)">Total</div></div>';
     html += '</div></div>';
     
     var totalGeral = 0;
@@ -1109,7 +1323,7 @@ function renderizarHistorico() {
         pedidos.forEach(function(p) {
             var data = new Date(p.created_at).toLocaleDateString('pt-BR');
             var corStatus = p.status === 'aberto' ? 'var(--warning)' : (p.status === 'finalizado' ? 'var(--success)' : 'var(--error)');
-            html += '<div class="item-card"><div class="item-info"><div class="item-name">#' + p.id.substr(0,8) + '</div><div class="item-detail">' + p.cliente_nome + ' • ' + data + '<br>' + p.itens + ' itens • R$ ' + parseFloat(p.total).toFixed(2).replace('.',',') + '</div></div><span style="color:' + corStatus + ';font-weight:600;font-size:12px">' + p.status.toUpperCase() + '</span></div>';
+            html += '<div class="item-card"><div class="item-info"><div class="item-name">#' + p.id.toString().substr(0,8) + '</div><div class="item-detail">' + p.cliente_nome + ' • ' + data + '<br>' + p.itens + ' itens • R$ ' + parseFloat(p.total).toFixed(2).replace('.',',') + '</div></div><span style="color:' + corStatus + ';font-weight:600;font-size:12px">' + p.status.toUpperCase() + '</span></div>';
         });
         html += '</div>';
     }
@@ -1128,6 +1342,25 @@ function renderizarConfig() {
     
     html += '<div class="form-group"><label class="form-label">Plano</label><div style="background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:12px"><span class="' + (LIMITES.proAtivo ? 'badge-pro' : 'badge-free') + '">' + (LIMITES.proAtivo ? 'PRO' : 'GRÁTIS') + '</span></div></div>';
     
+    // Info de sincronização (apenas Pro)
+    if (LIMITES.proAtivo) {
+        html += '<div class="sync-info">';
+        if (lastSync) {
+            var dataSync = new Date(lastSync).toLocaleString('pt-BR');
+            html += '<strong>✅ Último sync:</strong> ' + dataSync;
+        } else {
+            html += '<strong>Sem sincronização</strong>';
+        }
+        html += '<br><span style="color:' + (isOnline ? 'var(--success)' : 'var(--text3)') + '">' + (isOnline ? '🟢 Conectado' : '🔴 Desconectado') + '</span>';
+        html += '</div>';
+        html += '<button class="btn btn-primary" onclick="sincronizarDados()">🔄 Sincronizar Agora</button>';
+        
+        // Botão WhatsApp Suporte
+        var nomeUsuario = currentUser ? currentUser.email.split('@')[0] : 'Usuário';
+        var msgWhatsApp = 'Olá! Sou ' + nomeUsuario + ' e preciso de suporte no Kayla Consignado';
+        html += '<a href="https://wa.me/5541996427444?text=' + encodeURIComponent(msgWhatsApp) + '" target="_blank" class="btn whatsapp-btn">💬 Suporte WhatsApp</a>';
+    }
+    
     if (!LIMITES.proAtivo) {
         html += '<button class="btn btn-primary" onclick="mostrarPaywall()">🚀 Upgrade Pro</button>';
     }
@@ -1144,20 +1377,30 @@ function renderizarConfig() {
     
     html += '<div class="form-group"><label class="form-label">Endereço</label><input class="form-input" id="config-endereco" value="' + (configEmpresa.endereco || '') + '" placeholder="Rua, número, cidade"></div>';
     
-    html += '<div class="form-group"><label class="form-label">Logo da Empresa</label>';
-    if (configEmpresa.logo) {
-        html += '<div class="logo-preview"><img src="' + configEmpresa.logo + '" alt="Logo"></div>';
+    html += '<div class="form-group"><label class="form-label">Logo (armazenada localmente)</label>';
+    var logoLocal = localStorage.getItem('kayla_logo_local');
+    if (logoLocal) {
+        html += '<div class="logo-preview"><img src="' + logoLocal + '" alt="Logo"></div>';
         html += '<button class="btn btn-sm btn-outline" onclick="removerLogo()" style="margin-bottom:8px">🗑️ Remover Logo</button>';
     }
     html += '<div class="file-input-wrapper">';
     html += '<input type="file" id="config-logo-file" accept="image/*" onchange="uploadLogo(this)">';
-    html += '<label for="config-logo-file" class="file-input-label">📷 Selecionar Imagem (PNG, JPG)</label>';
-    html += '</div></div>';
+    html += '<label for="config-logo-file" class="file-input-label">📷 Selecionar Imagem (PNG, JPG - máx 2MB)</label>';
+    html += '</div><small style="color:var(--text3);display:block;margin-top:8px">A logo fica armazenada apenas neste dispositivo</small></div>';
     
     html += '<button class="btn btn-primary" onclick="salvarConfiguracoesEmpresa()">💾 Salvar Configurações</button>';
     html += '</div>';
     
-    html += '<div class="form-group" style="margin-top:16px"><label class="form-label">Versão</label><div style="background:var(--bg3);padding:12px;border-radius:8px">v4.2.0</div></div>';
+    // Backup
+    html += '<div class="backup-section">';
+    html += '<div class="config-section-title">💾 Backup</div>';
+    html += '<button class="btn btn-primary" onclick="exportarBackup()">📥 Exportar Backup</button>';
+    html += '<div class="file-input-wrapper" style="margin-top:12px">';
+    html += '<input type="file" id="backup-file" accept=".json" onchange="importarBackup(this)">';
+    html += '<label for="backup-file" class="file-input-label">📤 Importar Backup</label>';
+    html += '</div></div>';
+    
+    html += '<div class="form-group" style="margin-top:16px"><label class="form-label">Versão</label><div style="background:var(--bg3);padding:12px;border-radius:8px">v4.3.0</div></div>';
     
     html += '<button class="btn btn-red" onclick="fazerLogout()" style="margin-top:12px">🚪 Sair</button></div>';
     
@@ -1175,15 +1418,15 @@ function uploadLogo(input) {
     
     var reader = new FileReader();
     reader.onload = function(e) {
-        configEmpresa.logo = e.target.result;
-        toast('✅ Logo carregada!', 'success');
+        localStorage.setItem('kayla_logo_local', e.target.result);
+        toast('✅ Logo carregada (local)!', 'success');
         mudarAba('settings');
     };
     reader.readAsDataURL(file);
 }
 
 function removerLogo() {
-    configEmpresa.logo = null;
+    localStorage.removeItem('kayla_logo_local');
     toast('Logo removida', 'success');
     mudarAba('settings');
 }
@@ -1198,13 +1441,64 @@ function salvarConfiguracoesEmpresa() {
     toast('✅ Configurações salvas!', 'success');
 }
 
+function exportarBackup() {
+    var dados = {
+        clientes: clientes,
+        produtos: produtos,
+        pedidos: pedidos,
+        config: configEmpresa,
+        dataExport: new Date().toISOString(),
+        versao: '4.3.0'
+    };
+    
+    var blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'kayla_backup_' + new Date().toISOString().split('T')[0] + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    toast('📥 Backup exportado!', 'success');
+}
+
+function importarBackup(input) {
+    var file = input.files[0];
+    if (!file) return;
+    
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            var dados = JSON.parse(e.target.result);
+            
+            if (dados.clientes) clientes = dados.clientes;
+            if (dados.produtos) produtos = dados.produtos;
+            if (dados.pedidos) pedidos = dados.pedidos;
+            if (dados.config) {
+                configEmpresa = dados.config;
+                salvarConfigEmpresa();
+            }
+            
+            salvarDadosLocais();
+            toast('✅ Backup importado!', 'success');
+            mudarAba('settings');
+            
+        } catch(err) {
+            toast('Erro ao importar backup: ' + err.message, 'error');
+        }
+    };
+    reader.readAsText(file);
+}
+
 function mostrarPaywall() {
-    var html = '<div class="modal-title" style="color:var(--accent)">🚀 Upgrade Pro</div>';
+    var html = '<div class="modal-handle"></div>';
+    html += '<div class="modal-title" style="color:var(--accent)">🚀 Upgrade Pro</div>';
     html += '<div style="font-size:32px;font-weight:700;color:var(--accent);text-align:center;margin:20px 0">R$ 19,90<small style="font-size:14px;color:var(--text2);display:block">/mês</small></div>';
     html += '<div class="card" style="background:var(--bg3);padding:16px">';
     html += '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>👥 Clientes</span><span style="color:var(--error)">3</span><span style="color:var(--success)">∞</span></div>';
     html += '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>🏷️ Produtos</span><span style="color:var(--error)">20</span><span style="color:var(--success)">∞</span></div>';
-    html += '<div style="display:flex;justify-content:space-between;padding:8px 0"><span>📄 PDF</span><span style="color:var(--error)">❌</span><span style="color:var(--success)">✅</span></div>';
+    html += '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>📄 PDF</span><span style="color:var(--error)">❌</span><span style="color:var(--success)">✅</span></div>';
+    html += '<div style="display:flex;justify-content:space-between;padding:8px 0"><span>☁️ Sync Nuvem</span><span style="color:var(--error)">❌</span><span style="color:var(--success)">✅</span></div>';
     html += '</div>';
     html += '<div class="form-group"><label class="form-label">Chave</label><input class="form-input" id="pro-key" placeholder="PRO-XXXX-XXXX-XXXX"></div>';
     html += '<button class="btn btn-primary" onclick="ativarPro()">🔓 Ativar</button>';
@@ -1222,6 +1516,7 @@ function ativarPro() {
     toast('✅ Pro ativado!', 'success');
     fecharModal();
     atualizarBadgePlano();
+    mudarAba('settings');
 }
 
 // ============ AUXILIARES ============

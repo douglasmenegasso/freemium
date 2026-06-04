@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Kayla Consignado</title>
+<title>Kayla - Venda Consignada</title>
 <link rel="manifest" href="manifest.json">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
@@ -115,7 +115,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .file-input-label { display: block; padding: 12px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); text-align: center; cursor: pointer; }
 .file-input-label:hover { border-color: var(--accent); }
 
-/* Modal de Produtos - Estilo da Imagem */
+/* Modal de Produtos */
 .product-modal-list { max-height: 400px; overflow-y: auto; }
 .product-search-box { position: relative; margin-bottom: 16px; }
 .product-search-box input { width: 100%; padding: 12px 16px 12px 44px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 15px; color: var(--text); }
@@ -135,6 +135,15 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .whatsapp-btn:hover { background: #128C7E; }
 
 .backup-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+
+/* Modal Duplicado com +/- */
+.qty-selector { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 20px 0; }
+.qty-selector .qty-btn { width: 44px; height: 44px; font-size: 24px; }
+.qty-selector .qty-value { font-size: 28px; min-width: 60px; }
+.qty-selector-label { text-align: center; color: var(--text2); font-size: 12px; margin-bottom: 8px; text-transform: uppercase; }
+
+/* Toast duplo clique */
+#exit-toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: #fff; padding: 12px 24px; border-radius: var(--radius-sm); font-size: 14px; z-index: 3500; display: none; }
 </style>
 </head>
 <body>
@@ -143,11 +152,11 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 <div id="login-screen">
     <div class="login-card">
         <img src="icon-192-dark.png" class="login-logo" alt="Kayla">
-        <div class="login-title">Kayla Consignado</div>
+        <div class="login-title">Kayla - Venda Consignada</div>
         <div class="login-sub">Selecione seu perfil de acesso</div>
         <button class="btn btn-primary" onclick="abrirLogin('admin')">👑 Administrador</button>
         <button class="btn btn-outline" onclick="abrirLogin('user')">👤 Usuário</button>
-        <div style="font-size:11px;color:var(--text3);margin-top:20px">v4.3.0</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:20px">v4.3.1</div>
     </div>
 </div>
 
@@ -156,7 +165,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <div class="header">
         <div style="display:flex;justify-content:space-between;align-items:center">
             <div>
-                <div class="header-title">📦 Kayla Consignado</div>
+                <div class="header-title">📦 Kayla - Venda Consignada</div>
                 <div class="header-sub" id="header-sub">Nova Venda</div>
             </div>
             <div class="header-actions">
@@ -185,6 +194,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 <!-- TOAST -->
 <div id="toast-container"></div>
+<div id="exit-toast">Toque novamente para sair</div>
 
 <script>
 // ============ VARIÁVEIS ============
@@ -201,6 +211,7 @@ var configEmpresa = {};
 var LIMITES = { freeClientes: 3, freeProdutos: 20, proAtivo: false };
 var isOnline = navigator.onLine;
 var lastSync = localStorage.getItem('kayla_last_sync') || null;
+var lastBackPress = 0;
 
 // ============ INICIALIZAÇÃO ============
 window.addEventListener('DOMContentLoaded', function() {
@@ -223,8 +234,32 @@ window.addEventListener('DOMContentLoaded', function() {
         atualizarBadgeConexao();
     });
     
+    // Back button handler
+    document.addEventListener('backbutton', onBackButton, false);
+    
     mostrarTelaSelecao();
 });
+
+function onBackButton() {
+    var modalOverlay = document.getElementById('modal-overlay');
+    if (modalOverlay && modalOverlay.classList.contains('show')) {
+        fecharModal();
+        return;
+    }
+    
+    var currentTime = Date.now();
+    if (currentTime - lastBackPress < 2000) {
+        navigator.app.exitApp();
+    } else {
+        lastBackPress = currentTime;
+        var toast = document.getElementById('exit-toast');
+        toast.style.display = 'block';
+        setTimeout(function() {
+            toast.style.display = 'none';
+            lastBackPress = 0;
+        }, 2000);
+    }
+}
 
 function verificarConexao() {
     isOnline = navigator.onLine;
@@ -486,7 +521,6 @@ function mudarAba(aba) {
 function renderizarVenda() {
     var html = '';
     
-    // Cliente
     html += '<div class="card"><div class="card-title">👥 Cliente</div>';
     if (clienteAtual) {
         html += '<div class="client-selected"><span>✓ ' + clienteAtual.nome + '</span>';
@@ -507,7 +541,6 @@ function renderizarVenda() {
         html += '</div></div>';
     }
     
-    // Botão Adicionar Produto (Estilo Imagem)
     html += '<div class="card"><div class="card-title">⚡ Adicionar Produto</div>';
     if (!clienteAtual) {
         html += '<p style="color:var(--warning);text-align:center;padding:20px">⚠️ Selecione cliente primeiro</p>';
@@ -521,7 +554,6 @@ function renderizarVenda() {
     }
     html += '</div>';
     
-    // Pedido
     html += '<div class="card"><div class="card-title">📦 Pedido Atual';
     if (clienteAtual) html += ' - ' + clienteAtual.nome;
     html += '</div>';
@@ -586,91 +618,42 @@ function processarCodigo(codigo) {
         return;
     }
     
-    var historico = getHistoricoCliente(clienteAtual.id);
-    var jaComprou = historico.filter(function(h) { return h.produto_id === produto.id; });
-    
-    if (jaComprou.length > 0) {
-        abrirModalHistoricoProduto(produto, jaComprou);
+    var itemExistente = pedidoItens.find(function(i) { return i.produto_id === produto.id; });
+    if (itemExistente) {
+        abrirModalDuplicado(produto, itemExistente);
     } else {
-        var itemExistente = pedidoItens.find(function(i) { return i.produto_id === produto.id; });
-        if (itemExistente) {
-            abrirModalDuplicado(produto, itemExistente);
-        } else {
-            adicionarItem(produto, 1);
-            toast('✅ ' + produto.nome, 'success');
-        }
+        adicionarItem(produto, 1);
+        toast('✅ ' + produto.nome, 'success');
     }
     
     var campo = document.getElementById('codigo-manual');
     if (campo) { campo.value = ''; campo.focus(); }
 }
 
-function getHistoricoCliente(clienteId) {
-    var historico = [];
-    pedidos.forEach(function(p) {
-        if (p.cliente_id === clienteId && p.itens_detalhes) {
-            try {
-                var itens = JSON.parse(p.itens_detalhes);
-                itens.forEach(function(item) {
-                    historico.push({
-                        produto_id: item.produto_id,
-                        produto_nome: item.nome,
-                        pedido_id: p.id,
-                        data: p.created_at,
-                        status: p.status,
-                        devolucao: p.status === 'devolvido'
-                    });
-                });
-            } catch(e) {}
-        }
-    });
-    return historico;
-}
-
-function abrirModalHistoricoProduto(produto, historico) {
-    var html = '<div class="modal-title">⚠️ Produto Já Comprado</div>';
-    html += '<div class="modal-sub">' + produto.nome + '</div>';
-    html += '<div class="product-history">';
-    html += '<strong>Cliente já comprou ' + historico.length + ' vez(es)</strong><br><br>';
-    historico.forEach(function(h, i) {
-        if (i < 3) {
-            var data = new Date(h.data).toLocaleDateString('pt-BR');
-            var statusText = h.devolucao ? ' (DEVOLVIDO)' : '';
-            html += '• Pedido #' + h.pedido_id.substr(0,8) + ' em ' + data + statusText + '<br>';
-        }
-    });
-    if (historico.length > 3) html += '... e mais ' + (historico.length - 3) + ' vezes';
-    html += '</div>';
-    html += '<p style="color:var(--text2);font-size:13px;margin:16px 0">Adicionar mesmo assim?</p>';
-    html += '<button class="btn btn-primary" onclick="adicionarItemComHistorico(\'' + produto.id + '\')">✅ Sim, Adicionar</button>';
-    html += '<button class="btn btn-outline" onclick="fecharModal(); retomarScanner()">❌ Cancelar</button>';
-    document.getElementById('modal-body').innerHTML = html;
-    document.getElementById('modal-overlay').classList.add('show');
-}
-
-function adicionarItemComHistorico(produtoId) {
-    var produto = produtos.find(function(p) { return p.id === produtoId; });
-    if (produto) {
-        adicionarItem(produto, 1);
-        toast('✅ ' + produto.nome + ' adicionado', 'success');
-    }
-}
-
 function abrirModalDuplicado(produto, item) {
-    var html = '<div class="modal-title">📦 Já na Lista</div>';
+    var qtdAdicionar = 1;
+    var html = '<div class="modal-handle"></div>';
+    html += '<div class="modal-title">📦 Já na Lista</div>';
     html += '<div class="modal-sub">' + produto.nome + '</div>';
-    html += '<div class="card" style="background:var(--bg3);padding:16px;text-align:center">';
-    html += '<p style="margin-bottom:12px">Produto já está no pedido com <strong style="color:var(--accent)">' + item.qtd + ' un</strong></p></div>';
-    html += '<div class="form-group"><label class="form-label">Adicionar mais</label>';
-    html += '<input class="form-input" id="qtd-add" type="number" value="1" min="1" style="text-align:center;font-size:18px" onkeypress="if(event.key===\'Enter\')adicionarMaisUnidades(\'' + produto.id + '\')"></div>';
-    html += '<button class="btn btn-primary" onclick="adicionarMaisUnidades(\'' + produto.id + '\')">➕ Adicionar</button>';
+    html += '<div class="card" style="background:var(--bg3);padding:16px;text-align:center;margin-bottom:16px">';
+    html += '<p>Produto já está no pedido com <strong style="color:var(--accent)">' + item.qtd + ' un</strong></p></div>';
+    html += '<div class="qty-selector-label">Adicionar mais</div>';
+    html += '<div class="qty-selector">';
+    html += '<button class="qty-btn" onclick="document.getElementById(\'modal-qtd\').value = Math.max(1, parseInt(document.getElementById(\'modal-qtd\').value) - 1); document.querySelector(\'.qty-value\').textContent = document.getElementById(\'modal-qtd\').value;">−</button>';
+    html += '<div class="qty-value" id="modal-qtd-display">1</div>';
+    html += '<button class="qty-btn" onclick="document.getElementById(\'modal-qtd\').value = parseInt(document.getElementById(\'modal-qtd\').value) + 1; document.querySelector(\'.qty-value\').textContent = document.getElementById(\'modal-qtd\').value;">+</button>';
+    html += '</div>';
+    html += '<input type="hidden" id="modal-qtd" value="1">';
+    html += '<input type="hidden" id="modal-produto-id" value="' + produto.id + '">';
+    html += '<button class="btn btn-primary" onclick="adicionarMaisUnidadesModal()">➕ Adicionar</button>';
     html += '<button class="btn btn-outline" onclick="fecharModal(); retomarScanner()">Cancelar</button>';
     document.getElementById('modal-body').innerHTML = html;
     document.getElementById('modal-overlay').classList.add('show');
 }
 
-function adicionarMaisUnidades(produtoId) {
-    var qtdAdd = parseInt(document.getElementById('qtd-add').value) || 1;
+function adicionarMaisUnidadesModal() {
+    var produtoId = document.getElementById('modal-produto-id').value;
+    var qtdAdd = parseInt(document.getElementById('modal-qtd').value) || 1;
     var item = pedidoItens.find(function(i) { return i.produto_id === produtoId; });
     if (item) {
         item.qtd += qtdAdd;
@@ -749,14 +732,21 @@ async function finalizarPedido() {
             status: 'aberto',
             itens: totalItens,
             total: total,
-            itens_detalhes: JSON.stringify(itensDetalhes),
+            itens_json: JSON.stringify(itensDetalhes),
             user_id: currentUser ? currentUser.id : 'local',
             created_at: new Date().toISOString()
         };
         
         if (isOnline && supabaseClient) {
             var result = await supabaseClient.from('pedidos').insert(pedidoData).select();
-            if (result.error) throw result.error;
+            if (result.error) {
+                if (result.error.message.includes('itens_detalhes')) {
+                    pedidoData.itens_detalhes = pedidoData.itens_json;
+                    delete pedidoData.itens_json;
+                    result = await supabaseClient.from('pedidos').insert(pedidoData).select();
+                }
+                if (result.error) throw result.error;
+            }
             await carregarDados();
         } else {
             pedidos.unshift(pedidoData);
@@ -781,7 +771,7 @@ async function finalizarPedido() {
     btn.disabled = false;
 }
 
-// ============ MODAL ADICIONAR PRODUTO (ESTILO IMAGEM) ============
+// ============ MODAL ADICIONAR PRODUTO ============
 function abrirModalAdicionarProduto() {
     var html = '<div class="modal-handle"></div>';
     html += '<div class="modal-title">🔍 Adicionar produto</div>';
@@ -974,7 +964,11 @@ function renderizarClientes() {
         html += '<div class="item-list">';
         clientes.forEach(function(c) {
             html += '<div class="item-card"><div class="item-info"><div class="item-name">' + c.nome + '</div><div class="item-detail">' + (c.telefone || 'Sem tel') + '</div></div>';
-            html += '<button class="btn btn-sm btn-primary" onclick="iniciarPedidoCliente(\'' + c.id + '\')">🛒 Vender</button></div>';
+            html += '<div style="display:flex;gap:8px">';
+            html += '<button class="btn btn-sm btn-primary" onclick="iniciarPedidoCliente(\'' + c.id + '\')">🛒 Vender</button>';
+            html += '<button class="btn btn-sm btn-outline" onclick="editarCliente(\'' + c.id + '\')">✏️</button>';
+            html += '<button class="btn btn-sm btn-red" onclick="excluirCliente(\'' + c.id + '\')">🗑️</button>';
+            html += '</div></div>';
         });
         html += '</div>';
     }
@@ -987,37 +981,81 @@ function iniciarPedidoCliente(clienteId) {
     mudarAba('scan');
 }
 
-function abrirModalCliente() {
+function abrirModalCliente(clienteId) {
     if (!verificarLimite('clientes')) return;
+    var cliente = clienteId ? clientes.find(function(c) { return c.id === clienteId; }) : null;
     var html = '<div class="modal-handle"></div>';
-    html += '<div class="modal-title">👥 Cadastrar Cliente</div>';
-    html += '<div class="form-group"><label class="form-label">Nome *</label><input class="form-input" id="cliente-nome" onkeypress="if(event.key===\'Enter\')salvarCliente()"></div>';
-    html += '<div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="cliente-telefone"></div>';
-    html += '<div class="form-group"><label class="form-label">Endereço</label><input class="form-input" id="cliente-endereco"></div>';
-    html += '<button class="btn btn-primary" onclick="salvarCliente()">💾 Salvar</button>';
+    html += '<div class="modal-title">' + (cliente ? '✏️ Editar Cliente' : '👥 Cadastrar Cliente') + '</div>';
+    html += '<div class="form-group"><label class="form-label">Nome *</label><input class="form-input" id="cliente-nome" value="' + (cliente ? cliente.nome : '') + '" onkeypress="if(event.key===\'Enter\')salvarCliente(\'' + (cliente ? cliente.id : '') + '\')"></div>';
+    html += '<div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="cliente-telefone" value="' + (cliente ? cliente.telefone || '' : '') + '"></div>';
+    html += '<div class="form-group"><label class="form-label">Endereço</label><input class="form-input" id="cliente-endereco" value="' + (cliente ? cliente.endereco || '' : '') + '"></div>';
+    html += '<button class="btn btn-primary" onclick="salvarCliente(\'' + (cliente ? cliente.id : '') + '\')">💾 Salvar</button>';
     html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
     document.getElementById('modal-body').innerHTML = html;
     document.getElementById('modal-overlay').classList.add('show');
     setTimeout(function() { document.getElementById('cliente-nome').focus(); }, 100);
 }
 
-async function salvarCliente() {
-    var nome = document.getElementById('cliente-nome').value.trim();
-    if (!nome) { toast('Nome obrigatório', 'error'); return; }
-    
-    var clienteData = { nome: nome, telefone: document.getElementById('cliente-telefone').value.trim(), endereco: document.getElementById('cliente-endereco').value.trim(), user_id: currentUser ? currentUser.id : 'local', created_at: new Date().toISOString() };
+function editarCliente(clienteId) {
+    abrirModalCliente(clienteId);
+}
+
+async function excluirCliente(clienteId) {
+    if (!confirm('Tem certeza que deseja excluir este cliente?')) return;
     
     if (isOnline && supabaseClient) {
-        var result = await supabaseClient.from('clientes').insert(clienteData).select();
+        var result = await supabaseClient.from('clientes').delete().eq('id', clienteId);
         if (result.error) { toast('Erro: ' + result.error.message, 'error'); return; }
         await carregarDados();
     } else {
-        clienteData.id = 'local_' + Date.now();
-        clientes.push(clienteData);
+        clientes = clientes.filter(function(c) { return c.id !== clienteId; });
         salvarDadosLocais();
     }
     
-    toast('✅ Cliente salvo!', 'success');
+    toast('✅ Cliente excluído!', 'success');
+    mudarAba('clients');
+}
+
+async function salvarCliente(clienteId) {
+    var nome = document.getElementById('cliente-nome').value.trim();
+    if (!nome) { toast('Nome obrigatório', 'error'); return; }
+    
+    var clienteData = { 
+        nome: nome, 
+        telefone: document.getElementById('cliente-telefone').value.trim(), 
+        endereco: document.getElementById('cliente-endereco').value.trim(),
+        user_id: currentUser ? currentUser.id : 'local',
+        updated_at: new Date().toISOString()
+    };
+    
+    if (clienteId) {
+        if (isOnline && supabaseClient) {
+            var result = await supabaseClient.from('clientes').update(clienteData).eq('id', clienteId);
+            if (result.error) { toast('Erro: ' + result.error.message, 'error'); return; }
+            await carregarDados();
+        } else {
+            var idx = clientes.findIndex(function(c) { return c.id === clienteId; });
+            if (idx >= 0) {
+                clientes[idx] = Object.assign({}, clientes[idx], clienteData);
+                salvarDadosLocais();
+            }
+        }
+        toast('✅ Cliente atualizado!', 'success');
+    } else {
+        if (!verificarLimite('clientes')) return;
+        clienteData.created_at = new Date().toISOString();
+        if (isOnline && supabaseClient) {
+            var result = await supabaseClient.from('clientes').insert(clienteData).select();
+            if (result.error) { toast('Erro: ' + result.error.message, 'error'); return; }
+            await carregarDados();
+        } else {
+            clienteData.id = 'local_' + Date.now();
+            clientes.push(clienteData);
+            salvarDadosLocais();
+        }
+        toast('✅ Cliente cadastrado!', 'success');
+    }
+    
     fecharModal();
     mudarAba('clients');
 }
@@ -1080,6 +1118,8 @@ async function salvarProduto() {
     mudarAba('products');
 }
 
+function editarProduto(id) { toast('Em breve', 'warning'); }
+
 // ============ PEDIDOS ============
 function renderizarPedidos() {
     var html = '<div class="card"><div class="card-title">📋 Pedidos (' + pedidos.length + ')</div></div>';
@@ -1136,7 +1176,7 @@ async function devolverPedido(pedidoId) {
     html += '<p style="color:var(--text2);margin-bottom:12px">Itens do pedido:</p>';
     
     try {
-        var itens = JSON.parse(pedido.itens_detalhes);
+        var itens = JSON.parse(pedido.itens_json || pedido.itens_detalhes || '[]');
         itens.forEach(function(item, idx) {
             html += '<div class="item-card" style="margin-bottom:8px">';
             html += '<div class="item-info"><div class="item-name">' + item.nome + '</div><div class="item-detail">Qtd: ' + item.qtd + ' • R$ ' + item.total.toFixed(2).replace('.',',') + '</div></div>';
@@ -1164,7 +1204,7 @@ async function confirmarDevolucao(pedidoId) {
         return;
     }
     
-    var itens = JSON.parse(pedido.itens_detalhes);
+    var itens = JSON.parse(pedido.itens_json || pedido.itens_detalhes || '[]');
     var itensDevolvidos = [];
     
     checkboxes.forEach(function(cb) {
@@ -1206,7 +1246,7 @@ function verPedido(pedidoId) {
     html += '</div>';
     
     try {
-        var itens = JSON.parse(pedido.itens_detalhes);
+        var itens = JSON.parse(pedido.itens_json || pedido.itens_detalhes || '[]');
         html += '<div class="item-list" style="margin-bottom:16px">';
         itens.forEach(function(item) {
             html += '<div class="item-card"><div class="item-info"><div class="item-name">' + item.nome + '</div><div class="item-detail">' + item.qtd + 'x R$ ' + item.preco.toFixed(2).replace('.',',') + '</div></div><div style="font-weight:700;color:var(--accent)">R$ ' + item.total.toFixed(2).replace('.',',') + '</div></div>';
@@ -1239,7 +1279,7 @@ function gerarPDFPedido(pedido) {
         
         doc.setFontSize(16);
         doc.setTextColor(124, 92, 252);
-        doc.text(configEmpresa.nome || 'Kayla Consignado', 105, 15, { align: 'center' });
+        doc.text(configEmpresa.nome || 'Kayla - Venda Consignada', 105, 15, { align: 'center' });
         
         doc.setFontSize(10);
         doc.setTextColor(100);
@@ -1269,7 +1309,7 @@ function gerarPDFPedido(pedido) {
         
         var y = 115;
         try {
-            var itens = JSON.parse(pedido.itens_detalhes);
+            var itens = JSON.parse(pedido.itens_json || pedido.itens_detalhes || '[]');
             itens.forEach(function(item) {
                 doc.text(item.nome, 20, y);
                 doc.text(item.qtd + 'x R$ ' + item.preco.toFixed(2).replace('.',','), 120, y);
@@ -1342,7 +1382,6 @@ function renderizarConfig() {
     
     html += '<div class="form-group"><label class="form-label">Plano</label><div style="background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:12px"><span class="' + (LIMITES.proAtivo ? 'badge-pro' : 'badge-free') + '">' + (LIMITES.proAtivo ? 'PRO' : 'GRÁTIS') + '</span></div></div>';
     
-    // Info de sincronização (apenas Pro)
     if (LIMITES.proAtivo) {
         html += '<div class="sync-info">';
         if (lastSync) {
@@ -1355,9 +1394,8 @@ function renderizarConfig() {
         html += '</div>';
         html += '<button class="btn btn-primary" onclick="sincronizarDados()">🔄 Sincronizar Agora</button>';
         
-        // Botão WhatsApp Suporte
         var nomeUsuario = currentUser ? currentUser.email.split('@')[0] : 'Usuário';
-        var msgWhatsApp = 'Olá! Sou ' + nomeUsuario + ' e preciso de suporte no Kayla Consignado';
+        var msgWhatsApp = 'Olá! Sou ' + nomeUsuario + ' e preciso de suporte no Kayla - Venda Consignada';
         html += '<a href="https://wa.me/5541996427444?text=' + encodeURIComponent(msgWhatsApp) + '" target="_blank" class="btn whatsapp-btn">💬 Suporte WhatsApp</a>';
     }
     
@@ -1365,7 +1403,6 @@ function renderizarConfig() {
         html += '<button class="btn btn-primary" onclick="mostrarPaywall()">🚀 Upgrade Pro</button>';
     }
     
-    // Configurações da Empresa
     html += '<div class="config-section">';
     html += '<div class="config-section-title">🏢 Dados da Empresa</div>';
     
@@ -1391,7 +1428,6 @@ function renderizarConfig() {
     html += '<button class="btn btn-primary" onclick="salvarConfiguracoesEmpresa()">💾 Salvar Configurações</button>';
     html += '</div>';
     
-    // Backup
     html += '<div class="backup-section">';
     html += '<div class="config-section-title">💾 Backup</div>';
     html += '<button class="btn btn-primary" onclick="exportarBackup()">📥 Exportar Backup</button>';
@@ -1400,7 +1436,7 @@ function renderizarConfig() {
     html += '<label for="backup-file" class="file-input-label">📤 Importar Backup</label>';
     html += '</div></div>';
     
-    html += '<div class="form-group" style="margin-top:16px"><label class="form-label">Versão</label><div style="background:var(--bg3);padding:12px;border-radius:8px">v4.3.0</div></div>';
+    html += '<div class="form-group" style="margin-top:16px"><label class="form-label">Versão</label><div style="background:var(--bg3);padding:12px;border-radius:8px">v4.3.1</div></div>';
     
     html += '<button class="btn btn-red" onclick="fazerLogout()" style="margin-top:12px">🚪 Sair</button></div>';
     
@@ -1448,7 +1484,7 @@ function exportarBackup() {
         pedidos: pedidos,
         config: configEmpresa,
         dataExport: new Date().toISOString(),
-        versao: '4.3.0'
+        versao: '4.3.1'
     };
     
     var blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
@@ -1526,9 +1562,6 @@ function fecharModal(e) {
         document.getElementById('modal-body').innerHTML = '';
     }
 }
-
-function editarCliente(id) { toast('Em breve', 'warning'); }
-function editarProduto(id) { toast('Em breve', 'warning'); }
 
 function toast(msg, tipo) {
     var el = document.createElement('div');

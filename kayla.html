@@ -13,13 +13,11 @@
 :root { --bg: #0f0f13; --bg2: #1a1a24; --bg3: #252530; --text: #fff; --text2: #a0a0b0; --text3: #606070; --accent: #7c5cfc; --accent2: #9b82fc; --border: #2a2a35; --success: #00c853; --error: #ff1744; --warning: #ffab00; --radius: 12px; --radius-sm: 8px; }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; overflow: hidden; }
-
 #login-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
 .login-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 30px 20px; width: 100%; max-width: 360px; text-align: center; }
 .login-logo { width: 80px; height: 80px; border-radius: 20px; margin-bottom: 20px; }
 .login-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
 .login-sub { font-size: 13px; color: var(--text2); margin-bottom: 24px; }
-
 .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; cursor: pointer; border: none; width: 100%; margin-bottom: 12px; }
 .btn:active { transform: scale(0.97); }
 .btn-primary { background: var(--accent); color: #fff; }
@@ -28,7 +26,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .btn-green { background: var(--success); color: #fff; }
 .btn-warning { background: var(--warning); color: #000; }
 .btn-sm { padding: 10px 16px; font-size: 13px; width: auto; }
-
 #app { display: none; flex-direction: column; height: 100vh; position: fixed; top: 0; left: 0; right: 0; bottom: 0; }
 .header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 12px 16px; flex-shrink: 0; }
 .header-title { font-size: 18px; font-weight: 700; }
@@ -39,7 +36,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 2px; cursor: pointer; border: none; background: transparent; color: var(--text2); font-size: 11px; }
 .nav-btn.active { color: var(--accent); }
 .nav-btn .icon { font-size: 20px; margin-bottom: 2px; }
-
 .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
 .card-title { font-size: 14px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
 .form-group { margin-bottom: 14px; text-align: left; }
@@ -47,39 +43,32 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .form-input, .form-select { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; color: var(--text); font-size: 15px; outline: none; }
 .form-input:focus, .form-select:focus { border-color: var(--accent); }
 .form-select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a0a0b0' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 18px; padding-right: 40px; }
-
 .checkbox-group { display: flex; align-items: center; gap: 8px; margin: 12px 0; }
 .checkbox-group input { width: 18px; height: 18px; }
-
 .item-list { display: flex; flex-direction: column; gap: 8px; }
 .item-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
 .item-card:active { background: var(--bg2); }
 .item-info { flex: 1; min-width: 0; }
 .item-name { font-weight: 600; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .item-detail { font-size: 13px; color: var(--text3); }
-
 #reader { width: 100%; border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 12px; }
-
 #modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 2500; display: none; align-items: flex-end; justify-content: center; }
 #modal-overlay.show { display: flex; }
 .modal-content { background: var(--bg2); border-radius: 20px 20px 0 0; padding: 24px 20px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s; }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.modal-title { font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.modal-title { font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 8px; }
 .modal-sub { font-size: 13px; color: var(--text2); text-align: center; margin-bottom: 20px; }
 .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
-
 #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 3000; width: 90%; max-width: 300px; }
 .toast { padding: 12px 20px; border-radius: var(--radius-sm); margin-bottom: 8px; text-align: center; animation: fadeIn 0.3s; }
 .toast.success { background: var(--success); color: #fff; }
 .toast.error { background: var(--error); color: #fff; }
 .toast.warning { background: var(--warning); color: #000; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-
 .badge-free { background: var(--text3); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
 .badge-pro { background: var(--accent); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
 .badge-online { background: var(--success); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; }
 .badge-offline { background: var(--text3); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; }
-
 .order-item { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 8px; }
 .order-item-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
 .order-item-name { font-weight: 600; font-size: 15px; flex: 1; margin-right: 8px; }
@@ -89,66 +78,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .qty-btn:active { background: var(--accent); }
 .qty-value { min-width: 40px; text-align: center; font-weight: 700; font-size: 16px; }
 .order-item-remove { color: var(--error); font-size: 12px; margin-left: 8px; cursor: pointer; text-decoration: underline; }
-
 .order-total { background: var(--bg3); border-radius: var(--radius-sm); padding: 16px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: 700; }
 .order-total span:last-child { color: var(--accent); font-size: 22px; }
-
 .client-selected { background: var(--success); color: #fff; padding: 8px 12px; border-radius: var(--radius-sm); margin-bottom: 12px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
 .client-selected span { font-weight: 600; }
-
 .empty-state { text-align: center; color: var(--text3); padding: 30px 20px; }
-
 .limit-warning { background: var(--warning); color: #000; padding: 12px; border-radius: var(--radius-sm); margin: 12px 0; text-align: center; font-weight: 600; }
-
-.product-history { background: var(--bg3); border-left: 3px solid var(--warning); padding: 8px 12px; margin: 8px 0; border-radius: 4px; font-size: 12px; color: var(--text2); }
-.product-history strong { color: var(--warning); }
-
-.config-section { margin-bottom: 20px; }
-.config-section-title { font-size: 14px; font-weight: 600; color: var(--accent); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
-
-.logo-preview { width: 100px; height: 100px; border: 2px dashed var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin: 12px 0; overflow: hidden; }
-.logo-preview img { max-width: 100%; max-height: 100%; object-fit: contain; }
-
-.file-input-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
-.file-input-wrapper input[type=file] { position: absolute; left: -9999px; }
-.file-input-label { display: block; padding: 12px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); text-align: center; cursor: pointer; }
-.file-input-label:hover { border-color: var(--accent); }
-
-.product-modal-list { max-height: 400px; overflow-y: auto; }
-.product-search-box { position: relative; margin-bottom: 16px; }
-.product-search-box input { width: 100%; padding: 12px 16px 12px 44px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 15px; color: var(--text); }
-.product-search-box::before { content: '🔍'; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 16px; }
-.product-item-add { display: flex; justify-content: space-between; align-items: center; padding: 14px; background: var(--bg3); border-radius: var(--radius-sm); margin-bottom: 8px; cursor: pointer; }
-.product-item-add:active { background: var(--bg2); }
-.product-item-info { flex: 1; }
-.product-item-name { font-weight: 600; margin-bottom: 4px; }
-.product-item-code-price { font-size: 13px; color: var(--text3); }
-.btn-add-product { width: 36px; height: 36px; border-radius: 10px; background: var(--accent); color: #fff; border: none; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.btn-add-product:active { transform: scale(0.95); }
-
-.sync-info { background: var(--bg3); padding: 12px; border-radius: var(--radius-sm); margin: 12px 0; font-size: 12px; color: var(--text2); }
-.sync-info strong { color: var(--success); }
-
-.whatsapp-btn { background: #25D366; color: #fff; margin-top: 12px; }
-.whatsapp-btn:hover { background: #128C7E; }
-
-.backup-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
-
-.qty-selector { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 20px 0; }
-.qty-selector .qty-btn { width: 44px; height: 44px; font-size: 24px; }
-.qty-selector .qty-value { font-size: 28px; min-width: 60px; }
-.qty-selector-label { text-align: center; color: var(--text2); font-size: 12px; margin-bottom: 8px; text-transform: uppercase; }
-
-.update-banner { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; padding: 16px; border-radius: var(--radius); margin-bottom: 16px; display: none; }
-.update-banner.show { display: block; }
-.update-banner-title { font-weight: 700; margin-bottom: 8px; }
-.update-banner-text { font-size: 13px; margin-bottom: 12px; opacity: 0.9; }
-.update-banner button { margin-top: 8px; }
-
 #exit-toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: #fff; padding: 12px 24px; border-radius: var(--radius-sm); font-size: 14px; z-index: 3500; display: none; }
-
-.menu-item { padding: 16px; background: var(--bg3); border-radius: var(--radius-sm); margin-bottom: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-.menu-item:active { background: var(--bg2); }
 </style>
 </head>
 <body>
@@ -179,15 +115,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
             </div>
         </div>
     </div>
-    <div class="content" id="content">
-        <!-- Banner de atualização -->
-        <div id="update-banner" class="update-banner">
-            <div class="update-banner-title">🚀 Atualização Disponível!</div>
-            <div class="update-banner-text">Nova versão disponível. Atualize agora para ter acesso às últimas melhorias.</div>
-            <button class="btn btn-primary" onclick="atualizarApp()">🔄 Atualizar Agora</button>
-            <button class="btn btn-outline" onclick="fecharBannerAtualizacao()" style="margin-top:8px;border-color:#fff;color:#fff">Agora não</button>
-        </div>
-    </div>
+    <div class="content" id="content"></div>
     <div class="nav">
         <button class="nav-btn active" onclick="mudarAba('scan')"><span class="icon">⚡</span>Vender</button>
         <button class="nav-btn" onclick="mudarAba('clients')"><span class="icon">👥</span>Clientes</button>
@@ -226,11 +154,13 @@ var isOnline = navigator.onLine;
 var lastSync = localStorage.getItem('kayla_last_sync') || null;
 var lastBackPress = 0;
 var appVersion = '4.4.0';
-// Adicione após as outras variáveis globais
+
+// SISTEMA DE KEYS
 var SUPABASE_EDGE_URL = 'https://xwwklngrkvdwgiinycvt.supabase.co/functions/v1';
 var deviceUniqueId = localStorage.getItem('kayla_device_id') || null;
 var currentProKey = localStorage.getItem('kayla_pro_key') || null;
 
+// ============ FUNÇÃO DE LOGIN ============
 function abrirLogin(tipo) {
     perfilAtual = tipo;
     var html = '<div class="modal-title">' + (tipo === 'admin' ? '👑 Login Admin' : '👤 Login Usuário') + '</div>';
@@ -250,7 +180,6 @@ window.addEventListener('DOMContentLoaded', function() {
     verificarStatusPro();
     carregarConfigEmpresa();
     carregarDadosLocais();
-    verificarAtualizacao();
     
     try {
         supabaseClient = supabase.createClient('https://xwwklngrkvdwgiinycvt.supabase.co', 'sb_publishable_2Viwv3t4SvejW4SEfvpxGA_5K5thi7S');
@@ -261,7 +190,6 @@ window.addEventListener('DOMContentLoaded', function() {
         isOnline = true; 
         atualizarBadgeConexao();
         if (currentUser) sincronizarDados();
-        verificarAtualizacao();
     });
     window.addEventListener('offline', function() { 
         isOnline = false; 
@@ -269,8 +197,6 @@ window.addEventListener('DOMContentLoaded', function() {
     });
     
     document.addEventListener('backbutton', onBackButton, false);
-    
-    // Prevenir seleção de texto e menu de contexto
     document.addEventListener('selectstart', function(e) { e.preventDefault(); }, false);
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); }, false);
     
@@ -390,46 +316,6 @@ function mostrarApp() {
     mudarAba('scan');
 }
 
-// ============ ATUALIZAÇÃO ============
-function verificarAtualizacao() {
-    if (!isOnline) return;
-    
-    fetch('version.json?t=' + Date.now())
-        .then(function(response) { return response.json(); })
-        .then(function(data) {
-            if (data.version !== appVersion) {
-                mostrarBannerAtualizacao(data);
-            }
-        })
-        .catch(function(err) { console.log('Erro ao verificar atualização:', err); });
-}
-
-function mostrarBannerAtualizacao(data) {
-    var banner = document.getElementById('update-banner');
-    var content = document.querySelector('.content');
-    if (banner && content) {
-        content.insertBefore(banner, content.firstChild);
-        banner.classList.add('show');
-    }
-}
-
-function fecharBannerAtualizacao() {
-    var banner = document.getElementById('update-banner');
-    if (banner) {
-        banner.classList.remove('show');
-        localStorage.setItem('kayla_dismiss_update', Date.now().toString());
-    }
-}
-
-function atualizarApp() {
-    if ('caches' in window) {
-        caches.keys().then(function(names) {
-            for (var name of names) caches.delete(name);
-        });
-    }
-    window.location.reload(true);
-}
-
 // ============ AUTENTICAÇÃO ============
 async function verificarSessao() {
     if (!supabaseClient) { mostrarTelaSelecao(); return; }
@@ -531,6 +417,182 @@ async function sincronizarDados() {
     toast('✅ Dados sincronizados!', 'success');
 }
 
+// ============ SISTEMA DE KEYS E DISPOSITIVOS ============
+
+function getDeviceId() {
+    if (!deviceUniqueId) {
+        deviceUniqueId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('kayla_device_id', deviceUniqueId);
+    }
+    return deviceUniqueId;
+}
+
+function getDeviceName() {
+    var ua = navigator.userAgent;
+    if (ua.indexOf('Android') > -1) return 'Android';
+    if (ua.indexOf('iPhone') > -1) return 'iPhone';
+    if (ua.indexOf('iPad') > -1) return 'iPad';
+    return 'Web';
+}
+
+async function validarKeyBackend(keyCode) {
+    try {
+        var response = await fetch(SUPABASE_EDGE_URL + '/validate-key', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer sb_publishable_2Viwv3t4SvejW4SEfvpxGA_5K5thi7S'
+            },
+            body: JSON.stringify({
+                key_code: keyCode,
+                device_id: getDeviceId(),
+                device_name: getDeviceName()
+            })
+        });
+        
+        var data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Erro ao validar key:', error);
+        return { valid: false, message: 'Erro de conexão' };
+    }
+}
+
+async function removerDispositivo(keyCode, deviceId) {
+    try {
+        var response = await fetch(SUPABASE_EDGE_URL + '/remove-device', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer sb_publishable_2Viwv3t4SvejW4SEfvpxGA_5K5thi7S'
+            },
+            body: JSON.stringify({
+                key_code: keyCode,
+                device_id: deviceId
+            })
+        });
+        
+        var data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Erro ao remover dispositivo:', error);
+        return { success: false, message: 'Erro de conexão' };
+    }
+}
+
+async function ativarPro() {
+    var chave = document.getElementById('pro-key').value.trim().toUpperCase();
+    if (!chave || !chave.startsWith('PRO-')) { 
+        toast('Chave inválida', 'error'); 
+        return; 
+    }
+    
+    var btn = event.target;
+    var texto = btn.innerText;
+    btn.innerText = 'Validando...';
+    btn.disabled = true;
+    
+    var resultado = await validarKeyBackend(chave);
+    
+    if (resultado.valid) {
+        LIMITES.proAtivo = true;
+        localStorage.setItem('kayla_pro', 'true');
+        localStorage.setItem('kayla_pro_key', chave);
+        localStorage.setItem('kayla_pro_expires', resultado.expires_at || '');
+        localStorage.setItem('kayla_pro_devices', resultado.devices_used + '/' + resultado.max_devices);
+        
+        toast('✅ Plano PRO ativado! ' + resultado.devices_used + '/' + resultado.max_devices + ' dispositivos', 'success');
+        fecharModal();
+        atualizarBadgePlano();
+        mudarAba('settings');
+    } else {
+        toast('❌ ' + resultado.message, 'error');
+    }
+    
+    btn.innerText = texto;
+    btn.disabled = false;
+}
+
+function mostrarPlanos() {
+    var html = '<div class="modal-handle"></div>';
+    html += '<div class="modal-title">🚀 Escolha seu Plano</div>';
+    html += '<div class="modal-sub">Selecione o plano ideal para você</div>';
+    
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">';
+    html += '<div class="card" style="background:var(--bg3);padding:16px;cursor:pointer;border:2px solid var(--accent)" onclick="selecionarPlano(\'Mensal\', 19.90)">';
+    html += '<div style="font-size:24px;font-weight:700;color:var(--accent)">R$ 19,90</div>';
+    html += '<div style="font-size:13px;color:var(--text2)">Mensal<br>1 Dispositivo</div></div>';
+    
+    html += '<div class="card" style="background:var(--bg3);padding:16px;cursor:pointer;border:2px solid transparent" onclick="selecionarPlano(\'Trimestral\', 49.90)">';
+    html += '<div style="font-size:24px;font-weight:700;color:var(--accent)">R$ 49,90</div>';
+    html += '<div style="font-size:13px;color:var(--text2)">Trimestral<br>1 Dispositivo</div></div>';
+    
+    html += '<div class="card" style="background:var(--bg3);padding:16px;cursor:pointer;border:2px solid transparent" onclick="selecionarPlano(\'Semestral\', 89.90)">';
+    html += '<div style="font-size:24px;font-weight:700;color:var(--accent)">R$ 89,90</div>';
+    html += '<div style="font-size:13px;color:var(--text2)">Semestral<br>1 Dispositivo</div></div>';
+    
+    html += '<div class="card" style="background:var(--bg3);padding:16px;cursor:pointer;border:2px solid transparent" onclick="selecionarPlano(\'Anual\', 159.90)">';
+    html += '<div style="font-size:24px;font-weight:700;color:var(--accent)">R$ 159,90</div>';
+    html += '<div style="font-size:13px;color:var(--text2)">Anual<br>1 Dispositivo</div></div>';
+    html += '</div>';
+    
+    html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
+    document.getElementById('modal-body').innerHTML = html;
+    document.getElementById('modal-overlay').classList.add('show');
+}
+
+function selecionarPlano(plano, valor) {
+    toast('Em breve: Integração com Asaas para ' + plano + ' (R$ ' + valor.toFixed(2).replace('.', ',') + ')', 'warning');
+    fecharModal();
+}
+
+async function gerenciarDispositivos() {
+    var key = localStorage.getItem('kayla_pro_key');
+    if (!key) {
+        toast('Nenhuma key ativa', 'error');
+        return;
+    }
+    
+    var devices = localStorage.getItem('kayla_pro_devices') || '0/0';
+    
+    var html = '<div class="modal-handle"></div>';
+    html += '<div class="modal-title">📱 Gerenciar Dispositivos</div>';
+    html += '<div class="modal-sub">Dispositivos ativos: ' + devices + '</div>';
+    
+    html += '<div class="card" style="background:var(--bg3);padding:16px;margin-bottom:16px">';
+    html += '<div style="margin-bottom:12px"><strong>Dispositivo atual:</strong></div>';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--bg2);border-radius:8px">';
+    html += '<div><div style="font-weight:600">' + getDeviceName() + '</div><div style="font-size:12px;color:var(--text3)">ID: ' + getDeviceId().substr(0, 20) + '...</div></div>';
+    html += '<button class="btn btn-sm btn-red" onclick="removerEsteDispositivo()" style="margin:0">Remover</button></div></div>';
+    
+    html += '<small style="color:var(--text3);display:block;margin-bottom:16px">Ao remover este dispositivo, você poderá ativar em outro.</small>';
+    html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
+    document.getElementById('modal-body').innerHTML = html;
+    document.getElementById('modal-overlay').classList.add('show');
+}
+
+async function removerEsteDispositivo() {
+    var key = localStorage.getItem('kayla_pro_key');
+    var deviceId = getDeviceId();
+    
+    if (!confirm('Remover este dispositivo? Você precisará ativar a key novamente.')) return;
+    
+    var resultado = await removerDispositivo(key, deviceId);
+    
+    if (resultado.success) {
+        localStorage.removeItem('kayla_pro');
+        localStorage.removeItem('kayla_pro_key');
+        localStorage.removeItem('kayla_pro_devices');
+        LIMITES.proAtivo = false;
+        toast('✅ Dispositivo removido!', 'success');
+        fecharModal();
+        atualizarBadgePlano();
+        mudarAba('settings');
+    } else {
+        toast('❌ ' + resultado.message, 'error');
+    }
+}
+
 // ============ LIMITES ============
 function verificarLimite(tipo) {
     if (LIMITES.proAtivo) return true;
@@ -554,12 +616,6 @@ function mudarAba(aba) {
     
     var content = document.getElementById('content');
     var sub = document.getElementById('header-sub');
-    
-    // Re-insere banner se existir
-    var banner = document.getElementById('update-banner');
-    if (banner && banner.classList.contains('show')) {
-        content.insertBefore(banner, content.firstChild);
-    }
     
     switch(aba) {
         case 'scan':
@@ -819,10 +875,8 @@ async function finalizarPedido() {
         };
         
         if (isOnline && supabaseClient) {
-            // Tenta criar com itens_json
             var result = await supabaseClient.from('pedidos').insert(pedidoData).select();
             if (result.error) {
-                // Se falhar, tenta sem o campo
                 delete pedidoData.itens_json;
                 result = await supabaseClient.from('pedidos').insert(pedidoData).select();
                 if (result.error) throw result.error;
@@ -1484,332 +1538,7 @@ function renderizarConfig() {
     
     return html;
 }
-}
 
-function abrirDadosEmpresa() {
-    var html = '<div class="modal-handle"></div>';
-    html += '<div class="modal-title">🏢 Dados da Empresa</div>';
-    html += '<div class="form-group"><label class="form-label">Nome da Empresa</label><input class="form-input" id="config-nome" value="' + (configEmpresa.nome || '') + '" placeholder="Nome fantasia"></div>';
-    html += '<div class="form-group"><label class="form-label">CNPJ/CPF</label><input class="form-input" id="config-cnpj" value="' + (configEmpresa.cnpj || '') + '" placeholder="00.000.000/0000-00"></div>';
-    html += '<div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="config-telefone" value="' + (configEmpresa.telefone || '') + '" placeholder="(00) 00000-0000"></div>';
-    html += '<div class="form-group"><label class="form-label">Endereço</label><input class="form-input" id="config-endereco" value="' + (configEmpresa.endereco || '') + '" placeholder="Rua, número, cidade"></div>';
-    html += '<div class="form-group"><label class="form-label">Logo (armazenada localmente)</label>';
-    var logoLocal = localStorage.getItem('kayla_logo_local');
-    if (logoLocal) {
-        html += '<div class="logo-preview"><img src="' + logoLocal + '" alt="Logo"></div>';
-        html += '<button class="btn btn-sm btn-outline" onclick="removerLogo()" style="margin-bottom:8px">🗑️ Remover Logo</button>';
-    }
-    html += '<div class="file-input-wrapper">';
-    html += '<input type="file" id="config-logo-file" accept="image/*" onchange="uploadLogo(this)">';
-    html += '<label for="config-logo-file" class="file-input-label">📷 Selecionar Imagem (PNG, JPG - máx 2MB)</label>';
-    html += '</div><small style="color:var(--text3);display:block;margin-top:8px">A logo fica armazenada apenas neste dispositivo</small></div>';
-    html += '<button class="btn btn-primary" onclick="salvarConfiguracoesEmpresa()">💾 Salvar</button>';
-    html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
-    document.getElementById('modal-body').innerHTML = html;
-    document.getElementById('modal-overlay').classList.add('show');
-}
-
-function abrirConfigEmail() {
-    var html = '<div class="modal-handle"></div>';
-    html += '<div class="modal-title">📧 E-mail para Notificações</div>';
-    html += '<div class="modal-sub">Receba atualizações, promoções e avisos de renovação</div>';
-    html += '<div class="form-group"><label class="form-label">E-mail</label><input class="form-input" id="config-email-notificacao" value="' + (configEmpresa.email || '') + '" placeholder="seu@email.com" type="email"></div>';
-    html += '<small style="color:var(--text3);display:block;margin-bottom:16px">Enviaremos notificações sobre atualizações, renovação de licença e promoções especiais.</small>';
-    html += '<button class="btn btn-primary" onclick="salvarEmailNotificacao()">💾 Salvar</button>';
-    html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
-    document.getElementById('modal-body').innerHTML = html;
-    document.getElementById('modal-overlay').classList.add('show');
-}
-
-function salvarEmailNotificacao() {
-    var email = document.getElementById('config-email-notificacao').value.trim();
-    if (email && !email.includes('@')) {
-        toast('E-mail inválido', 'error');
-        return;
-    }
-    configEmpresa.email = email;
-    salvarConfigEmpresa();
-    toast('✅ E-mail salvo!', 'success');
-    fecharModal();
-}
-
-function uploadLogo(input) {
-    var file = input.files[0];
-    if (!file) return;
-    
-    if (file.size > 2 * 1024 * 1024) {
-        toast('Imagem muito grande (máx. 2MB)', 'error');
-        return;
-    }
-    
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        localStorage.setItem('kayla_logo_local', e.target.result);
-        toast('✅ Logo carregada (local)!', 'success');
-        abrirDadosEmpresa();
-    };
-    reader.readAsDataURL(file);
-}
-
-function removerLogo() {
-    localStorage.removeItem('kayla_logo_local');
-    toast('Logo removida', 'success');
-    abrirDadosEmpresa();
-}
-
-function salvarConfiguracoesEmpresa() {
-    configEmpresa.nome = document.getElementById('config-nome').value.trim();
-    configEmpresa.cnpj = document.getElementById('config-cnpj').value.trim();
-    configEmpresa.telefone = document.getElementById('config-telefone').value.trim();
-    configEmpresa.endereco = document.getElementById('config-endereco').value.trim();
-    
-    salvarConfigEmpresa();
-    toast('✅ Configurações salvas!', 'success');
-    fecharModal();
-}
-
-function exportarBackup() {
-    var dados = {
-        clientes: clientes,
-        produtos: produtos,
-        pedidos: pedidos,
-        config: configEmpresa,
-        dataExport: new Date().toISOString(),
-        versao: appVersion
-    };
-    
-    var blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = 'kayla_backup_' + new Date().toISOString().split('T')[0] + '.json';
-    a.click();
-    URL.revokeObjectURL(url);
-    
-    toast('📥 Backup exportado!', 'success');
-}
-
-function importarBackup(input) {
-    var file = input.files[0];
-    if (!file) return;
-    
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            var dados = JSON.parse(e.target.result);
-            
-            if (dados.clientes) clientes = dados.clientes;
-            if (dados.produtos) produtos = dados.produtos;
-            if (dados.pedidos) pedidos = dados.pedidos;
-            if (dados.config) {
-                configEmpresa = dados.config;
-                salvarConfigEmpresa();
-            }
-            
-            salvarDadosLocais();
-            toast('✅ Backup importado!', 'success');
-            mudarAba('settings');
-            
-        } catch(err) {
-            toast('Erro ao importar backup: ' + err.message, 'error');
-        }
-    };
-    reader.readAsText(file);
-}
-
-function mostrarPaywall() {
-    var html = '<div class="modal-handle"></div>';
-    html += '<div class="modal-title" style="color:var(--accent)">🚀 Upgrade Pro</div>';
-    html += '<div style="font-size:32px;font-weight:700;color:var(--accent);text-align:center;margin:20px 0">R$ 19,90<small style="font-size:14px;color:var(--text2);display:block">/mês</small></div>';
-    html += '<div class="card" style="background:var(--bg3);padding:16px">';
-    html += '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>👥 Clientes</span><span style="color:var(--error)">3</span><span style="color:var(--success)">∞</span></div>';
-    html += '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>🏷️ Produtos</span><span style="color:var(--error)">20</span><span style="color:var(--success)">∞</span></div>';
-    html += '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>📄 PDF</span><span style="color:var(--error)">❌</span><span style="color:var(--success)">✅</span></div>';
-    html += '<div style="display:flex;justify-content:space-between;padding:8px 0"><span>☁️ Sync Nuvem</span><span style="color:var(--error)">❌</span><span style="color:var(--success)">✅</span></div>';
-    html += '</div>';
-    html += '<div class="form-group"><label class="form-label">Chave</label><input class="form-input" id="pro-key" placeholder="PRO-XXXX-XXXX-XXXX"></div>';
-    html += '<button class="btn btn-primary" onclick="ativarPro()">🔓 Ativar</button>';
-    html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
-    document.getElementById('modal-body').innerHTML = html;
-    document.getElementById('modal-overlay').classList.add('show');
-}
-
-async function ativarPro() {
-    var chave = document.getElementById('pro-key').value.trim().toUpperCase();
-    if (!chave || !chave.startsWith('PRO-')) { 
-        toast('Chave inválida', 'error'); 
-        return; 
-    }
-    
-    var btn = event.target;
-    var texto = btn.innerText;
-    btn.innerText = 'Validando...';
-    btn.disabled = true;
-    
-    var resultado = await validarKeyBackend(chave);
-    
-    if (resultado.valid) {
-        LIMITES.proAtivo = true;
-        localStorage.setItem('kayla_pro', 'true');
-        localStorage.setItem('kayla_pro_key', chave);
-        localStorage.setItem('kayla_pro_expires', resultado.expires_at || '');
-        localStorage.setItem('kayla_pro_devices', resultado.devices_used + '/' + resultado.max_devices);
-        
-        toast('✅ Plano PRO ativado! ' + resultado.devices_used + '/' + resultado.max_devices + ' dispositivos', 'success');
-        fecharModal();
-        atualizarBadgePlano();
-        mudarAba('settings');
-    } else {
-        toast('❌ ' + resultado.message, 'error');
-        // ============ SISTEMA DE KEYS E DISPOSITIVOS ============
-
-function getDeviceId() {
-    if (!deviceUniqueId) {
-        deviceUniqueId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('kayla_device_id', deviceUniqueId);
-    }
-    return deviceUniqueId;
-}
-
-function getDeviceName() {
-    var ua = navigator.userAgent;
-    if (ua.indexOf('Android') > -1) return 'Android';
-    if (ua.indexOf('iPhone') > -1) return 'iPhone';
-    if (ua.indexOf('iPad') > -1) return 'iPad';
-    return 'Web';
-}
-
-async function validarKeyBackend(keyCode) {
-    try {
-        var response = await fetch(SUPABASE_EDGE_URL + '/validate-key', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer sb_publishable_2Viwv3t4SvejW4SEfvpxGA_5K5thi7S'
-            },
-            body: JSON.stringify({
-                key_code: keyCode,
-                device_id: getDeviceId(),
-                device_name: getDeviceName()
-            })
-        });
-        
-        var data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Erro ao validar key:', error);
-        return { valid: false, message: 'Erro de conexão' };
-    }
-}
-
-async function removerDispositivo(keyCode, deviceId) {
-    try {
-        var response = await fetch(SUPABASE_EDGE_URL + '/remove-device', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer sb_publishable_2Viwv3t4SvejW4SEfvpxGA_5K5thi7S'
-            },
-            body: JSON.stringify({
-                key_code: keyCode,
-                device_id: deviceId
-            })
-        });
-        
-        var data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Erro ao remover dispositivo:', error);
-        return { success: false, message: 'Erro de conexão' };
-    }
-}
-
-function mostrarPlanos() {
-    var html = '<div class="modal-handle"></div>';
-    html += '<div class="modal-title">🚀 Escolha seu Plano</div>';
-    html += '<div class="modal-sub">Selecione o plano ideal para você</div>';
-    
-    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">';
-    html += '<div class="card" style="background:var(--bg3);padding:16px;cursor:pointer;border:2px solid var(--accent)" onclick="selecionarPlano(\'Mensal\', 19.90)">';
-    html += '<div style="font-size:24px;font-weight:700;color:var(--accent)">R$ 19,90</div>';
-    html += '<div style="font-size:13px;color:var(--text2)">Mensal<br>1 Dispositivo</div></div>';
-    
-    html += '<div class="card" style="background:var(--bg3);padding:16px;cursor:pointer;border:2px solid transparent" onclick="selecionarPlano(\'Trimestral\', 49.90)">';
-    html += '<div style="font-size:24px;font-weight:700;color:var(--accent)">R$ 49,90</div>';
-    html += '<div style="font-size:13px;color:var(--text2)">Trimestral<br>1 Dispositivo</div></div>';
-    
-    html += '<div class="card" style="background:var(--bg3);padding:16px;cursor:pointer;border:2px solid transparent" onclick="selecionarPlano(\'Semestral\', 89.90)">';
-    html += '<div style="font-size:24px;font-weight:700;color:var(--accent)">R$ 89,90</div>';
-    html += '<div style="font-size:13px;color:var(--text2)">Semestral<br>1 Dispositivo</div></div>';
-    
-    html += '<div class="card" style="background:var(--bg3);padding:16px;cursor:pointer;border:2px solid transparent" onclick="selecionarPlano(\'Anual\', 159.90)">';
-    html += '<div style="font-size:24px;font-weight:700;color:var(--accent)">R$ 159,90</div>';
-    html += '<div style="font-size:13px;color:var(--text2)">Anual<br>1 Dispositivo</div></div>';
-    html += '</div>';
-    
-    html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
-    document.getElementById('modal-body').innerHTML = html;
-    document.getElementById('modal-overlay').classList.add('show');
-}
-
-function selecionarPlano(plano, valor) {
-    toast('Em breve: Integração com Asaas para ' + plano + ' (R$ ' + valor.toFixed(2).replace('.', ',') + ')', 'warning');
-    fecharModal();
-}
-
-async function gerenciarDispositivos() {
-    var key = localStorage.getItem('kayla_pro_key');
-    if (!key) {
-        toast('Nenhuma key ativa', 'error');
-        return;
-    }
-    
-    var devices = localStorage.getItem('kayla_pro_devices') || '0/0';
-    
-    var html = '<div class="modal-handle"></div>';
-    html += '<div class="modal-title">📱 Gerenciar Dispositivos</div>';
-    html += '<div class="modal-sub">Dispositivos ativos: ' + devices + '</div>';
-    
-    html += '<div class="card" style="background:var(--bg3);padding:16px;margin-bottom:16px">';
-    html += '<div style="margin-bottom:12px"><strong>Dispositivo atual:</strong></div>';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--bg2);border-radius:8px">';
-    html += '<div><div style="font-weight:600">' + getDeviceName() + '</div><div style="font-size:12px;color:var(--text3)">ID: ' + getDeviceId().substr(0, 20) + '...</div></div>';
-    html += '<button class="btn btn-sm btn-red" onclick="removerEsteDispositivo()" style="margin:0">Remover</button></div></div>';
-    
-    html += '<small style="color:var(--text3);display:block;margin-bottom:16px">Ao remover este dispositivo, você poderá ativar em outro.</small>';
-    html += '<button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>';
-    document.getElementById('modal-body').innerHTML = html;
-    document.getElementById('modal-overlay').classList.add('show');
-}
-
-async function removerEsteDispositivo() {
-    var key = localStorage.getItem('kayla_pro_key');
-    var deviceId = getDeviceId();
-    
-    if (!confirm('Remover este dispositivo? Você precisará ativar a key novamente.')) return;
-    
-    var resultado = await removerDispositivo(key, deviceId);
-    
-    if (resultado.success) {
-        localStorage.removeItem('kayla_pro');
-        localStorage.removeItem('kayla_pro_key');
-        localStorage.removeItem('kayla_pro_devices');
-        LIMITES.proAtivo = false;
-        toast('✅ Dispositivo removido!', 'success');
-        fecharModal();
-        atualizarBadgePlano();
-        mudarAba('settings');
-    } else {
-        toast('❌ ' + resultado.message, 'error');
-    }
-}
-    }
-    
-    btn.innerText = texto;
-    btn.disabled = false;
-}
-
-// ============ AUXILIARES ============
 function fecharModal(e) {
     if (!e || e.target.id === 'modal-overlay') {
         document.getElementById('modal-overlay').classList.remove('show');

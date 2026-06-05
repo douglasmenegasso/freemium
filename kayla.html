@@ -1162,7 +1162,7 @@ async function salvarCliente(clienteId) {
         telefone: document.getElementById('cliente-telefone').value.trim(), 
         endereco: document.getElementById('cliente-endereco').value.trim(),
         user_id: currentUser ? currentUser.id : 'local',
-        updated_at: new Date().toISOString()
+       
     };
     
     if (clienteId) {

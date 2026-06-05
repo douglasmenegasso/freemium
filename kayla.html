@@ -20,7 +20,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .login-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
 .login-sub { font-size: 13px; color: var(--text2); margin-bottom: 24px; }
 
-.btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; cursor: pointer; border: none; width: 100%; margin-bottom: 12px; }
+.btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; cursor: pointer; border: none; width: 100%; margin-bottom: 12px; pointer-events: auto; -webkit-user-select: none; user-select: none; }
 .btn:active { transform: scale(0.97); }
 .btn-primary { background: var(--accent); color: #fff; }
 .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
